@@ -65,6 +65,26 @@ body { font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif; backgrou
 .date-label { font-size: 10px; color: #A8A29E; margin-bottom: 3px; }
 .date-val { font-size: 13px; font-weight: 700; }
 
+/* Payments */
+.payments-section { margin-bottom: 14px; }
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.section-title { font-size: 11px; font-weight: 700; color: #A8A29E; letter-spacing: 1px; }
+.add-payment-btn { background: #F8F7F4; border: 1.5px solid #E7E5E0; border-radius: 8px; padding: 4px 10px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; color: #57534E; }
+.payment-summary { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 10px; }
+.pay-sum-box { border-radius: 10px; padding: 8px 10px; text-align: center; }
+.pay-sum-label { font-size: 9px; color: #78716C; margin-bottom: 3px; font-weight: 700; }
+.pay-sum-val { font-size: 13px; font-weight: 900; }
+.pay-progress { height: 6px; background: #F0EEE9; border-radius: 3px; margin-bottom: 10px; overflow: hidden; }
+.pay-progress-bar { height: 100%; background: #10B981; border-radius: 3px; transition: width 0.3s; }
+.payment-item { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: #F8F7F4; border-radius: 12px; margin-bottom: 6px; }
+.pay-check { width: 22px; height: 22px; border-radius: 6px; border: 2px solid #E7E5E0; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; transition: all 0.2s; }
+.pay-check.done { background: #10B981; border-color: #10B981; color: #fff; }
+.pay-info { flex: 1; }
+.pay-name { font-size: 13px; font-weight: 700; }
+.pay-amount { font-size: 12px; color: #78716C; margin-top: 1px; }
+.pay-del { background: none; border: none; color: #C7C3BC; font-size: 16px; cursor: pointer; padding: 2px 6px; }
+
+/* Stages */
 .stages-section { margin-bottom: 14px; }
 .stages-title { font-size: 11px; font-weight: 700; color: #A8A29E; margin-bottom: 8px; letter-spacing: 1px; }
 .stage-row { border-radius: 12px; margin-bottom: 6px; overflow: hidden; border: 1.5px solid #F0EEE9; }
@@ -80,9 +100,12 @@ body { font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif; backgrou
 .stage-note-ta:focus { border-color: #D4A853; }
 .stage-note-save { margin-top: 8px; background: #1C1917; color: #fff; border: none; border-radius: 10px; padding: 9px 18px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
 
+/* Card actions */
 .card-actions { display: flex; gap: 8px; }
 .edit-btn { flex: 1; background: #1C1917; color: #fff; border: none; border-radius: 12px; padding: 11px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
 .del-btn { background: #FEF2F2; color: #EF4444; border: none; border-radius: 12px; padding: 11px 16px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.order-btns { display: flex; gap: 4px; }
+.order-btn { background: #F8F7F4; border: 1.5px solid #E7E5E0; border-radius: 10px; width: 38px; height: 38px; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
 .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; display: none; align-items: flex-end; }
 .overlay.show { display: flex; }
@@ -125,6 +148,12 @@ body { font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif; backgrou
 .loading-spinner { width: 40px; height: 40px; border: 3px solid rgba(212,168,83,0.3); border-top-color: #D4A853; border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 16px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .loading-text { color: #A8A29E; font-size: 14px; }
+
+/* Payment sheet */
+.pay-sheet-row { display: flex; gap: 8px; margin-bottom: 10px; }
+.pay-sheet-input { flex: 1; background: #F8F7F4; border: 1.5px solid #E7E5E0; border-radius: 12px; padding: 11px 12px; font-size: 14px; font-family: inherit; direction: rtl; outline: none; }
+.pay-sheet-input:focus { border-color: #D4A853; }
+.pay-sheet-add { background: #1C1917; color: #fff; border: none; border-radius: 12px; padding: 11px 16px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
 </style>
 </head>
 <body>
@@ -170,7 +199,6 @@ body { font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif; backgrou
       <div class="stat"><div class="stat-val" id="stat-completed" style="color:#10B981">0</div><div class="stat-label">مكتمل</div></div>
     </div>
   </div>
-
   <div class="tabs">
     <button class="tab active" onclick="setTab('all',this)">الكل</button>
     <button class="tab" onclick="setTab('pending_approval',this)">⏳ بانتظار الاعتماد</button>
@@ -188,6 +216,26 @@ body { font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif; backgrou
     <div class="sheet-handle"></div>
     <div class="sheet-title">تغيير حالة المشروع</div>
     <div id="status-buttons"></div>
+  </div>
+</div>
+
+<!-- Add Payment Sheet -->
+<div class="overlay" id="payment-overlay" onclick="closePaymentSheet()">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">💰 إضافة دفعة</div>
+    <div class="form-group">
+      <label class="form-label">اسم الدفعة</label>
+      <input class="form-input" id="pay-name-input" placeholder="مثال: دفعة أولى، عربون...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">المبلغ</label>
+      <input class="form-input" id="pay-amount-input" type="number" placeholder="0">
+    </div>
+    <div class="form-btns">
+      <button class="form-cancel" onclick="closePaymentSheet()">إلغاء</button>
+      <button class="form-save" onclick="confirmAddPayment()">إضافة</button>
+    </div>
   </div>
 </div>
 
@@ -247,7 +295,7 @@ body { font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif; backgrou
       <input class="form-input" id="f-client" placeholder="مثال: محمد العمري">
     </div>
     <div class="form-group">
-      <label class="form-label">التسعيرة</label>
+      <label class="form-label">التسعيرة الإجمالية</label>
       <div class="price-row">
         <input class="form-input" id="f-price" type="number" placeholder="0" style="flex:1">
         <select class="form-select" id="f-currency">
@@ -319,9 +367,9 @@ onAuthStateChanged(auth, user => {
       render();
     });
     window._dbRef = dbRef;
+    window._uid = user.uid;
     window._db = db;
     window._ref = ref;
-    window._uid = user.uid;
   } else {
     currentUser = null;
     document.getElementById("login-screen").style.display = "flex";
@@ -337,19 +385,13 @@ window.signInWithGoogle = async () => {
     document.getElementById("login-error").textContent = "حدث خطأ، حاول مرة ثانية";
   }
 };
-
-window.doSignOut = async () => {
-  await fbSignOut(auth);
-  closeUserMenu();
-};
-
+window.doSignOut = async () => { await fbSignOut(auth); closeUserMenu(); };
 window._saveToDb = async () => {
   if (!window._dbRef) return;
   const obj = {};
   window._projects.forEach(p => { obj[p.id] = p; });
   await set(window._dbRef, obj);
 };
-
 window._deleteFromDb = async (id) => {
   if (!window._uid) return;
   await remove(ref(db, `users/${window._uid}/projects/${id}`));
@@ -370,6 +412,7 @@ const STAGES = [
 
 let currentTab = "all", expandedId = null, openStageNotes = {};
 let statusTargetId = null, deleteTargetId = null, editId = null, formStatus = "first_meeting";
+let paymentTargetId = null;
 
 function getStage(id) { return STAGES.find(s => s.id === id) || STAGES[0]; }
 function esc(s) { return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
@@ -386,37 +429,40 @@ function daysLeft(d) {
 }
 function showToast(msg) {
   const t = document.getElementById("toast");
-  t.textContent = msg;
-  t.classList.add("show");
+  t.textContent = msg; t.classList.add("show");
   setTimeout(() => t.classList.remove("show"), 2000);
 }
 function setTab(tab, el) {
   currentTab = tab;
   document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-  el.classList.add("active");
-  render();
+  el.classList.add("active"); render();
 }
-function render() {
-  const projects = window._projects || [];
-  document.getElementById("stat-total").textContent = projects.length;
-  document.getElementById("stat-pending").textContent = projects.filter(p => p.status==="pending_approval").length;
-  document.getElementById("stat-active").textContent = projects.filter(p => p.status!=="completed"&&p.status!=="pending_approval").length;
-  document.getElementById("stat-completed").textContent = projects.filter(p => p.status==="completed").length;
 
-  const filtered = projects.filter(p => {
+function getFilteredIndices() {
+  const projects = window._projects || [];
+  return projects.map((p, i) => ({p, i})).filter(({p}) => {
     if (currentTab==="all") return true;
     if (currentTab==="pending_approval") return p.status==="pending_approval";
     if (currentTab==="completed") return p.status==="completed";
     if (currentTab==="active") return p.status!=="completed"&&p.status!=="pending_approval";
   });
+}
 
+function render() {
+  const projects = window._projects || [];
+  document.getElementById("stat-total").textContent = projects.length;
+  document.getElementById("stat-pending").textContent = projects.filter(p=>p.status==="pending_approval").length;
+  document.getElementById("stat-active").textContent = projects.filter(p=>p.status!=="completed"&&p.status!=="pending_approval").length;
+  document.getElementById("stat-completed").textContent = projects.filter(p=>p.status==="completed").length;
+
+  const filtered = getFilteredIndices();
   const list = document.getElementById("list");
   if (!filtered.length) {
     list.innerHTML = `<div class="empty"><div class="empty-icon">🗂️</div><div class="empty-title">لا توجد مشاريع</div><div class="empty-sub">اضغط + لإضافة مشروع جديد</div></div>`;
     return;
   }
 
-  list.innerHTML = filtered.map(pr => {
+  list.innerHTML = filtered.map(({p: pr, i: realIdx}, filtIdx) => {
     const stage = getStage(pr.status);
     const days = daysLeft(pr.deliveryDate);
     const isExp = expandedId === pr.id;
@@ -428,6 +474,48 @@ function render() {
     }
     const priceStr = pr.price ? Number(pr.price).toLocaleString()+" "+(pr.currency||"SAR") : "—";
 
+    // Payments
+    const payments = pr.payments || [];
+    const totalPaid = payments.filter(p=>p.done).reduce((s,p)=>s+Number(p.amount||0),0);
+    const totalAmount = payments.reduce((s,p)=>s+Number(p.amount||0),0);
+    const remaining = Number(pr.price||0) - totalPaid;
+    const pct = Number(pr.price||0)>0 ? Math.min(100, Math.round(totalPaid/Number(pr.price||0)*100)) : 0;
+
+    const paymentsHtml = `
+      <div class="payments-section">
+        <div class="section-header">
+          <span class="section-title">💰 الدفعات</span>
+          <button class="add-payment-btn" onclick="event.stopPropagation();openPaymentSheet('${pr.id}')">+ إضافة دفعة</button>
+        </div>
+        ${payments.length ? `
+          <div class="payment-summary">
+            <div class="pay-sum-box" style="background:#ECFDF5">
+              <div class="pay-sum-label">المستلم</div>
+              <div class="pay-sum-val" style="color:#10B981">${totalPaid.toLocaleString()}</div>
+            </div>
+            <div class="pay-sum-box" style="background:#FEF3C7">
+              <div class="pay-sum-label">المتبقي</div>
+              <div class="pay-sum-val" style="color:#F59E0B">${remaining.toLocaleString()}</div>
+            </div>
+            <div class="pay-sum-box" style="background:#F0F9FF">
+              <div class="pay-sum-label">الإجمالي</div>
+              <div class="pay-sum-val" style="color:#0EA5E9">${Number(pr.price||0).toLocaleString()}</div>
+            </div>
+          </div>
+          <div class="pay-progress"><div class="pay-progress-bar" style="width:${pct}%"></div></div>
+          ${payments.map((pay,pi) => `
+            <div class="payment-item">
+              <div class="pay-check ${pay.done?'done':''}" onclick="event.stopPropagation();togglePayment('${pr.id}',${pi})">${pay.done?'✓':''}</div>
+              <div class="pay-info">
+                <div class="pay-name">${esc(pay.name)}</div>
+                <div class="pay-amount">${Number(pay.amount||0).toLocaleString()} ${pr.currency||'SAR'}</div>
+              </div>
+              <button class="pay-del" onclick="event.stopPropagation();deletePayment('${pr.id}',${pi})">✕</button>
+            </div>`).join("")}
+        ` : `<div style="color:#A8A29E;font-size:13px;text-align:center;padding:10px 0">لا توجد دفعات بعد</div>`}
+      </div>`;
+
+    // Stage notes
     const stagesHtml = STAGES.map(s => {
       const note = (pr.stageNotes&&pr.stageNotes[s.id])||"";
       const isOpen = openStageNotes[pr.id]===s.id;
@@ -447,13 +535,21 @@ function render() {
       </div>`;
     }).join("");
 
+    const isFirst = filtIdx === 0;
+    const isLast = filtIdx === filtered.length - 1;
+
     const detailsHtml = isExp ? `<div class="card-details">
       <div class="dates-grid">
         <div class="date-box"><div class="date-label">تاريخ البدء</div><div class="date-val">${formatDate(pr.startDate)}</div></div>
         <div class="date-box"><div class="date-label">التسليم النهائي</div><div class="date-val">${formatDate(pr.deliveryDate)}</div></div>
       </div>
+      ${paymentsHtml}
       <div class="stages-section"><div class="stages-title">ملاحظات المراحل</div>${stagesHtml}</div>
       <div class="card-actions">
+        <div class="order-btns">
+          <button class="order-btn" onclick="moveProject('${pr.id}',-1)" ${isFirst?'style="opacity:0.3;pointer-events:none"':''}>↑</button>
+          <button class="order-btn" onclick="moveProject('${pr.id}',1)" ${isLast?'style="opacity:0.3;pointer-events:none"':''}>↓</button>
+        </div>
         <button class="edit-btn" onclick="openEditForm('${pr.id}')">✏️ تعديل</button>
         <button class="del-btn" onclick="openDelete('${pr.id}')">🗑️</button>
       </div>
@@ -484,12 +580,64 @@ function toggleStageNote(pid,sid) { openStageNotes[pid]=openStageNotes[pid]===si
 async function saveStageNote(pid,sid) {
   const ta = document.getElementById(`sn-${pid}-${sid}`);
   if (!ta) return;
-  window._projects = window._projects.map(p => p.id!==pid?p:{...p,stageNotes:{...(p.stageNotes||{}),[sid]:ta.value}});
-  await window._saveToDb();
-  showToast("✓ تم الحفظ");
-  render();
+  window._projects = window._projects.map(p=>p.id!==pid?p:{...p,stageNotes:{...(p.stageNotes||{}),[sid]:ta.value}});
+  await window._saveToDb(); showToast("✓ تم الحفظ"); render();
 }
 
+// Payments
+function openPaymentSheet(id) {
+  paymentTargetId = id;
+  document.getElementById("pay-name-input").value = "";
+  document.getElementById("pay-amount-input").value = "";
+  document.getElementById("payment-overlay").classList.add("show");
+}
+function closePaymentSheet() { document.getElementById("payment-overlay").classList.remove("show"); }
+
+async function confirmAddPayment() {
+  const name = document.getElementById("pay-name-input").value.trim();
+  const amount = document.getElementById("pay-amount-input").value;
+  if (!name) { showToast("⚠️ أدخل اسم الدفعة"); return; }
+  window._projects = window._projects.map(p => {
+    if (p.id !== paymentTargetId) return p;
+    const payments = [...(p.payments||[]), {name, amount: Number(amount)||0, done: false}];
+    return {...p, payments};
+  });
+  await window._saveToDb();
+  closePaymentSheet(); showToast("✓ تمت الإضافة"); render();
+}
+
+async function togglePayment(pid, idx) {
+  window._projects = window._projects.map(p => {
+    if (p.id !== pid) return p;
+    const payments = (p.payments||[]).map((pay,i)=>i===idx?{...pay,done:!pay.done}:pay);
+    return {...p, payments};
+  });
+  await window._saveToDb(); render();
+}
+
+async function deletePayment(pid, idx) {
+  window._projects = window._projects.map(p => {
+    if (p.id !== pid) return p;
+    const payments = (p.payments||[]).filter((_,i)=>i!==idx);
+    return {...p, payments};
+  });
+  await window._saveToDb(); render();
+}
+
+// Reorder
+async function moveProject(id, dir) {
+  const projects = window._projects;
+  const idx = projects.findIndex(p=>p.id===id);
+  if (idx===-1) return;
+  const newIdx = idx + dir;
+  if (newIdx<0||newIdx>=projects.length) return;
+  const arr = [...projects];
+  [arr[idx], arr[newIdx]] = [arr[newIdx], arr[idx]];
+  window._projects = arr;
+  await window._saveToDb(); render();
+}
+
+// Status
 function openStatusSheet(id) {
   statusTargetId = id;
   document.getElementById("status-buttons").innerHTML = STAGES.map(s =>
@@ -501,10 +649,10 @@ function openStatusSheet(id) {
 function closeStatusSheet() { document.getElementById("status-overlay").classList.remove("show"); }
 async function changeStatus(status) {
   window._projects = window._projects.map(p=>p.id===statusTargetId?{...p,status}:p);
-  await window._saveToDb();
-  closeStatusSheet();
+  await window._saveToDb(); closeStatusSheet();
 }
 
+// Delete
 function openDelete(id) { deleteTargetId=id; document.getElementById("delete-overlay").classList.add("show"); }
 function closeDelete() { document.getElementById("delete-overlay").classList.remove("show"); }
 async function confirmDelete() {
@@ -512,9 +660,11 @@ async function confirmDelete() {
   expandedId=null; closeDelete();
 }
 
+// User
 function openUserMenu() { document.getElementById("user-overlay").classList.add("show"); }
 function closeUserMenu() { document.getElementById("user-overlay").classList.remove("show"); }
 
+// IO
 function openIO() {
   document.getElementById("export-code").textContent = btoa(unescape(encodeURIComponent(JSON.stringify(window._projects))));
   document.getElementById("import-ta").value = "";
@@ -532,11 +682,11 @@ async function doImport() {
     const data = JSON.parse(decodeURIComponent(escape(atob(raw))));
     if (!Array.isArray(data)) throw 0;
     window._projects = data;
-    await window._saveToDb();
-    closeIO(); showToast("✓ تم الاستيراد");
+    await window._saveToDb(); closeIO(); showToast("✓ تم الاستيراد");
   } catch(e) { showToast("⚠️ الكود غير صحيح"); }
 }
 
+// Form
 function buildStatusSelect() {
   document.getElementById("status-select").innerHTML = STAGES.map(s =>
     `<button class="status-option" style="background:${formStatus===s.id?s.bg:"#F8F7F4"};color:${formStatus===s.id?s.dark:"#78716C"};border-color:${formStatus===s.id?s.color:"transparent"}" onclick="selectFormStatus('${s.id}')">
@@ -555,7 +705,7 @@ function openForm() {
   document.getElementById("form-overlay").classList.add("show");
 }
 function openEditForm(id) {
-  const pr = window._projects.find(p=>p.id===id); if(!pr) return;
+  const pr=window._projects.find(p=>p.id===id); if(!pr) return;
   editId=id; formStatus=pr.status;
   document.getElementById("f-name").value=pr.name;
   document.getElementById("f-client").value=pr.client;
@@ -574,19 +724,18 @@ async function saveProject() {
   const name=document.getElementById("f-name").value.trim();
   const client=document.getElementById("f-client").value.trim();
   if (!name||!client) { alert("يرجى إدخال اسم المشروع واسم العميل"); return; }
-  const data = { name, client,
-    price: document.getElementById("f-price").value,
-    currency: document.getElementById("f-currency").value,
-    startDate: document.getElementById("f-start").value,
-    deliveryDate: document.getElementById("f-delivery").value,
-    status: formStatus };
+  const data={name,client,
+    price:document.getElementById("f-price").value,
+    currency:document.getElementById("f-currency").value,
+    startDate:document.getElementById("f-start").value,
+    deliveryDate:document.getElementById("f-delivery").value,
+    status:formStatus};
   if (editId) {
-    window._projects = window._projects.map(p=>p.id===editId?{...p,...data}:p);
+    window._projects=window._projects.map(p=>p.id===editId?{...p,...data}:p);
   } else {
-    window._projects.push({...data, id:Date.now().toString(), stageNotes:{}});
+    window._projects.push({...data,id:Date.now().toString(),stageNotes:{},payments:[]});
   }
-  await window._saveToDb();
-  closeForm(); showToast("✓ تم الحفظ");
+  await window._saveToDb(); closeForm(); showToast("✓ تم الحفظ");
 }
 </script>
 </body>
