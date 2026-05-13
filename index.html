@@ -67,22 +67,33 @@ body { font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif; backgrou
 
 /* Payments */
 .payments-section { margin-bottom: 14px; }
-.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-.section-title { font-size: 11px; font-weight: 700; color: #A8A29E; letter-spacing: 1px; }
-.add-payment-btn { background: #F8F7F4; border: 1.5px solid #E7E5E0; border-radius: 8px; padding: 4px 10px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; color: #57534E; }
-.payment-summary { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 10px; }
-.pay-sum-box { border-radius: 10px; padding: 8px 10px; text-align: center; }
-.pay-sum-label { font-size: 9px; color: #78716C; margin-bottom: 3px; font-weight: 700; }
-.pay-sum-val { font-size: 13px; font-weight: 900; }
-.pay-progress { height: 6px; background: #F0EEE9; border-radius: 3px; margin-bottom: 10px; overflow: hidden; }
-.pay-progress-bar { height: 100%; background: #10B981; border-radius: 3px; transition: width 0.3s; }
-.payment-item { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: #F8F7F4; border-radius: 12px; margin-bottom: 6px; }
-.pay-check { width: 22px; height: 22px; border-radius: 6px; border: 2px solid #E7E5E0; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; transition: all 0.2s; }
-.pay-check.done { background: #10B981; border-color: #10B981; color: #fff; }
-.pay-info { flex: 1; }
-.pay-name { font-size: 13px; font-weight: 700; }
-.pay-amount { font-size: 12px; color: #78716C; margin-top: 1px; }
-.pay-del { background: none; border: none; color: #C7C3BC; font-size: 16px; cursor: pointer; padding: 2px 6px; }
+.payments-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.payments-title { font-size: 11px; font-weight: 700; color: #A8A29E; letter-spacing: 1px; }
+.add-payment-btn { background: #D4A853; color: #1C1917; border: none; border-radius: 8px; padding: 4px 10px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.payment-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.payment-sum-box { border-radius: 10px; padding: 10px 12px; }
+.payment-sum-label { font-size: 10px; margin-bottom: 3px; font-weight: 700; }
+.payment-sum-val { font-size: 15px; font-weight: 900; }
+.payment-progress-wrap { margin-bottom: 10px; }
+.payment-progress-bg { background: #F0EEE9; border-radius: 20px; height: 8px; overflow: hidden; }
+.payment-progress-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, #D4A853, #F59E0B); transition: width 0.4s; }
+.payment-progress-label { font-size: 11px; font-weight: 700; color: #78716C; margin-top: 4px; text-align: left; direction: ltr; }
+.payment-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+.payment-item { background: #F8F7F4; border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.payment-item-right { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.payment-item-amount { font-size: 14px; font-weight: 900; }
+.payment-item-label { font-size: 11px; color: #78716C; font-weight: 600; }
+.payment-item-date { font-size: 11px; color: #A8A29E; }
+.payment-item-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+.payment-status-btn { border: none; border-radius: 8px; padding: 5px 8px; font-size: 11px; cursor: pointer; font-family: inherit; font-weight: 700; white-space: nowrap; }
+.payment-del-btn { background: #FEF2F2; color: #EF4444; border: none; border-radius: 8px; padding: 5px 8px; font-size: 12px; cursor: pointer; font-family: inherit; font-weight: 700; flex-shrink: 0; }
+.payment-form { background: #F8F7F4; border-radius: 12px; padding: 12px; margin-top: 6px; display: none; }
+.payment-form.open { display: block; }
+.payment-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.payment-input { width: 100%; background: #fff; border: 1.5px solid #E7E5E0; border-radius: 10px; padding: 9px 11px; font-size: 14px; font-family: inherit; direction: rtl; outline: none; }
+.payment-input:focus { border-color: #D4A853; }
+.payment-save-btn { width: 100%; background: #1C1917; color: #fff; border: none; border-radius: 10px; padding: 10px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.payment-status-select { width: 100%; background: #fff; border: 1.5px solid #E7E5E0; border-radius: 10px; padding: 9px 11px; font-size: 13px; font-family: inherit; outline: none; }
 
 /* Stages */
 .stages-section { margin-bottom: 14px; }
@@ -108,14 +119,21 @@ body { font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif; backgrou
 .stage-time-stat { background: #F8F7F4; border-radius: 10px; padding: 8px 6px; text-align: center; }
 .stage-time-stat-label { font-size: 9px; color: #78716C; margin-bottom: 3px; font-weight: 700; }
 .stage-time-stat-val { font-size: 12px; font-weight: 900; color: #1C1917; }
+.stage-time-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.stage-time-chip { background: #F8F7F4; border: 1.5px solid #E7E5E0; border-radius: 20px; padding: 4px 10px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; color: #57534E; }
+.stage-time-chip:hover { border-color: #D4A853; color: #92400E; background: #FEF3C7; }
+.stage-timing-summary { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.stage-timing-pill { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 10px; }
+
 
 /* Card actions */
 .card-actions { display: flex; gap: 8px; }
 .edit-btn { flex: 1; background: #1C1917; color: #fff; border: none; border-radius: 12px; padding: 11px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
 .del-btn { background: #FEF2F2; color: #EF4444; border: none; border-radius: 12px; padding: 11px 16px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
-.order-btns { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
-.order-btn { background: #F8F7F4; border: 1.5px solid #E7E5E0; border-radius: 9px; width: 32px; height: 32px; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #57534E; }
-.order-btn:disabled { opacity: 0.3; cursor: default; }
+.reorder-btns { display: flex; flex-direction: column; gap: 2px; margin-left: 6px; flex-shrink: 0; }
+.reorder-btn { background: #F3F2EF; border: none; border-radius: 6px; width: 26px; height: 22px; font-size: 12px; cursor: pointer; color: #78716C; display: flex; align-items: center; justify-content: center; line-height: 1; }
+.reorder-btn:active { background: #D4A853; color: #1C1917; }
+.reorder-btn:disabled { opacity: 0.2; cursor: default; }
 
 .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; display: none; align-items: flex-end; }
 .overlay.show { display: flex; }
@@ -374,6 +392,7 @@ onAuthStateChanged(auth, user => {
     onValue(dbRef, snap => {
       const data = snap.val();
       window._projects = data ? Object.values(data) : [];
+      window._projects.forEach((p, i) => { if (p.manualOrder === undefined) p.manualOrder = i * 10; });
       render();
     });
     window._dbRef = dbRef;
@@ -493,14 +512,35 @@ function setTab(tab, el) {
   el.classList.add("active"); render();
 }
 
-function getFilteredIndices() {
+function statusPriority(status) {
+  if (status !== "completed" && status !== "pending_approval") return 0;
+  if (status === "pending_approval") return 1;
+  return 2;
+}
+
+function getFilteredProjects() {
   const projects = window._projects || [];
-  return projects.map((p, i) => ({p, i})).filter(({p}) => {
-    if (currentTab==="all") return true;
-    if (currentTab==="pending_approval") return p.status==="pending_approval";
-    if (currentTab==="completed") return p.status==="completed";
-    if (currentTab==="active") return p.status!=="completed"&&p.status!=="pending_approval";
+  let filtered = projects.filter(p => {
+    if (currentTab === "all") return true;
+    if (currentTab === "pending_approval") return p.status === "pending_approval";
+    if (currentTab === "completed") return p.status === "completed";
+    if (currentTab === "active") return p.status !== "completed" && p.status !== "pending_approval";
+    return true;
   });
+
+  filtered = [...filtered].sort((a, b) => {
+    if (currentTab === "all") {
+      const pa = statusPriority(a.status), pb = statusPriority(b.status);
+      if (pa !== pb) return pa - pb;
+    }
+    return (a.manualOrder ?? 9999) - (b.manualOrder ?? 9999);
+  });
+
+  return filtered;
+}
+
+function paymentIsReceived(pay) {
+  return pay.done !== false;
 }
 
 function render() {
@@ -510,17 +550,20 @@ function render() {
   document.getElementById("stat-active").textContent = projects.filter(p=>p.status!=="completed"&&p.status!=="pending_approval").length;
   document.getElementById("stat-completed").textContent = projects.filter(p=>p.status==="completed").length;
 
-  const filtered = getFilteredIndices();
+  const filtered = getFilteredProjects();
   const list = document.getElementById("list");
   if (!filtered.length) {
     list.innerHTML = `<div class="empty"><div class="empty-icon">🗂️</div><div class="empty-title">لا توجد مشاريع</div><div class="empty-sub">اضغط + لإضافة مشروع جديد</div></div>`;
     return;
   }
 
-  list.innerHTML = filtered.map(({p: pr, i: realIdx}, filtIdx) => {
+  list.innerHTML = filtered.map((pr, idx) => {
     const stage = getStage(pr.status);
     const days = daysLeft(pr.deliveryDate);
     const isExp = expandedId === pr.id;
+    const isFirst = idx === 0;
+    const isLast = idx === filtered.length - 1;
+
     let daysHtml = "";
     if (days !== null) {
       const c = days<0?"#EF4444":days<=7?"#F59E0B":"#78716C";
@@ -529,94 +572,151 @@ function render() {
     }
     const priceStr = pr.price ? Number(pr.price).toLocaleString()+" "+(pr.currency||"SAR") : "—";
 
-    // Payments
-    const payments = pr.payments || [];
-    const totalPaid = payments.filter(p=>p.done).reduce((s,p)=>s+Number(p.amount||0),0);
-    const totalAmount = payments.reduce((s,p)=>s+Number(p.amount||0),0);
-    const remaining = Number(pr.price||0) - totalPaid;
-    const pct = Number(pr.price||0)>0 ? Math.min(100, Math.round(totalPaid/Number(pr.price||0)*100)) : 0;
+    const payments0 = pr.payments || [];
+    const totalPaid0 = payments0.filter(paymentIsReceived).reduce((s,p)=>s+(parseFloat(p.amount)||0),0);
+    const totalPrice0 = parseFloat(pr.price)||0;
+    const paidPct0 = totalPrice0>0 ? Math.min(100, Math.round((totalPaid0/totalPrice0)*100)) : null;
+    const paymentBadge = (pr.price && payments0.length>0) ? `<span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:10px;background:${paidPct0===100?"#ECFDF5":"#FEF3C7"};color:${paidPct0===100?"#065F46":"#92400E"}">💰 ${paidPct0}% مُستلم</span>` : "";
 
-    const paymentsHtml = `
-      <div class="payments-section">
-        <div class="section-header">
-          <span class="section-title">💰 الدفعات</span>
-          <button class="add-payment-btn" onclick="event.stopPropagation();openPaymentSheet('${pr.id}')">+ إضافة دفعة</button>
-        </div>
-        ${payments.length ? `
-          <div class="payment-summary">
-            <div class="pay-sum-box" style="background:#ECFDF5">
-              <div class="pay-sum-label">المستلم</div>
-              <div class="pay-sum-val" style="color:#10B981">${totalPaid.toLocaleString()}</div>
-            </div>
-            <div class="pay-sum-box" style="background:#FEF3C7">
-              <div class="pay-sum-label">المتبقي</div>
-              <div class="pay-sum-val" style="color:#F59E0B">${remaining.toLocaleString()}</div>
-            </div>
-            <div class="pay-sum-box" style="background:#F0F9FF">
-              <div class="pay-sum-label">الإجمالي</div>
-              <div class="pay-sum-val" style="color:#0EA5E9">${Number(pr.price||0).toLocaleString()}</div>
-            </div>
-          </div>
-          <div class="pay-progress"><div class="pay-progress-bar" style="width:${pct}%"></div></div>
-          ${payments.map((pay,pi) => `
-            <div class="payment-item">
-              <div class="pay-check ${pay.done?'done':''}" onclick="event.stopPropagation();togglePayment('${pr.id}',${pi})">${pay.done?'✓':''}</div>
-              <div class="pay-info">
-                <div class="pay-name">${esc(pay.name)}</div>
-                <div class="pay-amount">${Number(pay.amount||0).toLocaleString()} ${pr.currency||'SAR'}</div>
-              </div>
-              <button class="pay-del" onclick="event.stopPropagation();deletePayment('${pr.id}',${pi})">✕</button>
-            </div>`).join("")}
-        ` : `<div style="color:#A8A29E;font-size:13px;text-align:center;padding:10px 0">لا توجد دفعات بعد</div>`}
-      </div>`;
-
-    // Stage notes + stage timeline
     const stagesHtml = STAGES.map(s => {
-      const note = (pr.stageNotes&&pr.stageNotes[s.id])||"";
-      const timeline = (pr.stageTimeline&&pr.stageTimeline[s.id])||{};
-      const start = timeline.start || "";
-      const end = timeline.end || "";
-      const isOpen = openStageNotes[pr.id]===s.id;
+      const note = (pr.stageNotes && pr.stageNotes[s.id]) || "";
+      const oldTimeline = (pr.stageTimeline && pr.stageTimeline[s.id]) || {};
+      const stageTiming = (pr.stageTiming && pr.stageTiming[s.id]) || {};
+      const plannedDays = stageTiming.plannedDays || "";
+      const startDate = stageTiming.startDate || oldTimeline.start || "";
+      const endDate = stageTiming.endDate || oldTimeline.end || "";
+      const isOpen = openStageNotes[pr.id] === s.id;
+      const hasNote = note.trim().length > 0;
+
+      let actualDays = null;
+      if (startDate && endDate) {
+        const diff = Math.ceil((new Date(endDate+"T00:00:00") - new Date(startDate+"T00:00:00")) / 86400000) + 1;
+        actualDays = diff >= 1 ? diff : null;
+      } else if (startDate && !endDate) {
+        const today = new Date(); today.setHours(0,0,0,0);
+        const diff = Math.ceil((today - new Date(startDate+"T00:00:00")) / 86400000) + 1;
+        actualDays = diff >= 1 ? diff : 0;
+      }
+
+      let timingPills = "";
+      if (plannedDays) {
+        timingPills += `<span class="stage-timing-pill" style="background:#EEF2FF;color:#3730A3">🗓 ${plannedDays} يوم مخصص</span>`;
+      }
+      if (actualDays !== null) {
+        const over = plannedDays && actualDays > parseInt(plannedDays);
+        timingPills += `<span class="stage-timing-pill" style="background:${over?"#FEF2F2":"#ECFDF5"};color:${over?"#B91C1C":"#065F46"}">⏱ ${actualDays} يوم فعلي</span>`;
+      }
+
       return `<div class="stage-row">
         <div class="stage-row-header" onclick="toggleStageNote('${pr.id}','${s.id}')">
-          <div class="stage-row-left">
-            <span class="stage-row-emoji">${s.emoji}</span>
-            <span>
+          <div class="stage-row-left" style="flex-direction:column;align-items:flex-start;gap:4px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="stage-row-emoji">${s.emoji}</span>
               <span class="stage-row-label" style="color:${s.dark}">${s.label}</span>
-              <span class="stage-time-meta">${stageTimeText(start,end)}</span>
-            </span>
-            ${(note.trim()||start||end)?`<span class="stage-row-has-note"></span>`:""}
+              ${hasNote ? `<span class="stage-row-has-note"></span>` : ""}
+            </div>
+            ${timingPills ? `<div class="stage-timing-summary">${timingPills}</div>` : ""}
           </div>
           <span class="stage-row-arrow" style="transform:${isOpen?"rotate(180deg)":"rotate(0deg)"}">▾</span>
         </div>
         <div class="stage-note-body ${isOpen?"open":""}">
-          ${stageTimeStatsHtml(start,end)}
+          <div style="margin-bottom:8px;font-size:11px;font-weight:700;color:#A8A29E;letter-spacing:1px">⏱ توقيت المرحلة</div>
           <div class="stage-time-grid">
             <div class="stage-time-box">
-              <div class="stage-time-label">من تاريخ</div>
-              <input class="stage-time-input" id="ststart-${pr.id}-${s.id}" type="date" value="${esc(start)}">
+              <div class="stage-time-label">الوقت المخصص (أيام)</div>
+              <input class="stage-time-input" type="number" min="1" id="st-plan-${pr.id}-${s.id}" value="${esc(plannedDays)}" placeholder="0">
             </div>
-            <div class="stage-time-box">
-              <div class="stage-time-label">إلى تاريخ</div>
-              <input class="stage-time-input" id="stend-${pr.id}-${s.id}" type="date" value="${esc(end)}">
+            <div style="display:flex;flex-direction:column;gap:4px;justify-content:center">
+              <div class="stage-time-chips" style="margin-bottom:0">
+                <button class="stage-time-chip" onclick="setPlanned('${pr.id}','${s.id}',3)">3</button>
+                <button class="stage-time-chip" onclick="setPlanned('${pr.id}','${s.id}',7)">7</button>
+                <button class="stage-time-chip" onclick="setPlanned('${pr.id}','${s.id}',14)">14</button>
+                <button class="stage-time-chip" onclick="setPlanned('${pr.id}','${s.id}',30)">30</button>
+              </div>
             </div>
           </div>
+          <div class="stage-time-grid">
+            <div class="stage-time-box">
+              <div class="stage-time-label">تاريخ البدء الفعلي</div>
+              <input class="stage-time-input" type="date" id="st-start-${pr.id}-${s.id}" value="${esc(startDate)}">
+            </div>
+            <div class="stage-time-box">
+              <div class="stage-time-label">تاريخ الانتهاء الفعلي</div>
+              <input class="stage-time-input" type="date" id="st-end-${pr.id}-${s.id}" value="${esc(endDate)}">
+            </div>
+          </div>
+          <button class="stage-note-save" onclick="saveStageTime('${pr.id}','${s.id}')">حفظ التوقيت</button>
+          <div style="margin-top:12px;border-top:1px solid #F0EEE9;padding-top:10px;font-size:11px;font-weight:700;color:#A8A29E;letter-spacing:1px;margin-bottom:6px">📝 ملاحظات</div>
           <textarea class="stage-note-ta" id="sn-${pr.id}-${s.id}" rows="3" placeholder="اكتب ملاحظاتك هنا...">${esc(note)}</textarea>
-          <button class="stage-note-save" onclick="saveStageNote('${pr.id}','${s.id}')">حفظ المرحلة</button>
+          <button class="stage-note-save" onclick="saveStageNote('${pr.id}','${s.id}')">حفظ الملاحظات</button>
         </div>
       </div>`;
     }).join("");
 
-    const isFirst = filtIdx === 0;
-    const isLast = filtIdx === filtered.length - 1;
+    const payments = pr.payments || [];
+    const totalPrice = parseFloat(pr.price) || 0;
+    const totalPaid = payments.filter(paymentIsReceived).reduce((s,p)=>s+(parseFloat(p.amount)||0),0);
+    const remaining = totalPrice - totalPaid;
+    const paidPct = totalPrice > 0 ? Math.min(100, Math.round((totalPaid/totalPrice)*100)) : 0;
+    const currency = pr.currency || "SAR";
+
+    const paymentsListHtml = payments.length === 0
+      ? `<div style="text-align:center;color:#A8A29E;font-size:12px;padding:8px 0">لا توجد دفعات مسجّلة</div>`
+      : payments.map((p,i) => {
+          const received = paymentIsReceived(p);
+          return `<div class="payment-item">
+            <div class="payment-item-right">
+              <span class="payment-item-amount" style="color:${received?"#10B981":"#D97706"}">${received?"+":"⏳"} ${Number(p.amount||0).toLocaleString()} ${currency}</span>
+              <span class="payment-item-label">${esc(p.label || p.name || "دفعة")}</span>
+              ${p.date ? `<span class="payment-item-date">${formatDate(p.date)}</span>` : ""}
+            </div>
+            <div class="payment-item-actions">
+              <button class="payment-status-btn" style="background:${received?"#ECFDF5":"#FEF3C7"};color:${received?"#065F46":"#92400E"}" onclick="togglePaymentStatus('${pr.id}',${i})">${received?"✅ مستلمة":"⏳ غير مستلمة"}</button>
+              <button class="payment-del-btn" onclick="deletePayment('${pr.id}',${i})">حذف</button>
+            </div>
+          </div>`;
+        }).join("");
+
+    const paymentSummaryHtml = totalPrice > 0 ? `<div class="payment-summary">
+        <div class="payment-sum-box" style="background:#ECFDF5">
+          <div class="payment-sum-label" style="color:#065F46">✅ المُستلم</div>
+          <div class="payment-sum-val" style="color:#10B981">${totalPaid.toLocaleString()} ${currency}</div>
+        </div>
+        <div class="payment-sum-box" style="background:${remaining>0?"#FEF3C7":"#ECFDF5"}">
+          <div class="payment-sum-label" style="color:${remaining>0?"#92400E":"#065F46"}">${remaining>0?"⏳ المتبقي":"✔ مكتمل"}</div>
+          <div class="payment-sum-val" style="color:${remaining>0?"#D97706":"#10B981"}">${Math.abs(remaining).toLocaleString()} ${currency}</div>
+        </div>
+      </div>
+      <div class="payment-progress-wrap">
+        <div class="payment-progress-bg"><div class="payment-progress-fill" style="width:${paidPct}%"></div></div>
+        <div class="payment-progress-label">${paidPct}% تم استلامه</div>
+      </div>` : "";
 
     const detailsHtml = isExp ? `<div class="card-details">
       <div class="dates-grid">
         <div class="date-box"><div class="date-label">تاريخ البدء</div><div class="date-val">${formatDate(pr.startDate)}</div></div>
         <div class="date-box"><div class="date-label">التسليم النهائي</div><div class="date-val">${formatDate(pr.deliveryDate)}</div></div>
       </div>
-      ${paymentsHtml}
-      <div class="stages-section"><div class="stages-title">مراحل التصميم والمدة</div>${stagesHtml}</div>
+      <div class="payments-section">
+        <div class="payments-header">
+          <div class="payments-title">💰 الدفعات</div>
+          <button class="add-payment-btn" onclick="event.stopPropagation();togglePaymentForm('${pr.id}')">+ إضافة دفعة</button>
+        </div>
+        ${paymentSummaryHtml}
+        <div class="payment-list">${paymentsListHtml}</div>
+        <div class="payment-form" id="pf-${pr.id}">
+          <div class="payment-form-row">
+            <div><div class="stage-time-label" style="margin-bottom:4px">المبلغ</div><input class="payment-input" type="number" id="pi-amount-${pr.id}" placeholder="0"></div>
+            <div><div class="stage-time-label" style="margin-bottom:4px">التاريخ</div><input class="payment-input" type="date" id="pi-date-${pr.id}"></div>
+          </div>
+          <div class="payment-form-row">
+            <div><div class="stage-time-label" style="margin-bottom:4px">الوصف</div><input class="payment-input" type="text" id="pi-label-${pr.id}" placeholder="مثال: دفعة أولى"></div>
+            <div><div class="stage-time-label" style="margin-bottom:4px">الحالة</div><select class="payment-status-select" id="pi-done-${pr.id}"><option value="true">✅ مستلمة</option><option value="false">⏳ غير مستلمة</option></select></div>
+          </div>
+          <button class="payment-save-btn" onclick="addPayment('${pr.id}')">✓ حفظ الدفعة</button>
+        </div>
+      </div>
+      <div class="stages-section"><div class="stages-title">ملاحظات المراحل</div>${stagesHtml}</div>
       <div class="card-actions">
         <button class="edit-btn" onclick="openEditForm('${pr.id}')">✏️ تعديل</button>
         <button class="del-btn" onclick="openDelete('${pr.id}')">🗑️</button>
@@ -626,20 +726,16 @@ function render() {
     return `<div class="card">
       <div class="card-top" onclick="toggleExpand('${pr.id}')">
         <div class="card-row1">
-          <div style="flex:1">
-            <div class="card-name">${esc(pr.name)}</div>
-            <div class="card-client">👤 ${esc(pr.client)}</div>
+          <div class="reorder-btns" onclick="event.stopPropagation()">
+            <button class="reorder-btn" onclick="moveProject('${pr.id}',-1)" ${isFirst?"disabled":""} title="تحريك لأعلى">▲</button>
+            <button class="reorder-btn" onclick="moveProject('${pr.id}',1)" ${isLast?"disabled":""} title="تحريك لأسفل">▼</button>
           </div>
-          <div class="order-btns" onclick="event.stopPropagation()">
-            <button class="order-btn" onclick="moveProject('${pr.id}',-1)" ${isFirst ? "disabled" : ""}>↑</button>
-            <button class="order-btn" onclick="moveProject('${pr.id}',1)" ${isLast ? "disabled" : ""}>↓</button>
-          </div>
-          <button class="status-badge" style="background:${stage.bg};color:${stage.dark}" onclick="event.stopPropagation();openStatusSheet('${pr.id}')">
-            ${stage.emoji} ${stage.label}
-          </button>
+          <div style="flex:1"><div class="card-name">${esc(pr.name)}</div><div class="card-client">👤 ${esc(pr.client)}</div></div>
+          <button class="status-badge" style="background:${stage.bg};color:${stage.dark}" onclick="event.stopPropagation();openStatusSheet('${pr.id}')">${stage.emoji} ${stage.label}</button>
         </div>
         <div class="card-row2">
           <span class="card-price">${priceStr}</span>
+          ${paymentBadge}
           ${daysHtml}
           <span class="card-arrow" style="transform:${isExp?"rotate(180deg)":"rotate(0deg)"}">▾</span>
         </div>
@@ -654,50 +750,65 @@ function toggleStageNote(pid,sid) { openStageNotes[pid]=openStageNotes[pid]===si
 
 async function saveStageNote(pid,sid) {
   const ta = document.getElementById(`sn-${pid}-${sid}`);
-  const startInput = document.getElementById(`ststart-${pid}-${sid}`);
-  const endInput = document.getElementById(`stend-${pid}-${sid}`);
   if (!ta) return;
-  const start = startInput ? startInput.value : "";
-  const end = endInput ? endInput.value : "";
+  window._projects = window._projects.map(p => p.id !== pid ? p : {
+    ...p,
+    stageNotes: { ...(p.stageNotes || {}), [sid]: ta.value }
+  });
+  await window._saveToDb(); showToast("✓ تم حفظ الملاحظات"); render();
+}
+
+async function saveStageTime(pid, sid) {
+  const planned = document.getElementById(`st-plan-${pid}-${sid}`)?.value || "";
+  const start = document.getElementById(`st-start-${pid}-${sid}`)?.value || "";
+  const end = document.getElementById(`st-end-${pid}-${sid}`)?.value || "";
   if (start && end && new Date(end+"T00:00:00") < new Date(start+"T00:00:00")) {
     showToast("⚠️ تاريخ النهاية قبل البداية");
     return;
   }
-  window._projects = window._projects.map(p=>p.id!==pid?p:{
+  window._projects = window._projects.map(p => p.id !== pid ? p : {
     ...p,
-    stageNotes:{...(p.stageNotes||{}),[sid]:ta.value},
-    stageTimeline:{...(p.stageTimeline||{}),[sid]:{start,end}}
+    stageTiming: { ...(p.stageTiming || {}), [sid]: { plannedDays: planned, startDate: start, endDate: end } },
+    stageTimeline: { ...(p.stageTimeline || {}), [sid]: { start, end } }
   });
-  await window._saveToDb(); showToast("✓ تم حفظ المرحلة"); render();
+  await window._saveToDb(); showToast("✓ تم حفظ التوقيت"); render();
+}
+
+function setPlanned(pid, sid, days) {
+  const input = document.getElementById(`st-plan-${pid}-${sid}`);
+  if (input) input.value = days;
 }
 
 // Payments
-function openPaymentSheet(id) {
-  paymentTargetId = id;
-  document.getElementById("pay-name-input").value = "";
-  document.getElementById("pay-amount-input").value = "";
-  document.getElementById("payment-overlay").classList.add("show");
-}
-function closePaymentSheet() { document.getElementById("payment-overlay").classList.remove("show"); }
-
-async function confirmAddPayment() {
-  const name = document.getElementById("pay-name-input").value.trim();
-  const amount = document.getElementById("pay-amount-input").value;
-  if (!name) { showToast("⚠️ أدخل اسم الدفعة"); return; }
-  window._projects = window._projects.map(p => {
-    if (p.id !== paymentTargetId) return p;
-    const payments = [...(p.payments||[]), {name, amount: Number(amount)||0, done: false}];
-    return {...p, payments};
-  });
-  await window._saveToDb();
-  closePaymentSheet(); showToast("✓ تمت الإضافة"); render();
+function togglePaymentForm(pid) {
+  const form = document.getElementById(`pf-${pid}`);
+  if (!form) return;
+  form.classList.toggle("open");
+  if (form.classList.contains("open")) {
+    const dateInput = document.getElementById(`pi-date-${pid}`);
+    if (dateInput && !dateInput.value) dateInput.value = new Date().toISOString().split("T")[0];
+  }
 }
 
-async function togglePayment(pid, idx) {
+async function addPayment(pid) {
+  const amount = document.getElementById(`pi-amount-${pid}`)?.value;
+  const date = document.getElementById(`pi-date-${pid}`)?.value || "";
+  const label = document.getElementById(`pi-label-${pid}`)?.value.trim() || "دفعة";
+  const done = document.getElementById(`pi-done-${pid}`)?.value !== "false";
+  if (!amount || parseFloat(amount) <= 0) { showToast("⚠️ أدخل المبلغ"); return; }
   window._projects = window._projects.map(p => {
     if (p.id !== pid) return p;
-    const payments = (p.payments||[]).map((pay,i)=>i===idx?{...pay,done:!pay.done}:pay);
-    return {...p, payments};
+    const payments = [...(p.payments || []), { amount: parseFloat(amount), date, label, name: label, done }];
+    return { ...p, payments };
+  });
+  await window._saveToDb(); showToast("✓ تمت إضافة الدفعة"); render();
+}
+
+async function togglePaymentStatus(pid, idx) {
+  window._projects = window._projects.map(p => {
+    if (p.id !== pid) return p;
+    const payments = (p.payments || []).map((pay, i) => i === idx ? { ...pay, done: pay.done === false ? true : false } : pay);
+    return { ...p, payments };
   });
   await window._saveToDb(); render();
 }
@@ -705,22 +816,32 @@ async function togglePayment(pid, idx) {
 async function deletePayment(pid, idx) {
   window._projects = window._projects.map(p => {
     if (p.id !== pid) return p;
-    const payments = (p.payments||[]).filter((_,i)=>i!==idx);
-    return {...p, payments};
+    const payments = (p.payments || []).filter((_,i)=>i!==idx);
+    return { ...p, payments };
   });
-  await window._saveToDb(); render();
+  await window._saveToDb(); showToast("✓ تم حذف الدفعة"); render();
 }
 
 // Reorder
 async function moveProject(id, dir) {
-  const projects = window._projects;
-  const idx = projects.findIndex(p=>p.id===id);
-  if (idx===-1) return;
-  const newIdx = idx + dir;
-  if (newIdx<0||newIdx>=projects.length) return;
-  const arr = [...projects];
-  [arr[idx], arr[newIdx]] = [arr[newIdx], arr[idx]];
-  window._projects = arr;
+  let filtered = getFilteredProjects();
+  const idx = filtered.findIndex(p => p.id === id);
+  const swapIdx = idx + dir;
+  if (swapIdx < 0 || swapIdx >= filtered.length) return;
+
+  filtered.forEach((p, i) => {
+    const proj = window._projects.find(pr => pr.id === p.id);
+    if (proj) proj.manualOrder = i * 10;
+  });
+
+  const projA = window._projects.find(p => p.id === filtered[idx].id);
+  const projB = window._projects.find(p => p.id === filtered[swapIdx].id);
+  if (projA && projB) {
+    const tmp = projA.manualOrder;
+    projA.manualOrder = projB.manualOrder;
+    projB.manualOrder = tmp;
+  }
+
   await window._saveToDb(); render();
 }
 
@@ -820,7 +941,8 @@ async function saveProject() {
   if (editId) {
     window._projects=window._projects.map(p=>p.id===editId?{...p,...data}:p);
   } else {
-    window._projects.push({...data,id:Date.now().toString(),stageNotes:{},stageTimeline:{},payments:[]});
+    const maxOrder = window._projects.length ? Math.max(...window._projects.map(p => Number(p.manualOrder ?? 0))) : 0;
+    window._projects.push({...data,id:Date.now().toString(),stageNotes:{},stageTimeline:{},stageTiming:{},payments:[],manualOrder:maxOrder+10});
   }
   await window._saveToDb(); closeForm(); showToast("✓ تم الحفظ");
 }
