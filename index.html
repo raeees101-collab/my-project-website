@@ -99,13 +99,23 @@ body { font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif; backgrou
 .stage-note-ta { width: 100%; background: #F8F7F4; border: 1.5px solid #E7E5E0; border-radius: 10px; padding: 10px 12px; font-size: 13px; font-family: inherit; direction: rtl; outline: none; resize: none; line-height: 1.6; color: #1C1917; }
 .stage-note-ta:focus { border-color: #D4A853; }
 .stage-note-save { margin-top: 8px; background: #1C1917; color: #fff; border: none; border-radius: 10px; padding: 9px 18px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.stage-time-meta { display: block; font-size: 10px; color: #78716C; margin-top: 2px; font-weight: 600; }
+.stage-time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.stage-time-box { background: #F8F7F4; border: 1.5px solid #E7E5E0; border-radius: 10px; padding: 9px 10px; }
+.stage-time-label { font-size: 10px; color: #78716C; margin-bottom: 5px; font-weight: 700; }
+.stage-time-input { width: 100%; background: #fff; border: 1px solid #E7E5E0; border-radius: 8px; padding: 8px; font-size: 12px; font-family: inherit; outline: none; }
+.stage-time-summary { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 10px; }
+.stage-time-stat { background: #F8F7F4; border-radius: 10px; padding: 8px 6px; text-align: center; }
+.stage-time-stat-label { font-size: 9px; color: #78716C; margin-bottom: 3px; font-weight: 700; }
+.stage-time-stat-val { font-size: 12px; font-weight: 900; color: #1C1917; }
 
 /* Card actions */
 .card-actions { display: flex; gap: 8px; }
 .edit-btn { flex: 1; background: #1C1917; color: #fff; border: none; border-radius: 12px; padding: 11px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
 .del-btn { background: #FEF2F2; color: #EF4444; border: none; border-radius: 12px; padding: 11px 16px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
-.order-btns { display: flex; gap: 4px; }
-.order-btn { background: #F8F7F4; border: 1.5px solid #E7E5E0; border-radius: 10px; width: 38px; height: 38px; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.order-btns { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
+.order-btn { background: #F8F7F4; border: 1.5px solid #E7E5E0; border-radius: 9px; width: 32px; height: 32px; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #57534E; }
+.order-btn:disabled { opacity: 0.3; cursor: default; }
 
 .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; display: none; align-items: flex-end; }
 .overlay.show { display: flex; }
@@ -427,6 +437,51 @@ function daysLeft(d) {
   const today = new Date(); today.setHours(0,0,0,0);
   return Math.ceil((new Date(d+"T00:00:00") - today) / 86400000);
 }
+
+function shortDate(d) {
+  if (!d) return "—";
+  const [y,m,day] = d.split("-");
+  return `${parseInt(day)}/${parseInt(m)}`;
+}
+function diffDaysInclusive(start, end) {
+  if (!start || !end) return null;
+  const a = new Date(start+"T00:00:00");
+  const b = new Date(end+"T00:00:00");
+  return Math.max(1, Math.ceil((b-a)/86400000) + 1);
+}
+function elapsedStageDays(start, end) {
+  if (!start) return null;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const startDate = new Date(start+"T00:00:00");
+  const endDate = end ? new Date(end+"T00:00:00") : today;
+  const until = endDate < today ? endDate : today;
+  if (until < startDate) return 0;
+  return Math.max(1, Math.ceil((until-startDate)/86400000) + 1);
+}
+function remainingStageDays(end) {
+  if (!end) return null;
+  const today = new Date(); today.setHours(0,0,0,0);
+  return Math.ceil((new Date(end+"T00:00:00") - today) / 86400000);
+}
+function stageTimeText(start, end) {
+  if (!start && !end) return "حدد مدة المرحلة";
+  const planned = diffDaysInclusive(start, end);
+  if (start && end) return `من ${shortDate(start)} إلى ${shortDate(end)} • ${planned} يوم`;
+  if (start) return `بدأت ${shortDate(start)} • مضى ${elapsedStageDays(start, end)} يوم`;
+  return `تنتهي ${shortDate(end)}`;
+}
+function stageTimeStatsHtml(start, end) {
+  const planned = diffDaysInclusive(start, end);
+  const elapsed = elapsedStageDays(start, end);
+  const rem = remainingStageDays(end);
+  let remText = "—";
+  if (rem !== null) remText = rem < 0 ? `متأخرة ${Math.abs(rem)} يوم` : rem === 0 ? "اليوم" : `${rem} يوم`;
+  return `<div class="stage-time-summary">
+    <div class="stage-time-stat"><div class="stage-time-stat-label">المدة المحددة</div><div class="stage-time-stat-val">${planned ? planned + " يوم" : "—"}</div></div>
+    <div class="stage-time-stat"><div class="stage-time-stat-label">أخذت الآن</div><div class="stage-time-stat-val">${elapsed !== null ? elapsed + " يوم" : "—"}</div></div>
+    <div class="stage-time-stat"><div class="stage-time-stat-label">المتبقي</div><div class="stage-time-stat-val">${remText}</div></div>
+  </div>`;
+}
 function showToast(msg) {
   const t = document.getElementById("toast");
   t.textContent = msg; t.classList.add("show");
@@ -515,22 +570,39 @@ function render() {
         ` : `<div style="color:#A8A29E;font-size:13px;text-align:center;padding:10px 0">لا توجد دفعات بعد</div>`}
       </div>`;
 
-    // Stage notes
+    // Stage notes + stage timeline
     const stagesHtml = STAGES.map(s => {
       const note = (pr.stageNotes&&pr.stageNotes[s.id])||"";
+      const timeline = (pr.stageTimeline&&pr.stageTimeline[s.id])||{};
+      const start = timeline.start || "";
+      const end = timeline.end || "";
       const isOpen = openStageNotes[pr.id]===s.id;
       return `<div class="stage-row">
         <div class="stage-row-header" onclick="toggleStageNote('${pr.id}','${s.id}')">
           <div class="stage-row-left">
             <span class="stage-row-emoji">${s.emoji}</span>
-            <span class="stage-row-label" style="color:${s.dark}">${s.label}</span>
-            ${note.trim()?`<span class="stage-row-has-note"></span>`:""}
+            <span>
+              <span class="stage-row-label" style="color:${s.dark}">${s.label}</span>
+              <span class="stage-time-meta">${stageTimeText(start,end)}</span>
+            </span>
+            ${(note.trim()||start||end)?`<span class="stage-row-has-note"></span>`:""}
           </div>
           <span class="stage-row-arrow" style="transform:${isOpen?"rotate(180deg)":"rotate(0deg)"}">▾</span>
         </div>
         <div class="stage-note-body ${isOpen?"open":""}">
+          ${stageTimeStatsHtml(start,end)}
+          <div class="stage-time-grid">
+            <div class="stage-time-box">
+              <div class="stage-time-label">من تاريخ</div>
+              <input class="stage-time-input" id="ststart-${pr.id}-${s.id}" type="date" value="${esc(start)}">
+            </div>
+            <div class="stage-time-box">
+              <div class="stage-time-label">إلى تاريخ</div>
+              <input class="stage-time-input" id="stend-${pr.id}-${s.id}" type="date" value="${esc(end)}">
+            </div>
+          </div>
           <textarea class="stage-note-ta" id="sn-${pr.id}-${s.id}" rows="3" placeholder="اكتب ملاحظاتك هنا...">${esc(note)}</textarea>
-          <button class="stage-note-save" onclick="saveStageNote('${pr.id}','${s.id}')">حفظ</button>
+          <button class="stage-note-save" onclick="saveStageNote('${pr.id}','${s.id}')">حفظ المرحلة</button>
         </div>
       </div>`;
     }).join("");
@@ -544,12 +616,8 @@ function render() {
         <div class="date-box"><div class="date-label">التسليم النهائي</div><div class="date-val">${formatDate(pr.deliveryDate)}</div></div>
       </div>
       ${paymentsHtml}
-      <div class="stages-section"><div class="stages-title">ملاحظات المراحل</div>${stagesHtml}</div>
+      <div class="stages-section"><div class="stages-title">مراحل التصميم والمدة</div>${stagesHtml}</div>
       <div class="card-actions">
-        <div class="order-btns">
-          <button class="order-btn" onclick="moveProject('${pr.id}',-1)" ${isFirst?'style="opacity:0.3;pointer-events:none"':''}>↑</button>
-          <button class="order-btn" onclick="moveProject('${pr.id}',1)" ${isLast?'style="opacity:0.3;pointer-events:none"':''}>↓</button>
-        </div>
         <button class="edit-btn" onclick="openEditForm('${pr.id}')">✏️ تعديل</button>
         <button class="del-btn" onclick="openDelete('${pr.id}')">🗑️</button>
       </div>
@@ -558,7 +626,14 @@ function render() {
     return `<div class="card">
       <div class="card-top" onclick="toggleExpand('${pr.id}')">
         <div class="card-row1">
-          <div style="flex:1"><div class="card-name">${esc(pr.name)}</div><div class="card-client">👤 ${esc(pr.client)}</div></div>
+          <div style="flex:1">
+            <div class="card-name">${esc(pr.name)}</div>
+            <div class="card-client">👤 ${esc(pr.client)}</div>
+          </div>
+          <div class="order-btns" onclick="event.stopPropagation()">
+            <button class="order-btn" onclick="moveProject('${pr.id}',-1)" ${isFirst ? "disabled" : ""}>↑</button>
+            <button class="order-btn" onclick="moveProject('${pr.id}',1)" ${isLast ? "disabled" : ""}>↓</button>
+          </div>
           <button class="status-badge" style="background:${stage.bg};color:${stage.dark}" onclick="event.stopPropagation();openStatusSheet('${pr.id}')">
             ${stage.emoji} ${stage.label}
           </button>
@@ -579,9 +654,21 @@ function toggleStageNote(pid,sid) { openStageNotes[pid]=openStageNotes[pid]===si
 
 async function saveStageNote(pid,sid) {
   const ta = document.getElementById(`sn-${pid}-${sid}`);
+  const startInput = document.getElementById(`ststart-${pid}-${sid}`);
+  const endInput = document.getElementById(`stend-${pid}-${sid}`);
   if (!ta) return;
-  window._projects = window._projects.map(p=>p.id!==pid?p:{...p,stageNotes:{...(p.stageNotes||{}),[sid]:ta.value}});
-  await window._saveToDb(); showToast("✓ تم الحفظ"); render();
+  const start = startInput ? startInput.value : "";
+  const end = endInput ? endInput.value : "";
+  if (start && end && new Date(end+"T00:00:00") < new Date(start+"T00:00:00")) {
+    showToast("⚠️ تاريخ النهاية قبل البداية");
+    return;
+  }
+  window._projects = window._projects.map(p=>p.id!==pid?p:{
+    ...p,
+    stageNotes:{...(p.stageNotes||{}),[sid]:ta.value},
+    stageTimeline:{...(p.stageTimeline||{}),[sid]:{start,end}}
+  });
+  await window._saveToDb(); showToast("✓ تم حفظ المرحلة"); render();
 }
 
 // Payments
@@ -733,7 +820,7 @@ async function saveProject() {
   if (editId) {
     window._projects=window._projects.map(p=>p.id===editId?{...p,...data}:p);
   } else {
-    window._projects.push({...data,id:Date.now().toString(),stageNotes:{},payments:[]});
+    window._projects.push({...data,id:Date.now().toString(),stageNotes:{},stageTimeline:{},payments:[]});
   }
   await window._saveToDb(); closeForm(); showToast("✓ تم الحفظ");
 }
