@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="مشاريعي">
+<title>مشاريعي</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif; background: #F8F7F4; color: #1C1917; min-height: 100vh; }
+
+.header { background: #1C1917; color: #fff; padding: 52px 20px 18px; position: sticky; top: 0; z-index: 50; }
+.header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.header-sub { font-size: 10px; color: #A8A29E; letter-spacing: 2px; margin-bottom: 2px; }
+.header-title { font-size: 24px; font-weight: 900; }
+.header-actions { display: flex; gap: 8px; align-items: center; }
+.add-btn { background: #D4A853; border: none; border-radius: 14px; width: 46px; height: 46px; font-size: 26px; cursor: pointer; color: #1C1917; font-weight: 900; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(212,168,83,0.4); }
+.menu-btn { background: rgba(255,255,255,0.1); border: none; border-radius: 12px; width: 40px; height: 40px; font-size: 18px; cursor: pointer; color: #fff; display: flex; align-items: center; justify-content: center; }
+
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.stat { background: rgba(255,255,255,0.07); border-radius: 12px; padding: 10px 6px; text-align: center; }
+.stat-val { font-size: 22px; font-weight: 900; }
+.stat-label { font-size: 10px; color: #A8A29E; margin-top: 2px; }
+
+.tabs { display: flex; gap: 6px; padding: 14px 16px 0; overflow-x: auto; scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab { white-space: nowrap; padding: 8px 14px; border-radius: 20px; border: none; cursor: pointer; font-size: 13px; font-weight: 700; font-family: inherit; transition: all 0.2s; }
+.tab.active { background: #1C1917; color: #fff; }
+.tab:not(.active) { background: #E7E5E0; color: #57534E; }
+
+.list { padding: 14px 16px 100px; }
+.empty { text-align: center; padding: 60px 20px; color: #A8A29E; }
+.empty-icon { font-size: 48px; margin-bottom: 12px; }
+.empty-title { font-size: 16px; font-weight: 700; }
+.empty-sub { font-size: 13px; margin-top: 6px; }
+
+.card { background: #fff; border-radius: 18px; margin-bottom: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid #E7E5E0; }
+.card-top { padding: 16px; cursor: pointer; user-select: none; }
+.card-row1 { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+.card-name { font-weight: 900; font-size: 16px; margin-bottom: 3px; line-height: 1.3; }
+.card-client { font-size: 13px; color: #78716C; }
+.status-badge { border: none; border-radius: 10px; padding: 6px 10px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 4px; flex-shrink: 0; margin-right: 8px; }
+.card-row2 { display: flex; align-items: center; justify-content: space-between; }
+.card-price { font-size: 18px; font-weight: 900; color: #D4A853; }
+.card-days { font-size: 12px; font-weight: 700; }
+.card-arrow { font-size: 16px; color: #C7C3BC; display: inline-block; transition: transform 0.2s; }
+
+.card-details { border-top: 1px solid #F3F2EF; padding: 14px 16px; }
+.dates-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.date-box { background: #F8F7F4; border-radius: 10px; padding: 10px 12px; }
+.date-label { font-size: 10px; color: #A8A29E; margin-bottom: 3px; }
+.date-val { font-size: 13px; font-weight: 700; }
+
+.stages-section { margin-bottom: 14px; }
+.stages-title { font-size: 11px; font-weight: 700; color: #A8A29E; margin-bottom: 8px; letter-spacing: 1px; }
+.stage-row { border-radius: 12px; margin-bottom: 6px; overflow: hidden; border: 1.5px solid #F0EEE9; }
+.stage-row-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; cursor: pointer; user-select: none; background: #F8F7F4; }
+.stage-row-left { display: flex; align-items: center; gap: 8px; }
+.stage-row-emoji { font-size: 16px; }
+.stage-row-label { font-size: 13px; font-weight: 700; }
+.stage-row-has-note { width: 6px; height: 6px; border-radius: 50%; background: #D4A853; flex-shrink: 0; }
+.stage-row-arrow { font-size: 13px; color: #C7C3BC; transition: transform 0.2s; display: inline-block; }
+.stage-note-body { padding: 10px 12px; background: #fff; border-top: 1px solid #F0EEE9; display: none; }
+.stage-note-body.open { display: block; }
+.stage-note-ta { width: 100%; background: #F8F7F4; border: 1.5px solid #E7E5E0; border-radius: 10px; padding: 10px 12px; font-size: 13px; font-family: inherit; direction: rtl; outline: none; resize: none; line-height: 1.6; color: #1C1917; }
+.stage-note-ta:focus { border-color: #D4A853; }
+.stage-note-save { margin-top: 8px; background: #1C1917; color: #fff; border: none; border-radius: 10px; padding: 9px 18px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
+
+.card-actions { display: flex; gap: 8px; }
+.edit-btn { flex: 1; background: #1C1917; color: #fff; border: none; border-radius: 12px; padding: 11px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.del-btn { background: #FEF2F2; color: #EF4444; border: none; border-radius: 12px; padding: 11px 16px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
+
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; display: none; align-items: flex-end; }
+.overlay.show { display: flex; }
+.sheet { background: #fff; width: 100%; border-radius: 24px 24px 0 0; padding: 20px 16px 40px; max-height: 92vh; overflow-y: auto; }
+.sheet-handle { width: 40px; height: 4px; background: #E7E5E0; border-radius: 2px; margin: 0 auto 20px; }
+.sheet-title { font-size: 16px; font-weight: 900; margin-bottom: 14px; text-align: center; }
+.stage-btn { width: 100%; border-radius: 14px; padding: 14px 16px; margin-bottom: 8px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; text-align: right; display: flex; align-items: center; gap: 10px; border: 2px solid transparent; }
+
+.overlay-center { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px; }
+.overlay-center.show { display: flex; }
+.dialog { background: #fff; border-radius: 20px; padding: 24px; width: 100%; max-width: 320px; text-align: center; }
+.dialog-icon { font-size: 40px; margin-bottom: 12px; }
+.dialog-title { font-size: 17px; font-weight: 900; margin-bottom: 8px; }
+.dialog-sub { font-size: 13px; color: #78716C; margin-bottom: 20px; }
+.dialog-btns { display: flex; gap: 10px; }
+.cancel-btn { flex: 1; background: #F3F2EF; border: none; border-radius: 12px; padding: 12px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.confirm-del { flex: 1; background: #EF4444; color: #fff; border: none; border-radius: 12px; padding: 12px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
+
+.form-label { font-size: 12px; font-weight: 700; color: #78716C; margin-bottom: 6px; display: block; }
+.form-input { width: 100%; background: #F8F7F4; border: 1.5px solid #E7E5E0; border-radius: 12px; padding: 12px 14px; font-size: 15px; font-family: inherit; direction: rtl; outline: none; }
+.form-input:focus { border-color: #D4A853; }
+.form-group { margin-bottom: 14px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.price-row { display: flex; gap: 8px; }
+.form-select { background: #F8F7F4; border: 1.5px solid #E7E5E0; border-radius: 12px; padding: 12px 10px; font-size: 14px; font-family: inherit; outline: none; }
+.form-textarea { width: 100%; background: #F8F7F4; border: 1.5px solid #E7E5E0; border-radius: 12px; padding: 12px 14px; font-size: 14px; font-family: inherit; direction: rtl; outline: none; resize: none; }
+.form-btns { display: flex; gap: 10px; margin-top: 20px; }
+.form-cancel { flex: 1; background: #F3F2EF; border: none; border-radius: 14px; padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.form-save { flex: 2; background: #1C1917; color: #fff; border: none; border-radius: 14px; padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.status-option { width: 100%; border-radius: 12px; padding: 11px 14px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; text-align: right; display: flex; align-items: center; gap: 8px; border: 2px solid transparent; margin-bottom: 6px; }
+
+.io-btn { width: 100%; border-radius: 14px; padding: 16px; margin-bottom: 10px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; text-align: right; display: flex; align-items: center; gap: 12px; border: none; }
+.export-code { background: #F8F7F4; border: 1.5px solid #E7E5E0; border-radius: 12px; padding: 14px; font-size: 13px; word-break: break-all; line-height: 1.6; color: #57534E; direction: ltr; text-align: left; max-height: 160px; overflow-y: auto; margin-bottom: 10px; font-family: monospace; }
+.copy-btn { width: 100%; background: #1C1917; color: #fff; border: none; border-radius: 12px; padding: 13px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; margin-bottom: 6px; }
+.import-ta { width: 100%; background: #F8F7F4; border: 1.5px solid #E7E5E0; border-radius: 12px; padding: 12px 14px; font-size: 13px; font-family: monospace; direction: ltr; outline: none; resize: none; }
+.import-ta:focus { border-color: #D4A853; }
+.import-btn { width: 100%; background: #D4A853; color: #1C1917; border: none; border-radius: 12px; padding: 13px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; margin-top: 8px; }
+.io-divider { text-align: center; color: #A8A29E; font-size: 12px; font-weight: 700; margin: 16px 0; position: relative; }
+.io-divider::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: #E7E5E0; }
+.io-divider span { background: #fff; padding: 0 10px; position: relative; }
+
+.saved-toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #1C1917; color: #fff; padding: 10px 22px; border-radius: 20px; font-size: 13px; font-weight: 700; z-index: 300; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
+.saved-toast.show { opacity: 1; }
+
+/* Payments */
+.payments-section { margin-bottom: 14px; }
+.payments-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.payments-title { font-size: 11px; font-weight: 700; color: #A8A29E; letter-spacing: 1px; }
+.add-payment-btn { background: #D4A853; color: #1C1917; border: none; border-radius: 8px; padding: 4px 10px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.payment-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.payment-sum-box { border-radius: 10px; padding: 10px 12px; }
+.payment-sum-label { font-size: 10px; margin-bottom: 3px; font-weight: 700; }
+.payment-sum-val { font-size: 15px; font-weight: 900; }
+.payment-progress-wrap { margin-bottom: 10px; }
+.payment-progress-bg { background: #F0EEE9; border-radius: 20px; height: 8px; overflow: hidden; }
+.payment-progress-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, #D4A853, #F59E0B); transition: width 0.4s; }
+.payment-progress-label { font-size: 11px; font-weight: 700; color: #78716C; margin-top: 4px; text-align: left; direction: ltr; }
+.payment-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+.payment-item { background: #F8F7F4; border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.payment-item-right { display: flex; flex-direction: column; gap: 2px; }
+.payment-item-amount { font-size: 14px; font-weight: 900; color: #10B981; }
+.payment-item-label { font-size: 11px; color: #78716C; font-weight: 600; }
+.payment-item-date { font-size: 11px; color: #A8A29E; }
+.payment-del-btn { background: #FEF2F2; color: #EF4444; border: none; border-radius: 8px; padding: 5px 8px; font-size: 12px; cursor: pointer; font-family: inherit; font-weight: 700; flex-shrink: 0; }
+.payment-form { background: #F8F7F4; border-radius: 12px; padding: 12px; margin-top: 6px; display: none; }
+.payment-form.open { display: block; }
+.payment-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.payment-input { width: 100%; background: #fff; border: 1.5px solid #E7E5E0; border-radius: 10px; padding: 9px 11px; font-size: 14px; font-family: inherit; direction: rtl; outline: none; }
+.payment-input:focus { border-color: #D4A853; }
+.payment-save-btn { width: 100%; background: #1C1917; color: #fff; border: none; border-radius: 10px; padding: 10px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
+
+/* Reorder buttons */
+.reorder-btns { display: flex; flex-direction: column; gap: 2px; margin-left: 6px; flex-shrink: 0; }
+.reorder-btn { background: #F3F2EF; border: none; border-radius: 6px; width: 26px; height: 22px; font-size: 12px; cursor: pointer; color: #78716C; display: flex; align-items: center; justify-content: center; line-height: 1; }
+.reorder-btn:active { background: #D4A853; color: #1C1917; }
+.reorder-btn:disabled { opacity: 0.2; cursor: default; }
+
+/* Stage timing */
+.stage-time-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.stage-time-box { background: #F8F7F4; border-radius: 8px; padding: 8px 10px; }
+.stage-time-label { font-size: 10px; color: #A8A29E; margin-bottom: 3px; }
+.stage-time-input { width: 100%; background: transparent; border: none; font-size: 13px; font-weight: 700; font-family: inherit; color: #1C1917; outline: none; }
+.stage-time-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.stage-time-chip { background: #F8F7F4; border: 1.5px solid #E7E5E0; border-radius: 20px; padding: 4px 10px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; color: #57534E; }
+.stage-time-chip:hover { border-color: #D4A853; color: #92400E; background: #FEF3C7; }
+.stage-timing-summary { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.stage-timing-pill { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 10px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="header-sub">INTERIOR DESIGN</div>
+      <div class="header-title">مشاريعي</div>
+    </div>
+    <div class="header-actions">
+      <button class="menu-btn" onclick="openIO()">⇅</button>
+      <button class="add-btn" onclick="openForm()">+</button>
+    </div>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-val" id="stat-total" style="color:#D4A853">0</div><div class="stat-label">الكل</div></div>
+    <div class="stat"><div class="stat-val" id="stat-pending" style="color:#F59E0B">0</div><div class="stat-label">بانتظار</div></div>
+    <div class="stat"><div class="stat-val" id="stat-active" style="color:#6366F1">0</div><div class="stat-label">نشط</div></div>
+    <div class="stat"><div class="stat-val" id="stat-completed" style="color:#10B981">0</div><div class="stat-label">مكتمل</div></div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="setTab('active',this)">🔥 نشط</button>
+  <button class="tab" onclick="setTab('pending_approval',this)">⏳ بانتظار الاعتماد</button>
+  <button class="tab" onclick="setTab('completed',this)">✅ مكتمل</button>
+  <button class="tab" onclick="setTab('all',this)">الكل</button>
+</div>
+
+<div class="list" id="list"></div>
+
+<div class="saved-toast" id="toast">✓ تم الحفظ</div>
+
+<!-- Status Sheet -->
+<div class="overlay" id="status-overlay" onclick="closeStatusSheet()">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">تغيير حالة المشروع</div>
+    <div id="status-buttons"></div>
+  </div>
+</div>
+
+<!-- Delete Confirm -->
+<div class="overlay-center" id="delete-overlay">
+  <div class="dialog">
+    <div class="dialog-icon">🗑️</div>
+    <div class="dialog-title">حذف المشروع؟</div>
+    <div class="dialog-sub">لا يمكن التراجع عن هذا الإجراء</div>
+    <div class="dialog-btns">
+      <button class="cancel-btn" onclick="closeDelete()">إلغاء</button>
+      <button class="confirm-del" onclick="confirmDelete()">حذف</button>
+    </div>
+  </div>
+</div>
+
+<!-- Export/Import Sheet -->
+<div class="overlay" id="io-overlay" onclick="closeIO()">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">نقل البيانات</div>
+    <div style="margin-bottom:4px;font-size:12px;font-weight:700;color:#78716C;">📤 تصدير — انسخ الكود وارسله لأي جهاز</div>
+    <div class="export-code" id="export-code"></div>
+    <button class="copy-btn" onclick="copyExport()">نسخ الكود</button>
+    <div class="io-divider"><span>أو</span></div>
+    <div style="margin-bottom:6px;font-size:12px;font-weight:700;color:#78716C;">📥 استيراد — الصق الكود هنا</div>
+    <textarea class="import-ta" id="import-ta" rows="4" placeholder="الصق الكود هنا..."></textarea>
+    <button class="import-btn" onclick="doImport()">استيراد البيانات</button>
+  </div>
+</div>
+
+<!-- Add/Edit Form -->
+<div class="overlay" id="form-overlay" onclick="closeForm()">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" id="form-title">➕ مشروع جديد</div>
+    <div class="form-group">
+      <label class="form-label">اسم المشروع *</label>
+      <input class="form-input" id="f-name" placeholder="مثال: فيلا الرياض">
+    </div>
+    <div class="form-group">
+      <label class="form-label">اسم العميل *</label>
+      <input class="form-input" id="f-client" placeholder="مثال: محمد العمري">
+    </div>
+    <div class="form-group">
+      <label class="form-label">التسعيرة</label>
+      <div class="price-row">
+        <input class="form-input" id="f-price" type="number" placeholder="0" style="flex:1">
+        <select class="form-select" id="f-currency">
+          <option>SAR</option><option>AED</option><option>USD</option><option>KWD</option><option>QAR</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div>
+        <label class="form-label">تاريخ البدء</label>
+        <input class="form-input" id="f-start" type="date">
+      </div>
+      <div>
+        <label class="form-label">التسليم النهائي</label>
+        <input class="form-input" id="f-delivery" type="date">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">حالة المشروع</label>
+      <div id="status-select"></div>
+    </div>
+    <div class="form-btns">
+      <button class="form-cancel" onclick="closeForm()">إلغاء</button>
+      <button class="form-save" id="form-save-btn" onclick="saveProject()">إضافة المشروع</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STAGES = [
+  { id:"pending_approval", label:"بانتظار الاعتماد", emoji:"⏳", color:"#F59E0B", bg:"#FEF3C7", dark:"#92400E" },
+  { id:"first_meeting",    label:"الاجتماع الأول",   emoji:"🤝", color:"#6366F1", bg:"#EEF2FF", dark:"#3730A3" },
+  { id:"moodboard",        label:"المود بورد",        emoji:"🎨", color:"#EC4899", bg:"#FDF2F8", dark:"#9D174D" },
+  { id:"3d_design",        label:"التصميم ثلاثي الأبعاد", emoji:"📐", color:"#8B5CF6", bg:"#F5F3FF", dark:"#5B21B6" },
+  { id:"floor_plans",      label:"المخططات",          emoji:"🗺️", color:"#0EA5E9", bg:"#F0F9FF", dark:"#075985" },
+  { id:"completed",        label:"مكتمل",             emoji:"✅", color:"#10B981", bg:"#ECFDF5", dark:"#065F46" },
+];
+
+let projects = [];
+let currentTab = "active";
+let expandedId = null;
+let openStageNotes = {};
+let statusTargetId = null;
+let deleteTargetId = null;
+let editId = null;
+let formStatus = "first_meeting";
+
+try { projects = JSON.parse(localStorage.getItem("id_projects_v3") || "[]"); } catch(e) { projects = []; }
+
+// Assign manualOrder to existing projects that don't have it
+projects.forEach((p, i) => { if (p.manualOrder === undefined) p.manualOrder = i * 10; });
+
+function save() { localStorage.setItem("id_projects_v3", JSON.stringify(projects)); }
+function getStage(id) { return STAGES.find(s => s.id === id) || STAGES[0]; }
+function esc(s) { return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+function formatDate(d) {
+  if (!d) return "—";
+  const [y,m,day] = d.split("-");
+  const months = ["","يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+  return `${parseInt(day)} ${months[parseInt(m)]} ${y}`;
+}
+
+function daysLeft(d) {
+  if (!d) return null;
+  const today = new Date(); today.setHours(0,0,0,0);
+  return Math.ceil((new Date(d + "T00:00:00") - today) / 86400000);
+}
+
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg || "✓ تم الحفظ";
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2000);
+}
+
+function setTab(tab, el) {
+  currentTab = tab;
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  el.classList.add("active");
+  render();
+}
+
+// Status priority for auto-sort within each tab group
+function statusPriority(status) {
+  if (status !== "completed" && status !== "pending_approval") return 0; // active
+  if (status === "pending_approval") return 1;
+  return 2; // completed
+}
+
+function render() {
+  document.getElementById("stat-total").textContent = projects.length;
+  document.getElementById("stat-pending").textContent = projects.filter(p => p.status === "pending_approval").length;
+  document.getElementById("stat-active").textContent = projects.filter(p => p.status !== "completed" && p.status !== "pending_approval").length;
+  document.getElementById("stat-completed").textContent = projects.filter(p => p.status === "completed").length;
+
+  // Filter
+  let filtered = projects.filter(p => {
+    if (currentTab === "all") return true;
+    if (currentTab === "pending_approval") return p.status === "pending_approval";
+    if (currentTab === "completed") return p.status === "completed";
+    if (currentTab === "active") return p.status !== "completed" && p.status !== "pending_approval";
+    return true;
+  });
+
+  // For "all" tab: sort by status priority (active → pending → completed), keep manual order within each group
+  if (currentTab === "all") {
+    filtered = [...filtered].sort((a, b) => {
+      const pa = statusPriority(a.status), pb = statusPriority(b.status);
+      if (pa !== pb) return pa - pb;
+      return (a.manualOrder ?? 9999) - (b.manualOrder ?? 9999);
+    });
+  } else {
+    // Within a specific tab, just sort by manualOrder
+    filtered = [...filtered].sort((a, b) => (a.manualOrder ?? 9999) - (b.manualOrder ?? 9999));
+  }
+
+  const list = document.getElementById("list");
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="empty"><div class="empty-icon">🗂️</div><div class="empty-title">لا توجد مشاريع</div><div class="empty-sub">اضغط + لإضافة مشروع جديد</div></div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map((pr, idx) => {
+    const stage = getStage(pr.status);
+    const days = daysLeft(pr.deliveryDate);
+    const isExp = expandedId === pr.id;
+    const isFirst = idx === 0;
+    const isLast = idx === filtered.length - 1;
+
+    let daysHtml = "";
+    if (days !== null) {
+      const c = days < 0 ? "#EF4444" : days <= 7 ? "#F59E0B" : "#78716C";
+      const txt = days < 0 ? `تأخر ${Math.abs(days)} يوم` : days === 0 ? "التسليم اليوم!" : `${days} يوم متبقي`;
+      daysHtml = `<span class="card-days" style="color:${c}">${txt}</span>`;
+    }
+
+    const priceStr = pr.price ? Number(pr.price).toLocaleString() + " " + (pr.currency || "SAR") : "—";
+
+    // Mini payment badge on card face
+    const payments0 = pr.payments || [];
+    const totalPaid0 = payments0.reduce((s, p) => s + (parseFloat(p.amount) || 0), 0);
+    const totalPrice0 = parseFloat(pr.price) || 0;
+    const paidPct0 = totalPrice0 > 0 ? Math.min(100, Math.round((totalPaid0 / totalPrice0) * 100)) : null;
+    const paymentBadge = (pr.price && payments0.length > 0) ? `<span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:10px;background:${paidPct0===100?"#ECFDF5":"#FEF3C7"};color:${paidPct0===100?"#065F46":"#92400E"}">💰 ${paidPct0}% مُستلم</span>` : "";
+
+    const stagesHtml = STAGES.map(s => {
+      const note = (pr.stageNotes && pr.stageNotes[s.id]) || "";
+      const stageTiming = (pr.stageTiming && pr.stageTiming[s.id]) || {};
+      const plannedDays = stageTiming.plannedDays || "";
+      const startDate = stageTiming.startDate || "";
+      const endDate = stageTiming.endDate || "";
+      const isOpen = openStageNotes[pr.id] === s.id;
+      const hasNote = note.trim().length > 0;
+
+      // Calculate actual days taken
+      let actualDays = null;
+      if (startDate && endDate) {
+        const diff = Math.ceil((new Date(endDate + "T00:00:00") - new Date(startDate + "T00:00:00")) / 86400000);
+        actualDays = diff >= 0 ? diff : null;
+      } else if (startDate && !endDate) {
+        const today = new Date(); today.setHours(0,0,0,0);
+        actualDays = Math.ceil((today - new Date(startDate + "T00:00:00")) / 86400000);
+      }
+
+      // Build summary pills for header
+      let timingPills = "";
+      if (plannedDays) {
+        timingPills += `<span class="stage-timing-pill" style="background:#EEF2FF;color:#3730A3">🗓 ${plannedDays} يوم مخصص</span>`;
+      }
+      if (actualDays !== null) {
+        const over = plannedDays && actualDays > parseInt(plannedDays);
+        timingPills += `<span class="stage-timing-pill" style="background:${over?"#FEF2F2":"#ECFDF5"};color:${over?"#B91C1C":"#065F46"}">⏱ ${actualDays} يوم فعلي</span>`;
+      }
+
+      return `
+        <div class="stage-row">
+          <div class="stage-row-header" onclick="toggleStageNote('${pr.id}','${s.id}')">
+            <div class="stage-row-left" style="flex-direction:column;align-items:flex-start;gap:4px">
+              <div style="display:flex;align-items:center;gap:8px">
+                <span class="stage-row-emoji">${s.emoji}</span>
+                <span class="stage-row-label" style="color:${s.dark}">${s.label}</span>
+                ${hasNote ? `<span class="stage-row-has-note"></span>` : ""}
+              </div>
+              ${timingPills ? `<div class="stage-timing-summary">${timingPills}</div>` : ""}
+            </div>
+            <span class="stage-row-arrow" style="transform:${isOpen?"rotate(180deg)":"rotate(0deg)"}">▾</span>
+          </div>
+          <div class="stage-note-body ${isOpen?"open":""}">
+            <div style="margin-bottom:8px;font-size:11px;font-weight:700;color:#A8A29E;letter-spacing:1px">⏱ توقيت المرحلة</div>
+            <div class="stage-time-row">
+              <div class="stage-time-box">
+                <div class="stage-time-label">الوقت المخصص (أيام)</div>
+                <input class="stage-time-input" type="number" min="1" id="st-plan-${pr.id}-${s.id}" value="${esc(plannedDays)}" placeholder="0">
+              </div>
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <div class="stage-time-chips" style="margin-bottom:0">
+                  <button class="stage-time-chip" onclick="setPlanned('${pr.id}','${s.id}',3)">3</button>
+                  <button class="stage-time-chip" onclick="setPlanned('${pr.id}','${s.id}',7)">7</button>
+                  <button class="stage-time-chip" onclick="setPlanned('${pr.id}','${s.id}',14)">14</button>
+                  <button class="stage-time-chip" onclick="setPlanned('${pr.id}','${s.id}',30)">30</button>
+                </div>
+              </div>
+            </div>
+            <div class="stage-time-row">
+              <div class="stage-time-box">
+                <div class="stage-time-label">تاريخ البدء الفعلي</div>
+                <input class="stage-time-input" type="date" id="st-start-${pr.id}-${s.id}" value="${esc(startDate)}">
+              </div>
+              <div class="stage-time-box">
+                <div class="stage-time-label">تاريخ الانتهاء الفعلي</div>
+                <input class="stage-time-input" type="date" id="st-end-${pr.id}-${s.id}" value="${esc(endDate)}">
+              </div>
+            </div>
+            <button class="stage-note-save" onclick="saveStageTime('${pr.id}','${s.id}')">حفظ التوقيت</button>
+            <div style="margin-top:12px;border-top:1px solid #F0EEE9;padding-top:10px;font-size:11px;font-weight:700;color:#A8A29E;letter-spacing:1px;margin-bottom:6px">📝 ملاحظات</div>
+            <textarea class="stage-note-ta" id="sn-${pr.id}-${s.id}" rows="3" placeholder="اكتب ملاحظاتك هنا...">${esc(note)}</textarea>
+            <button class="stage-note-save" onclick="saveStageNote('${pr.id}','${s.id}')">حفظ الملاحظات</button>
+          </div>
+        </div>`;
+    }).join("");
+
+    // Payments calculations
+    const payments = pr.payments || [];
+    const totalPrice = parseFloat(pr.price) || 0;
+    const totalPaid = payments.reduce((s, p) => s + (parseFloat(p.amount) || 0), 0);
+    const remaining = totalPrice - totalPaid;
+    const paidPct = totalPrice > 0 ? Math.min(100, Math.round((totalPaid / totalPrice) * 100)) : 0;
+    const currency = pr.currency || "SAR";
+
+    const paymentsListHtml = payments.length === 0
+      ? `<div style="text-align:center;color:#A8A29E;font-size:12px;padding:8px 0">لا توجد دفعات مسجّلة</div>`
+      : payments.map((p, i) => `
+        <div class="payment-item">
+          <div class="payment-item-right">
+            <span class="payment-item-amount">+ ${Number(p.amount).toLocaleString()} ${currency}</span>
+            <span class="payment-item-label">${esc(p.label || "دفعة")}</span>
+            ${p.date ? `<span class="payment-item-date">${formatDate(p.date)}</span>` : ""}
+          </div>
+          <button class="payment-del-btn" onclick="deletePayment('${pr.id}',${i})">حذف</button>
+        </div>`).join("");
+
+    const paymentSummaryHtml = totalPrice > 0 ? `
+      <div class="payment-summary">
+        <div class="payment-sum-box" style="background:#ECFDF5">
+          <div class="payment-sum-label" style="color:#065F46">✅ المُستلم</div>
+          <div class="payment-sum-val" style="color:#10B981">${totalPaid.toLocaleString()} ${currency}</div>
+        </div>
+        <div class="payment-sum-box" style="background:${remaining > 0 ? "#FEF3C7" : "#ECFDF5"}">
+          <div class="payment-sum-label" style="color:${remaining > 0 ? "#92400E" : "#065F46"}">${remaining > 0 ? "⏳ المتبقي" : "✔ مكتمل"}</div>
+          <div class="payment-sum-val" style="color:${remaining > 0 ? "#D97706" : "#10B981"}">${Math.abs(remaining).toLocaleString()} ${currency}</div>
+        </div>
+      </div>
+      <div class="payment-progress-wrap">
+        <div class="payment-progress-bg"><div class="payment-progress-fill" style="width:${paidPct}%"></div></div>
+        <div class="payment-progress-label">${paidPct}% تم استلامه</div>
+      </div>` : "";
+
+    const detailsHtml = isExp ? `
+      <div class="card-details">
+        <div class="dates-grid">
+          <div class="date-box"><div class="date-label">تاريخ البدء</div><div class="date-val">${formatDate(pr.startDate)}</div></div>
+          <div class="date-box"><div class="date-label">التسليم النهائي</div><div class="date-val">${formatDate(pr.deliveryDate)}</div></div>
+        </div>
+
+        <div class="payments-section">
+          <div class="payments-header">
+            <div class="payments-title">💰 الدفعات</div>
+            <button class="add-payment-btn" onclick="togglePaymentForm('${pr.id}')">+ إضافة دفعة</button>
+          </div>
+          ${paymentSummaryHtml}
+          <div class="payment-list">${paymentsListHtml}</div>
+          <div class="payment-form" id="pf-${pr.id}">
+            <div class="payment-form-row">
+              <div>
+                <div class="stage-time-label" style="margin-bottom:4px">المبلغ</div>
+                <input class="payment-input" type="number" id="pi-amount-${pr.id}" placeholder="0">
+              </div>
+              <div>
+                <div class="stage-time-label" style="margin-bottom:4px">التاريخ</div>
+                <input class="payment-input" type="date" id="pi-date-${pr.id}">
+              </div>
+            </div>
+            <div style="margin-bottom:8px">
+              <div class="stage-time-label" style="margin-bottom:4px">الوصف (اختياري)</div>
+              <input class="payment-input" type="text" id="pi-label-${pr.id}" placeholder="مثال: دفعة أولى، دفعة ثانية...">
+            </div>
+            <button class="payment-save-btn" onclick="addPayment('${pr.id}')">✓ حفظ الدفعة</button>
+          </div>
+        </div>
+
+        <div class="stages-section">
+          <div class="stages-title">ملاحظات المراحل</div>
+          ${stagesHtml}
+        </div>
+        <div class="card-actions">
+          <button class="edit-btn" onclick="openEditForm('${pr.id}')">✏️ تعديل</button>
+          <button class="del-btn" onclick="openDelete('${pr.id}')">🗑️</button>
+        </div>
+      </div>` : "";
+
+    return `<div class="card">
+      <div class="card-top" onclick="toggleExpand('${pr.id}')">
+        <div class="card-row1">
+          <div class="reorder-btns" onclick="event.stopPropagation()">
+            <button class="reorder-btn" onclick="moveProject('${pr.id}',-1)" ${isFirst?"disabled":""} title="تحريك لأعلى">▲</button>
+            <button class="reorder-btn" onclick="moveProject('${pr.id}',1)" ${isLast?"disabled":""} title="تحريك لأسفل">▼</button>
+          </div>
+          <div style="flex:1">
+            <div class="card-name">${esc(pr.name)}</div>
+            <div class="card-client">👤 ${esc(pr.client)}</div>
+          </div>
+          <button class="status-badge" style="background:${stage.bg};color:${stage.dark}" onclick="event.stopPropagation();openStatusSheet('${pr.id}')">
+            ${stage.emoji} ${stage.label}
+          </button>
+        </div>
+        <div class="card-row2">
+          <span class="card-price">${priceStr}</span>
+          ${paymentBadge}
+          ${daysHtml}
+          <span class="card-arrow" style="transform:${isExp?"rotate(180deg)":"rotate(0deg)"}">▾</span>
+        </div>
+      </div>
+      ${detailsHtml}
+    </div>`;
+  }).join("");
+}
+
+function toggleExpand(id) { expandedId = expandedId === id ? null : id; render(); }
+
+function moveProject(id, dir) {
+  // Get currently filtered list in same order as rendered
+  let filtered = projects.filter(p => {
+    if (currentTab === "all") return true;
+    if (currentTab === "pending_approval") return p.status === "pending_approval";
+    if (currentTab === "completed") return p.status === "completed";
+    if (currentTab === "active") return p.status !== "completed" && p.status !== "pending_approval";
+    return true;
+  });
+  if (currentTab === "all") {
+    filtered = [...filtered].sort((a, b) => {
+      const pa = statusPriority(a.status), pb = statusPriority(b.status);
+      if (pa !== pb) return pa - pb;
+      return (a.manualOrder ?? 9999) - (b.manualOrder ?? 9999);
+    });
+  }
+
+  const idx = filtered.findIndex(p => p.id === id);
+  const swapIdx = idx + dir;
+  if (swapIdx < 0 || swapIdx >= filtered.length) return;
+
+  // Swap manualOrder between the two projects in the real projects array
+  const idA = filtered[idx].id;
+  const idB = filtered[swapIdx].id;
+
+  // Assign fresh sequential manualOrder to filtered list, then swap
+  filtered.forEach((p, i) => {
+    const proj = projects.find(pr => pr.id === p.id);
+    if (proj) proj.manualOrder = i * 10;
+  });
+  const projA = projects.find(p => p.id === idA);
+  const projB = projects.find(p => p.id === idB);
+  if (projA && projB) {
+    const tmp = projA.manualOrder;
+    projA.manualOrder = projB.manualOrder;
+    projB.manualOrder = tmp;
+  }
+
+  save(); render();
+}
+
+function toggleStageNote(projectId, stageId) {
+  openStageNotes[projectId] = openStageNotes[projectId] === stageId ? null : stageId;
+  render();
+}
+
+function saveStageNote(projectId, stageId) {
+  const ta = document.getElementById(`sn-${projectId}-${stageId}`);
+  if (!ta) return;
+  projects = projects.map(p => {
+    if (p.id !== projectId) return p;
+    return { ...p, stageNotes: { ...(p.stageNotes || {}), [stageId]: ta.value } };
+  });
+  save(); showToast("✓ تم الحفظ"); render();
+}
+
+function saveStageTime(projectId, stageId) {
+  const planned = document.getElementById(`st-plan-${projectId}-${stageId}`)?.value || "";
+  const start = document.getElementById(`st-start-${projectId}-${stageId}`)?.value || "";
+  const end = document.getElementById(`st-end-${projectId}-${stageId}`)?.value || "";
+  projects = projects.map(p => {
+    if (p.id !== projectId) return p;
+    return { ...p, stageTiming: { ...(p.stageTiming || {}), [stageId]: { plannedDays: planned, startDate: start, endDate: end } } };
+  });
+  save(); showToast("✓ تم حفظ التوقيت"); render();
+}
+
+function setPlanned(projectId, stageId, days) {
+  const input = document.getElementById(`st-plan-${projectId}-${stageId}`);
+  if (input) input.value = days;
+}
+
+// Payments
+function togglePaymentForm(projectId) {
+  const form = document.getElementById(`pf-${projectId}`);
+  if (!form) return;
+  form.classList.toggle("open");
+  if (form.classList.contains("open")) {
+    // set today as default date
+    const dateInput = document.getElementById(`pi-date-${projectId}`);
+    if (dateInput && !dateInput.value) dateInput.value = new Date().toISOString().split("T")[0];
+  }
+}
+
+function addPayment(projectId) {
+  const amount = document.getElementById(`pi-amount-${projectId}`)?.value;
+  const date = document.getElementById(`pi-date-${projectId}`)?.value || "";
+  const label = document.getElementById(`pi-label-${projectId}`)?.value.trim() || "دفعة";
+  if (!amount || parseFloat(amount) <= 0) { showToast("⚠️ أدخل المبلغ"); return; }
+  projects = projects.map(p => {
+    if (p.id !== projectId) return p;
+    const payments = [...(p.payments || []), { amount: parseFloat(amount), date, label }];
+    return { ...p, payments };
+  });
+  save(); showToast("✓ تمت إضافة الدفعة"); render();
+}
+
+function deletePayment(projectId, index) {
+  projects = projects.map(p => {
+    if (p.id !== projectId) return p;
+    const payments = (p.payments || []).filter((_, i) => i !== index);
+    return { ...p, payments };
+  });
+  save(); showToast("✓ تم حذف الدفعة"); render();
+}
+
+function openStatusSheet(id) {
+  statusTargetId = id;
+  document.getElementById("status-buttons").innerHTML = STAGES.map(s =>
+    `<button class="stage-btn" style="background:${s.bg};color:${s.dark};border-color:${s.color}30" onclick="changeStatus('${s.id}')"><span style="font-size:20px">${s.emoji}</span> ${s.label}</button>`).join("");
+  document.getElementById("status-overlay").classList.add("show");
+}
+function closeStatusSheet() { document.getElementById("status-overlay").classList.remove("show"); }
+function changeStatus(status) {
+  projects = projects.map(p => p.id === statusTargetId ? {...p, status} : p);
+  save(); closeStatusSheet(); render();
+}
+
+function openDelete(id) { deleteTargetId = id; document.getElementById("delete-overlay").classList.add("show"); }
+function closeDelete() { document.getElementById("delete-overlay").classList.remove("show"); }
+function confirmDelete() {
+  projects = projects.filter(p => p.id !== deleteTargetId);
+  expandedId = null; save(); closeDelete(); render();
+}
+
+function openIO() {
+  const code = btoa(unescape(encodeURIComponent(JSON.stringify(projects))));
+  document.getElementById("export-code").textContent = code;
+  document.getElementById("import-ta").value = "";
+  document.getElementById("io-overlay").classList.add("show");
+}
+function closeIO() { document.getElementById("io-overlay").classList.remove("show"); }
+
+function copyExport() {
+  const code = document.getElementById("export-code").textContent;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(code).then(() => showToast("✓ تم النسخ")).catch(() => fallbackCopy(code));
+  } else { fallbackCopy(code); }
+}
+function fallbackCopy(text) {
+  const ta = document.createElement("textarea");
+  ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try { document.execCommand("copy"); showToast("✓ تم النسخ"); } catch(e) { showToast("⚠️ انسخ الكود يدوياً"); }
+  document.body.removeChild(ta);
+}
+
+function doImport() {
+  const raw = document.getElementById("import-ta").value.trim();
+  if (!raw) { showToast("⚠️ الصق الكود أولاً"); return; }
+  try {
+    const decoded = decodeURIComponent(escape(atob(raw)));
+    const data = JSON.parse(decoded);
+    if (!Array.isArray(data)) throw new Error();
+    projects = data;
+    save(); closeIO(); render();
+    showToast("✓ تم الاستيراد بنجاح");
+  } catch(e) {
+    showToast("⚠️ الكود غير صحيح");
+  }
+}
+
+function buildStatusSelect() {
+  document.getElementById("status-select").innerHTML = STAGES.map(s =>
+    `<button class="status-option" style="background:${formStatus===s.id?s.bg:"#F8F7F4"};color:${formStatus===s.id?s.dark:"#78716C"};border-color:${formStatus===s.id?s.color:"transparent"}" onclick="selectFormStatus('${s.id}')">${s.emoji} ${s.label}</button>`).join("");
+}
+function selectFormStatus(id) { formStatus = id; buildStatusSelect(); }
+
+function openForm() {
+  editId = null; formStatus = "first_meeting";
+  ["f-name","f-client","f-price","f-start","f-delivery"].forEach(id => document.getElementById(id).value = "");
+  document.getElementById("f-currency").value = "SAR";
+  document.getElementById("form-title").textContent = "➕ مشروع جديد";
+  document.getElementById("form-save-btn").textContent = "إضافة المشروع";
+  buildStatusSelect();
+  document.getElementById("form-overlay").classList.add("show");
+}
+
+function openEditForm(id) {
+  const pr = projects.find(p => p.id === id);
+  if (!pr) return;
+  editId = id; formStatus = pr.status;
+  document.getElementById("f-name").value = pr.name;
+  document.getElementById("f-client").value = pr.client;
+  document.getElementById("f-price").value = pr.price || "";
+  document.getElementById("f-currency").value = pr.currency || "SAR";
+  document.getElementById("f-start").value = pr.startDate || "";
+  document.getElementById("f-delivery").value = pr.deliveryDate || "";
+  document.getElementById("form-title").textContent = "✏️ تعديل المشروع";
+  document.getElementById("form-save-btn").textContent = "حفظ التعديلات";
+  buildStatusSelect();
+  document.getElementById("form-overlay").classList.add("show");
+}
+
+function closeForm() { document.getElementById("form-overlay").classList.remove("show"); }
+
+function saveProject() {
+  const name = document.getElementById("f-name").value.trim();
+  const client = document.getElementById("f-client").value.trim();
+  if (!name || !client) { alert("يرجى إدخال اسم المشروع واسم العميل"); return; }
+  const data = { name, client,
+    price: document.getElementById("f-price").value,
+    currency: document.getElementById("f-currency").value,
+    startDate: document.getElementById("f-start").value,
+    deliveryDate: document.getElementById("f-delivery").value,
+    status: formStatus };
+  if (editId) {
+    projects = projects.map(p => p.id === editId ? {...p, ...data} : p);
+  } else {
+    projects.push({...data, id: Date.now().toString(), stageNotes: {}, manualOrder: projects.length * 10});
+  }
+  save(); closeForm(); render();
+}
+
+render();
+</script>
+</body>
+</html>
