@@ -137,6 +137,27 @@ button:active { transform: scale(0.96); }
 .stage-timing-pill { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 10px; }
 
 
+/* Revisions */
+.revisions-section { margin-top: 12px; border-top: 1px solid #F0EEE9; padding-top: 10px; }
+.revisions-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.revisions-title { font-size: 11px; font-weight: 700; color: #A8A29E; letter-spacing: 1px; }
+.add-revision-btn { background: #FEF3C7; color: #92400E; border: none; border-radius: 8px; padding: 5px 10px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.revision-item { background: #FAFAF8; border-radius: 12px; padding: 10px 12px; margin-bottom: 6px; border: 1.5px solid #F0EEE9; }
+.revision-item.done { border-color: #D1FAE5; background: #F0FDF4; }
+.revision-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+.revision-desc { font-size: 13px; font-weight: 600; flex: 1; line-height: 1.4; }
+.revision-actions { display: flex; gap: 5px; flex-shrink: 0; }
+.revision-toggle { border: none; border-radius: 8px; padding: 4px 8px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit; white-space: nowrap; }
+.revision-del { background: none; border: none; color: #C7C3BC; font-size: 13px; cursor: pointer; padding: 4px 6px; }
+.revision-meta { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #A8A29E; }
+.revision-num { font-weight: 700; color: #F59E0B; }
+.revision-form { background: #F8F7F4; border-radius: 12px; padding: 12px; margin-top: 6px; display: none; border: 1.5px solid #E7E5E0; }
+.revision-form.open { display: block; animation: slideDown 0.2s ease; }
+.revision-input { width: 100%; background: #fff; border: 1.5px solid #E7E5E0; border-radius: 10px; padding: 10px 12px; font-size: 13px; font-family: inherit; direction: rtl; outline: none; margin-bottom: 8px; }
+.revision-input:focus { border-color: #F59E0B; }
+.revision-save { background: #1C1917; color: #fff; border: none; border-radius: 10px; padding: 9px 18px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.open-revisions-badge { display: inline-flex; align-items: center; gap: 3px; background: #FEF3C7; color: #92400E; border-radius: 8px; padding: 2px 7px; font-size: 11px; font-weight: 700; }
+
 /* Card actions */
 .card-actions { display: flex; gap: 8px; }
 .edit-btn { flex: 1; background: #1C1917; color: #fff; border: none; border-radius: 14px; padding: 13px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
@@ -596,9 +617,10 @@ function render() {
       const plannedDays = stageTiming.plannedDays || "";
       const startDate = stageTiming.startDate || oldTimeline.start || "";
       const endDate = stageTiming.endDate || oldTimeline.end || "";
-      const isOpen = openStageNotes[pr.id] === s.id;
+      const stageRevisions = (pr.stageRevisions && pr.stageRevisions[s.id]) || [];
+      const openRevisions = stageRevisions.filter(r => !r.done).length;
       const hasNote = note.trim().length > 0;
-
+      const isOpen = openStageNotes[pr.id] === s.id;
       let actualDays = null;
       if (startDate && endDate) {
         const diff = Math.ceil((new Date(endDate+"T00:00:00") - new Date(startDate+"T00:00:00")) / 86400000) + 1;
@@ -625,6 +647,7 @@ function render() {
               <span class="stage-row-emoji">${s.emoji}</span>
               <span class="stage-row-label" style="color:${s.dark}">${s.label}</span>
               ${hasNote ? `<span class="stage-row-has-note"></span>` : ""}
+              ${openRevisions > 0 ? `<span class="open-revisions-badge">✏️ ${openRevisions} تعديل</span>` : ""}
             </div>
             ${timingPills ? `<div class="stage-timing-summary">${timingPills}</div>` : ""}
           </div>
@@ -660,6 +683,31 @@ function render() {
           <div style="margin-top:12px;border-top:1px solid #F0EEE9;padding-top:10px;font-size:11px;font-weight:700;color:#A8A29E;letter-spacing:1px;margin-bottom:6px">📝 ملاحظات</div>
           <textarea class="stage-note-ta" id="sn-${pr.id}-${s.id}" rows="3" placeholder="اكتب ملاحظاتك هنا...">${esc(note)}</textarea>
           <button class="stage-note-save" onclick="saveStageNote('${pr.id}','${s.id}')">حفظ الملاحظات</button>
+          <div class="revisions-section">
+            <div class="revisions-header">
+              <span class="revisions-title">✏️ سجل التعديلات (${stageRevisions.length})</span>
+              <button class="add-revision-btn" onclick="toggleRevisionForm('${pr.id}','${s.id}')">+ تعديل جديد</button>
+            </div>
+            ${stageRevisions.length === 0 ? `<div style="text-align:center;color:#A8A29E;font-size:12px;padding:6px 0">لا توجد تعديلات</div>` :
+              stageRevisions.map((r,ri) => `
+                <div class="revision-item ${r.done?'done':''}">
+                  <div class="revision-top">
+                    <span class="revision-desc">${esc(r.desc)}</span>
+                    <div class="revision-actions">
+                      <button class="revision-toggle" style="background:${r.done?'#ECFDF5':'#FEF3C7'};color:${r.done?'#065F46':'#92400E'}" onclick="toggleRevision('${pr.id}','${s.id}',${ri})">${r.done?'✅ منتهي':'🔄 جاري'}</button>
+                      <button class="revision-del" onclick="deleteRevision('${pr.id}','${s.id}',${ri})">✕</button>
+                    </div>
+                  </div>
+                  <div class="revision-meta">
+                    <span class="revision-num">#${ri+1}</span>
+                    ${r.date ? `<span>${r.date}</span>` : ""}
+                  </div>
+                </div>`).join("")}
+            <div class="revision-form" id="rf-${pr.id}-${s.id}">
+              <input class="revision-input" id="ri-desc-${pr.id}-${s.id}" placeholder="وصف التعديل المطلوب...">
+              <button class="revision-save" onclick="addRevision('${pr.id}','${s.id}')">✓ حفظ التعديل</button>
+            </div>
+          </div>
         </div>
       </div>`;
     }).join("");
@@ -956,6 +1004,52 @@ async function saveProject() {
     window._projects.push({...data,id:Date.now().toString(),stageNotes:{},stageTimeline:{},stageTiming:{},payments:[],manualOrder:maxOrder+10});
   }
   await window._saveToDb(); closeForm(); showToast("✓ تم الحفظ");
+}
+
+// Revisions
+function toggleRevisionForm(pid, sid) {
+  const form = document.getElementById(`rf-${pid}-${sid}`);
+  if (!form) return;
+  form.classList.toggle("open");
+  if (form.classList.contains("open")) {
+    const inp = document.getElementById(`ri-desc-${pid}-${sid}`);
+    if (inp) inp.focus();
+  }
+}
+
+async function addRevision(pid, sid) {
+  const inp = document.getElementById(`ri-desc-${pid}-${sid}`);
+  if (!inp) return;
+  const desc = inp.value.trim();
+  if (!desc) { showToast("⚠️ اكتب وصف التعديل"); return; }
+  const today = new Date().toLocaleDateString("ar-SA", {day:"numeric",month:"short",year:"numeric"});
+  window._projects = window._projects.map(p => {
+    if (p.id !== pid) return p;
+    const existing = (p.stageRevisions && p.stageRevisions[sid]) || [];
+    return { ...p, stageRevisions: { ...(p.stageRevisions||{}), [sid]: [...existing, { desc, date: today, done: false }] } };
+  });
+  await window._saveToDb();
+  showToast("✓ تم إضافة التعديل");
+  render();
+}
+
+async function toggleRevision(pid, sid, idx) {
+  window._projects = window._projects.map(p => {
+    if (p.id !== pid) return p;
+    const revs = [...((p.stageRevisions && p.stageRevisions[sid]) || [])];
+    revs[idx] = { ...revs[idx], done: !revs[idx].done };
+    return { ...p, stageRevisions: { ...(p.stageRevisions||{}), [sid]: revs } };
+  });
+  await window._saveToDb(); render();
+}
+
+async function deleteRevision(pid, sid, idx) {
+  window._projects = window._projects.map(p => {
+    if (p.id !== pid) return p;
+    const revs = ((p.stageRevisions && p.stageRevisions[sid]) || []).filter((_,i)=>i!==idx);
+    return { ...p, stageRevisions: { ...(p.stageRevisions||{}), [sid]: revs } };
+  });
+  await window._saveToDb(); showToast("✓ تم حذف التعديل"); render();
 }
 </script>
 </body>
