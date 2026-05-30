@@ -1166,6 +1166,23 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
   box-shadow: 0 0 0 3px rgba(29,158,117,0.08);
 }
 
+
+.calc-scope-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #44403C;
+  user-select: none;
+}
+.calc-scope-toggle input {
+  width: 16px;
+  height: 16px;
+  accent-color: #1D9E75;
+}
+
 </style>
 </head>
 <body>
@@ -1383,7 +1400,11 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
         <div class="calc-logo-preview calc-plan-preview" id="calcPlanPreview"><span class="calc-logo-note">بدون مخطط</span></div>
         <button class="calc-logo-btn primary" type="button" onclick="document.getElementById('calcPlanInput').click()">رفع مخطط نطاق التصميم</button>
         <button class="calc-logo-btn" type="button" onclick="clearCalcPlan()">حذف المخطط</button>
-        <span class="calc-logo-note">تظهر الصورة في صفحة مستقلة باسم نطاق التصميم</span>
+        <label class="calc-scope-toggle">
+          <input id="cq-scope-toggle" type="checkbox" onchange="calcSyncQuoteMeta()">
+          <span>إظهار نطاق التصميم في التسعيرة</span>
+        </label>
+        <span class="calc-logo-note">عند إيقافه لن تظهر صفحة نطاق التصميم في ملف التسعيرة</span>
         <input id="calcPlanInput" type="file" accept="image/*" style="display:none" onchange="calcHandlePlanUpload(event)">
       </div>
     </div>
@@ -2209,7 +2230,8 @@ let calcQuoteMeta = {
   accountNumber: '',
   notes: '',
   logoData: '',
-  scopePlanData: ''
+  scopePlanData: '',
+  includeDesignScope: true
 };
 
 function calcInitPcts(){CALC_ORDER.forEach(t=>{CALC_BASE[t].forEach(d=>{calcItemPct[d.id]=d.pct;});});calcItemPct[CALC_SURVEY.id]=2;}
@@ -2279,6 +2301,7 @@ function loadCalcQuoteMeta(){
     if(!calcQuoteMeta.components) calcQuoteMeta.components = '- الواجهة المعمارية\n- التصميم الداخلي\n- تصميم الحدائق والمسطحات الخارجية';
     if(!calcQuoteMeta.bankName) calcQuoteMeta.bankName = 'الراجحي';
     if(!calcQuoteMeta.accountName) calcQuoteMeta.accountName = 'خالد حسن العجمي';
+    if(typeof calcQuoteMeta.includeDesignScope === 'undefined') calcQuoteMeta.includeDesignScope = true;
   } catch(e) {}
 }
 function saveCalcQuoteMeta(){
@@ -2306,6 +2329,8 @@ function calcFillQuoteMetaForm(){
   setVal('cq-notes', calcQuoteMeta.notes || '');
   renderCalcLogoPreview();
   renderCalcPlanPreview();
+  const scopeToggle = document.getElementById('cq-scope-toggle');
+  if (scopeToggle) scopeToggle.checked = calcQuoteMeta.includeDesignScope !== false;
 }
 function calcSyncQuoteMeta(){
   calcQuoteMeta.title = document.getElementById('cq-title').value.trim() || 'عرض سعر';
@@ -2326,6 +2351,8 @@ function calcSyncQuoteMeta(){
   calcQuoteMeta.accountName = document.getElementById('cq-account-name').value.trim() || 'خالد حسن العجمي';
   calcQuoteMeta.accountNumber = document.getElementById('cq-account-number').value.trim();
   calcQuoteMeta.notes = document.getElementById('cq-notes').value.trim();
+  const scopeToggle = document.getElementById('cq-scope-toggle');
+  calcQuoteMeta.includeDesignScope = scopeToggle ? scopeToggle.checked : true;
   saveCalcQuoteMeta();
 }
 function renderCalcLogoPreview(){
@@ -3159,13 +3186,14 @@ function calcExportPDF(){
   </div>
 </div>
 
-<!-- ════ DESIGN SCOPE PAGE ════ -->
+${calcQuoteMeta.includeDesignScope !== false ? `<!-- ════ DESIGN SCOPE PAGE ════ -->
 <div class="page page-scope">
   <div class="scope-page-title">نطاق التصميم</div>
   <div class="scope-plan-frame">
     ${calcQuoteMeta.scopePlanData ? `<img src="${calcQuoteMeta.scopePlanData}" alt="نطاق التصميم">` : `<div class="scope-plan-empty">ارفع صورة المخطط من الحاسبة لتظهر هنا</div>`}
   </div>
 </div>
+` : ''}
 
 <!-- ════ PAGE 2 ════ -->
 <div class="page page-2 quote-flow-page">
