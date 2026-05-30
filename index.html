@@ -21,6 +21,87 @@ button:active { transform: scale(0.96); }
 .login-sub { font-size: 15px; color: #A8A29E; margin-bottom: 52px; text-align: center; line-height: 1.6; animation: floatIn 1s ease; }
 .google-btn { display: flex; align-items: center; gap: 12px; background: #fff; border: none; border-radius: 18px; padding: 17px 28px; font-size: 16px; font-weight: 700; cursor: pointer; font-family: inherit; box-shadow: 0 8px 30px rgba(0,0,0,0.4); width: 100%; max-width: 300px; justify-content: center; animation: floatIn 1.1s ease; }
 .login-error { color: #EF4444; font-size: 13px; margin-top: 16px; text-align: center; }
+
+.email-login-card {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: floatIn 1.05s ease;
+}
+.email-login-card input {
+  width: 100%;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  border-radius: 14px;
+  padding: 14px 15px;
+  font-size: 15px;
+  font-family: inherit;
+  outline: none;
+  direction: ltr;
+  text-align: left;
+}
+.email-login-card input::placeholder { color: #A8A29E; }
+.email-login-card input:focus {
+  border-color: #D4A853;
+  background: rgba(255,255,255,0.12);
+  box-shadow: 0 0 0 3px rgba(212,168,83,0.12);
+}
+.email-login-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.email-login-btn {
+  border: none;
+  border-radius: 14px;
+  padding: 13px 12px;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: inherit;
+}
+.email-login-btn.primary {
+  background: linear-gradient(135deg, #D4A853, #E8C070);
+  color: #1C1917;
+}
+.email-login-btn.secondary {
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.14);
+}
+.login-divider {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #78716C;
+  font-size: 12px;
+  font-weight: 700;
+  margin: 16px 0;
+  animation: floatIn 1.08s ease;
+}
+.login-divider::before,
+.login-divider::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: rgba(255,255,255,0.12);
+}
+.forgot-link {
+  background: transparent;
+  border: none;
+  color: #D4A853;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 4px 0 0;
+}
+
 @keyframes floatIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
 /* ─── APP ─── */
@@ -1196,6 +1277,19 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
   <div class="login-logo">🗂️</div>
   <div class="login-title">PROJECT TRACKER</div>
   <div class="login-sub">سجّل دخولك لإدارة مشاريعك<br>بشكل احترافي</div>
+
+  <div class="email-login-card">
+    <input id="email-login-input" type="email" placeholder="Email">
+    <input id="password-login-input" type="password" placeholder="Password">
+    <div class="email-login-actions">
+      <button class="email-login-btn primary" onclick="signInWithEmail()">دخول</button>
+      <button class="email-login-btn secondary" onclick="createAccountWithEmail()">تسجيل جديد</button>
+    </div>
+    <button class="forgot-link" onclick="resetEmailPassword()">نسيت كلمة المرور؟</button>
+  </div>
+
+  <div class="login-divider"><span>أو</span></div>
+
   <button class="google-btn" onclick="signInWithGoogle()">
     <svg width="22" height="22" viewBox="0 0 24 24">
       <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -1442,7 +1536,7 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
 <!-- Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut as fbSignOut }
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut as fbSignOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getDatabase, ref, onValue, set, remove }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -1461,6 +1555,16 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
 const provider = new GoogleAuthProvider();
+
+function setupEmailLoginEnter() {
+  ["email-login-input", "password-login-input"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("keydown", e => {
+      if (e.key === "Enter") window.signInWithEmail();
+    });
+  });
+}
+setupEmailLoginEnter();
 
 let currentUser = null;
 onAuthStateChanged(auth, user => {
@@ -1493,10 +1597,66 @@ onAuthStateChanged(auth, user => {
   }
 });
 
+function getEmailLoginValues() {
+  const email = (document.getElementById("email-login-input")?.value || "").trim();
+  const password = document.getElementById("password-login-input")?.value || "";
+  return { email, password };
+}
+function showLoginError(message) {
+  const el = document.getElementById("login-error");
+  if (el) el.textContent = message || "";
+}
+function friendlyAuthError(error) {
+  const code = error?.code || "";
+  if (code.includes("invalid-email")) return "الإيميل غير صحيح";
+  if (code.includes("missing-password")) return "اكتب كلمة المرور";
+  if (code.includes("weak-password")) return "كلمة المرور لازم تكون 6 أحرف على الأقل";
+  if (code.includes("email-already-in-use")) return "هذا الإيميل مسجل مسبقًا، جرّب تسجيل الدخول";
+  if (code.includes("user-not-found") || code.includes("wrong-password") || code.includes("invalid-credential")) return "الإيميل أو كلمة المرور غير صحيحة";
+  if (code.includes("too-many-requests")) return "محاولات كثيرة، انتظر شوي ثم حاول";
+  if (code.includes("operation-not-allowed")) return "فعّل تسجيل الدخول بالإيميل من Firebase أولًا";
+  return "حدث خطأ، حاول مرة ثانية";
+}
+
 window.signInWithGoogle = async () => {
-  try { document.getElementById("login-error").textContent = ""; await signInWithPopup(auth, provider); }
-  catch(e) { document.getElementById("login-error").textContent = "حدث خطأ، حاول مرة ثانية"; }
+  try { showLoginError(""); await signInWithPopup(auth, provider); }
+  catch(e) { showLoginError("حدث خطأ، حاول مرة ثانية"); }
 };
+
+window.signInWithEmail = async () => {
+  try {
+    showLoginError("");
+    const { email, password } = getEmailLoginValues();
+    if (!email || !password) { showLoginError("اكتب الإيميل وكلمة المرور"); return; }
+    await signInWithEmailAndPassword(auth, email, password);
+  } catch(e) {
+    showLoginError(friendlyAuthError(e));
+  }
+};
+
+window.createAccountWithEmail = async () => {
+  try {
+    showLoginError("");
+    const { email, password } = getEmailLoginValues();
+    if (!email || !password) { showLoginError("اكتب الإيميل وكلمة المرور"); return; }
+    await createUserWithEmailAndPassword(auth, email, password);
+  } catch(e) {
+    showLoginError(friendlyAuthError(e));
+  }
+};
+
+window.resetEmailPassword = async () => {
+  try {
+    showLoginError("");
+    const { email } = getEmailLoginValues();
+    if (!email) { showLoginError("اكتب الإيميل أولًا ثم اضغط نسيت كلمة المرور"); return; }
+    await sendPasswordResetEmail(auth, email);
+    showLoginError("تم إرسال رابط إعادة تعيين كلمة المرور للإيميل");
+  } catch(e) {
+    showLoginError(friendlyAuthError(e));
+  }
+};
+
 window.doSignOut = async () => { await fbSignOut(auth); closeUserMenu(); };
 window._saveToDb = async () => {
   if (!window._dbRef) return;
