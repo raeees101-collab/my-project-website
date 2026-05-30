@@ -810,6 +810,130 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
   border-radius: 10px;
 }
 
+
+/* Better quote form layout */
+.calc-quote-card {
+  max-width: 980px;
+  margin: 0 auto 1rem;
+  padding: 16px;
+  border-radius: 18px;
+  background: #fff;
+  border: 1px solid #E5E2DC;
+}
+.calc-quote-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+.calc-quote-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.calc-quote-field label {
+  font-size: 12px;
+  color: #57534E;
+  font-weight: 800;
+  text-align: right;
+}
+.calc-quote-field input,
+.calc-quote-field textarea {
+  width: 100%;
+  border: 1.5px solid #E7E5E0;
+  border-radius: 13px;
+  padding: 11px 13px;
+  font-size: 14px;
+  line-height: 1.8;
+  color: #1C1917;
+  background: #FDFDFC;
+  font-family: inherit;
+  direction: rtl;
+  text-align: right;
+  outline: none;
+  box-sizing: border-box;
+}
+.calc-quote-field input:focus,
+.calc-quote-field textarea:focus {
+  border-color: #1D9E75;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(29,158,117,0.08);
+}
+.calc-quote-field textarea {
+  resize: vertical;
+  min-height: 92px;
+  white-space: pre-wrap;
+}
+.calc-quote-field.calc-quote-full {
+  grid-column: 1 / -1;
+}
+#cq-work-desc {
+  min-height: 260px !important;
+  font-size: 14px;
+  line-height: 2;
+}
+#cq-notes {
+  min-height: 90px;
+}
+.calc-logo-tools {
+  max-width: 980px;
+  margin: 14px auto 0;
+  padding-top: 12px;
+  border-top: 1px solid #F0EEE9;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.calc-logo-preview {
+  width: 72px;
+  height: 72px;
+  border-radius: 14px;
+  border: 1px solid #E5E2DC;
+  background: #FAFAF8;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.calc-logo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.calc-logo-btn {
+  border: 1px solid #E5E2DC;
+  background: #fff;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: inherit;
+}
+.calc-logo-btn.primary {
+  background: #1C1917;
+  color: #fff;
+}
+.calc-logo-note {
+  font-size: 11px;
+  color: #A8A29E;
+}
+@media (max-width: 720px) {
+  .calc-quote-grid { grid-template-columns: 1fr; }
+  .calc-quote-card { padding: 12px; }
+}
+
+
+.calc-sheet {
+  max-width: 1120px;
+  margin: 0 auto;
+  border-radius: 28px 28px 0 0;
+}
+#calc-overlay .sheet {
+  padding-left: 18px;
+  padding-right: 18px;
+}
+
 </style>
 </head>
 <body>
@@ -983,17 +1107,17 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
     <div class="calc-sec-label">بيانات عرض السعر</div>
     <div class="calc-quote-card">
       <div class="calc-quote-grid">
-        <div class="calc-quote-field"><label>عنوان العرض</label><input id="cq-title" type="text" placeholder="عرض سعر" oninput="calcSyncQuoteMeta()"></div>
+        <div class="calc-quote-field"><label>عنوان عرض السعر</label><input id="cq-title" type="text" placeholder="عرض سعر" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>اسم المشروع</label><input id="cq-project" type="text" placeholder="مثال: تصميم داخلي لفيلا" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>موقع المشروع</label><input id="cq-location" type="text" placeholder="المدينة / الحي" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>مساحة المشروع</label><input id="cq-area" type="number" min="0" step="1" placeholder="اكتب الرقم فقط" oninput="calcSyncQuoteMeta()"></div>
-        <div class="calc-quote-field"><label>مدة الصلاحية (أيام)</label><input id="cq-validity" type="number" min="1" value="7" oninput="calcSyncQuoteMeta()"></div>
+        <div class="calc-quote-field"><label>مدة صلاحية العرض (أيام)</label><input id="cq-validity" type="number" min="1" value="7" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>رقم الحساب / الآيبان</label><input id="cq-account-number" type="text" placeholder="اكتب رقم الحساب أو IBAN" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>اسم الحساب</label><input id="cq-account-name" type="text" placeholder="خالد حسن العجمي" oninput="calcSyncQuoteMeta()"></div>
-        <div class="calc-quote-field calc-quote-full"><label>نوع العمل</label><textarea id="cq-work-type" placeholder="مثال: تصميم معماري&#10;تصميم داخلي" oninput="calcSyncQuoteMeta()"></textarea></div>
-        <div class="calc-quote-field calc-quote-full"><label>مكونات المشروع</label><textarea id="cq-components" placeholder="- الواجهة المعمارية&#10;- التصميم الداخلي" oninput="calcSyncQuoteMeta()"></textarea></div>
-        <div class="calc-quote-field calc-quote-full"><label>وصف العمل / تفاصيل ما ستحصلون عليه</label><textarea id="cq-work-desc" placeholder="اكتب وصف العمل والخدمات هنا..." oninput="calcSyncQuoteMeta()" style="min-height:180px"></textarea></div>
-        <div class="calc-quote-field calc-quote-full"><label>ملاحظات إضافية</label><textarea id="cq-notes" placeholder="مثال: الأسعار لا تشمل التنفيذ أو تعتمد بعد اعتماد العرض النهائي" oninput="calcSyncQuoteMeta()"></textarea></div>
+        <div class="calc-quote-field calc-quote-full"><label>نوع العمل</label><textarea id="cq-work-type" rows="2" placeholder="مثال: تصميم معماري&#10;تصميم داخلي" oninput="calcSyncQuoteMeta()"></textarea></div>
+        <div class="calc-quote-field calc-quote-full"><label>مكونات المشروع</label><textarea id="cq-components" rows="4" placeholder="- الواجهة المعمارية&#10;- التصميم الداخلي" oninput="calcSyncQuoteMeta()"></textarea></div>
+        <div class="calc-quote-field calc-quote-full"><label>وصف العمل — تفاصيل ما ستحصلون عليه</label><textarea id="cq-work-desc" rows="10" placeholder="اكتب وصف العمل والخدمات هنا..." oninput="calcSyncQuoteMeta()" style="min-height:180px"></textarea></div>
+        <div class="calc-quote-field calc-quote-full"><label>ملاحظات إضافية</label><textarea id="cq-notes" rows="3" placeholder="مثال: الأسعار لا تشمل التنفيذ أو تعتمد بعد اعتماد العرض النهائي" oninput="calcSyncQuoteMeta()"></textarea></div>
       </div>
       <div class="calc-logo-tools">
         <div class="calc-logo-preview" id="calcLogoPreview"><span class="calc-logo-note">بدون شعار</span></div>
@@ -1813,8 +1937,24 @@ let calcQuoteMeta = {
   projectArea: '',
   validityDays: 7,
   workType: 'تصميم معماري\nتصميم داخلي',
-  components: '- الواجهة المعمارية\n- التصميم الداخلي\n- تصميم الحدائق والمسطحات الخارجية',
-  workDescription: 'تصميم المبنى المعماري والداخلي لمساحة 625 م²\n\nعدد زيارتين إشرافيتين\n\nلوحة الأفكار (المود بورد):\nتشمل مجموعة من الصور والعناصر المراد استخدامها في التصميم المعماري والداخلي لتوضيح الأفكار، واختيار المواد، وتوزيع الأثاث وأشكاله، والألوان، بالإضافة إلى الإضاءة والديكورات.\n\nالتصميم ثلاثي الأبعاد:\nتقديم لقطات ثلاثية الأبعاد توضح التصميم المعماري والداخلي بشكل واقعي قبل التنفيذ.\n\nالمخططات التنفيذية:\nإعداد المخططات الفنية اللازمة للتنفيذ، مثل مخططات نقاط الكهرباء، وتوزيع الإضاءة، ومواقع نقاط المياه.\n\nجدول الكميات (BOQ):\nجدول كميات للمواد والأثاث المستخدمة ومواصفاتها بصيغة Excel',
+  components: "- الواجهة المعمارية
+- التصميم الداخلي
+- تصميم الحدائق والمسطحات الخارجية",
+  workDescription: "تصميم المبنى المعماري والداخلي لمساحة 300 م²
+
+عدد زيارتين إشرافيتين.
+
+لوحة الأفكار (المود بورد):
+تشمل مجموعة من الصور والعناصر المراد استخدامها في التصميم المعماري والداخلي؛ لتوضيح الأفكار، واختيار المواد، وتوزيع الأثاث وأشكاله، وتحديد الألوان، بالإضافة إلى الإضاءة والديكورات.
+
+التصميم ثلاثي الأبعاد:
+تقديم لقطات ثلاثية الأبعاد توضح التصميم المعماري والداخلي بشكل واقعي قبل التنفيذ.
+
+المخططات التنفيذية:
+إعداد المخططات الفنية اللازمة للتنفيذ، مثل مخططات نقاط الكهرباء، وتوزيع الإضاءة، ومواقع نقاط المياه.
+
+جدول الكميات (BOQ):
+جدول كميات للمواد والأثاث المستخدمة ومواصفاتها بصيغة Excel.",
   accountName: 'خالد حسن العجمي',
   accountNumber: '',
   notes: '',
@@ -2012,11 +2152,14 @@ function calcExp(){
 function normalizeArabicTextForPdf(text){
   return String(text || '')
     .replace(/تصميم\s*الثلاثي\s*الأبعاد/g, 'التصميم ثلاثي الأبعاد')
+    .replace(/تصميم\s*ثلاثي\s*الأبعاد/g, 'التصميم ثلاثي الأبعاد')
     .replace(/مود\s*بورد/g, 'المود بورد')
     .replace(/اشرافية/g, 'إشرافية')
     .replace(/زيارتين إشرافية/g, 'زيارتين إشرافيتين')
     .replace(/ماسيتم/g, 'ما سيتم')
-    .replace(/اسم المشروع/g, 'اسم المشروع');
+    .replace(/اسم\s*المشروع/g, 'اسم المشروع')
+    .replace(/موقع\s*المشروع/g, 'موقع المشروع')
+    .replace(/مساحة\s*المشروع/g, 'مساحة المشروع');
 }
 function pdfRichLines(text){
   return esc(normalizeArabicTextForPdf(text || '')).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
