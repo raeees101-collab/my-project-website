@@ -71,7 +71,7 @@ button:active { transform: scale(0.96); }
 .review-banner-icon { font-size: 24px; }
 .review-banner-title { font-size: 13px; font-weight: 800; color: #92400E; }
 .review-banner-sub { font-size: 11px; color: #B45309; margin-top: 2px; }
-.review-days-badge { background: #92400E; color: #FEF3C7; border-radius: 10px; padding: 5px 10px; font-size: 12px; font-weight: 800; white-space: nowrap; flex-shrink: 0; }
+.review-days-badge { background: #92400E; color: #FEF3C7; border-radius: 0; padding: 5px 10px; font-size: 12px; font-weight: 800; white-space: nowrap; flex-shrink: 0; }
 .review-days-badge.urgent { background: #DC2626; color: #fff; animation: pulse 1.5s infinite; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.7} }
 
@@ -1144,6 +1144,28 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
 .calc-plan-preview { width: 120px; height: 82px; border-radius: 14px; }
 .calc-plan-preview img { width: 100%; height: 100%; object-fit: contain; }
 
+
+.calc-quote-field select {
+  width: 100%;
+  border: 1.5px solid #E7E5E0;
+  border-radius: 13px;
+  padding: 11px 13px;
+  font-size: 14px;
+  line-height: 1.8;
+  color: #1C1917;
+  background: #FDFDFC;
+  font-family: inherit;
+  direction: rtl;
+  text-align: right;
+  outline: none;
+  box-sizing: border-box;
+}
+.calc-quote-field select:focus {
+  border-color: #1D9E75;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(29,158,117,0.08);
+}
+
 </style>
 </head>
 <body>
@@ -1319,14 +1341,20 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
       <div class="calc-quote-grid">
         <div class="calc-quote-field"><label>عنوان عرض السعر</label><input id="cq-title" type="text" placeholder="عرض سعر" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>اسم المشروع</label><input id="cq-project" type="text" placeholder="مثال: تصميم داخلي لفيلا" oninput="calcSyncQuoteMeta()"></div>
-        <div class="calc-quote-field"><label>موقع المشروع</label><input id="cq-location" type="text" placeholder="المدينة / الحي" oninput="calcSyncQuoteMeta()"></div>
+        <div class="calc-quote-field"><label>النشاط</label><select id="cq-activity" oninput="calcSyncQuoteMeta()">
+            <option value="">اختر النشاط</option>
+            <option value="سكني">سكني</option>
+            <option value="تجاري">تجاري</option>
+            <option value="ترفيهي">ترفيهي</option>
+          </select></div>
         <div class="calc-quote-field"><label>مساحة المشروع</label><input id="cq-area" type="number" min="0" step="1" placeholder="اكتب الرقم فقط" oninput="calcSyncQuoteMeta()"></div>
-        <div class="calc-quote-field"><label>مدة صلاحية العرض (أيام)</label><input id="cq-validity" type="number" min="1" value="7" oninput="calcSyncQuoteMeta()"></div>
+        <div class="calc-quote-field"><label>موقع المشروع</label><input id="cq-location" type="text" placeholder="المدينة / الحي" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>رقم الجوال</label><input id="cq-my-phone" type="text" placeholder="05xxxxxxxx" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>البريد الإلكتروني</label><input id="cq-my-email" type="email" placeholder="example@email.com" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>اسم العميل</label><input id="cq-client-name" type="text" placeholder="اختياري" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>رقم العميل</label><input id="cq-client-phone" type="text" placeholder="اختياري" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>إيميل العميل</label><input id="cq-client-email" type="email" placeholder="اختياري" oninput="calcSyncQuoteMeta()"></div>
+        <div class="calc-quote-field"><label>مدة الصلاحية (أيام)</label><input id="cq-validity" type="number" min="1" value="7" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>اسم البنك</label><input id="cq-bank-name" type="text" placeholder="الراجحي" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>رقم الحساب / الآيبان</label><input id="cq-account-number" type="text" placeholder="اكتب رقم الحساب أو IBAN" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>اسم الحساب</label><input id="cq-account-name" type="text" placeholder="خالد حسن العجمي" oninput="calcSyncQuoteMeta()"></div>
@@ -2166,6 +2194,7 @@ let calcQuoteMeta = {
   title: 'عرض سعر',
   projectName: '',
   projectLocation: '',
+  projectActivity: '',
   projectArea: '',
   validityDays: 7,
   components: "- الواجهة المعمارية\n- التصميم الداخلي\n- تصميم الحدائق والمسطحات الخارجية",
@@ -2259,8 +2288,9 @@ function calcFillQuoteMetaForm(){
   const setVal = (id,val) => { const el=document.getElementById(id); if(el) el.value = val ?? ''; };
   setVal('cq-title', calcQuoteMeta.title || 'عرض سعر');
   setVal('cq-project', calcQuoteMeta.projectName || '');
-  setVal('cq-location', calcQuoteMeta.projectLocation || '');
+  setVal('cq-activity', calcQuoteMeta.projectActivity || '');
   setVal('cq-area', cleanProjectAreaValue(calcQuoteMeta.projectArea) || '');
+  setVal('cq-location', calcQuoteMeta.projectLocation || '');
   setVal('cq-validity', calcQuoteMeta.validityDays || 7);
   setVal('cq-my-phone', calcQuoteMeta.myPhone || '');
   setVal('cq-my-email', calcQuoteMeta.myEmail || '');
@@ -2280,8 +2310,9 @@ function calcFillQuoteMetaForm(){
 function calcSyncQuoteMeta(){
   calcQuoteMeta.title = document.getElementById('cq-title').value.trim() || 'عرض سعر';
   calcQuoteMeta.projectName = document.getElementById('cq-project').value.trim();
-  calcQuoteMeta.projectLocation = document.getElementById('cq-location').value.trim();
+  calcQuoteMeta.projectActivity = document.getElementById('cq-activity').value.trim();
   calcQuoteMeta.projectArea = cleanProjectAreaValue(document.getElementById('cq-area').value);
+  calcQuoteMeta.projectLocation = document.getElementById('cq-location').value.trim();
   calcQuoteMeta.validityDays = Math.max(1, parseInt(document.getElementById('cq-validity').value) || 7);
   calcQuoteMeta.myPhone = document.getElementById('cq-my-phone').value.trim();
   calcQuoteMeta.myEmail = document.getElementById('cq-my-email').value.trim();
@@ -2617,7 +2648,7 @@ function calcExportPDF(){
     height: 22mm;
     object-fit: contain;
     border-radius: 10px;
-    border: 1px solid #eee;
+    border: none;
     flex-shrink: 0;
   }
 
@@ -3032,6 +3063,46 @@ function calcExportPDF(){
     font-weight: 850;
     color: #111;
   }
+
+  /* Brand block alignment update */
+  .brand-block {
+    width: 52mm;
+    flex-shrink: 0;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .brand-block .logo-img {
+    margin-bottom: 3mm;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+  .brand-info {
+    font-size: 10px;
+    line-height: 1.55;
+    color: #333;
+    font-weight: 600;
+    text-align: left;
+  }
+  .brand-info strong {
+    display: block;
+    font-size: 11px;
+    font-weight: 900;
+    color: #111;
+    margin-bottom: 1mm;
+    text-align: left;
+  }
+  .brand-info div { text-align: left; }
+  .terms-box {
+    border: 1px solid #E9E9E9;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #FAFAFA;
+    margin-top: 4mm;
+  }
 </style>
 </head>
 <body>
@@ -3043,8 +3114,7 @@ function calcExportPDF(){
     <div class="header-main">
       <div class="doc-title">${calcQuoteMeta.title || 'عرض سعر'}</div>
       <div class="doc-sub">
-        تاريخ الإصدار: ${issueDate}<br>
-        صالح لمدة ${calcQuoteMeta.validityDays || 7} أيام
+        تاريخ الإصدار: ${issueDate}
       </div>
     </div>
     <div class="brand-block">
@@ -3059,9 +3129,9 @@ function calcExportPDF(){
 
   <div class="meta-grid">
     <div class="meta-box"><div class="meta-label">اسم المشروع</div><div class="meta-value">${calcQuoteMeta.projectName || '—'}</div></div>
-    <div class="meta-box"><div class="meta-label">موقع المشروع</div><div class="meta-value">${calcQuoteMeta.projectLocation || '—'}</div></div>
+    <div class="meta-box"><div class="meta-label">النشاط</div><div class="meta-value">${calcQuoteMeta.projectActivity || '—'}</div></div>
     <div class="meta-box"><div class="meta-label">مساحة المشروع</div><div class="meta-value">${calcQuoteMeta.projectArea ? calcQuoteMeta.projectArea + ' م²' : '—'}</div></div>
-    <div class="meta-box"><div class="meta-label">مدة الصلاحية</div><div class="meta-value">صالح لمدة ${calcQuoteMeta.validityDays || 7} أيام</div></div>
+    <div class="meta-box"><div class="meta-label">موقع المشروع</div><div class="meta-value">${calcQuoteMeta.projectLocation || '—'}</div></div>
   </div>
 
   <div class="customer-box">
@@ -3119,6 +3189,11 @@ function calcExportPDF(){
   <div class="total-row">
     <span>الإجمالي الكلي</span>
     <span class="total-val">SAR ${fmtN(total)}</span>
+  </div>
+
+  <div class="terms-box">
+    <div class="account-label">شروط العرض</div>
+    <div class="account-row"><span>مدة الصلاحية</span><span>صالح لمدة ${calcQuoteMeta.validityDays || 7} أيام</span></div>
   </div>
 
   <div class="account-box">
