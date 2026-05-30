@@ -1325,6 +1325,7 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
         <div class="calc-quote-field"><label>رقم الجوال</label><input id="cq-my-phone" type="text" placeholder="05xxxxxxxx" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>البريد الإلكتروني</label><input id="cq-my-email" type="email" placeholder="example@email.com" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>اسم العميل</label><input id="cq-client-name" type="text" placeholder="اختياري" oninput="calcSyncQuoteMeta()"></div>
+        <div class="calc-quote-field"><label>رقم العميل</label><input id="cq-client-phone" type="text" placeholder="اختياري" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>إيميل العميل</label><input id="cq-client-email" type="email" placeholder="اختياري" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>اسم البنك</label><input id="cq-bank-name" type="text" placeholder="الراجحي" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>رقم الحساب / الآيبان</label><input id="cq-account-number" type="text" placeholder="اكتب رقم الحساب أو IBAN" oninput="calcSyncQuoteMeta()"></div>
@@ -2172,6 +2173,7 @@ let calcQuoteMeta = {
   myPhone: '',
   myEmail: '',
   clientName: '',
+  clientPhone: '',
   clientEmail: '',
   bankName: 'الراجحي',
   accountName: 'خالد حسن العجمي',
@@ -2263,6 +2265,7 @@ function calcFillQuoteMetaForm(){
   setVal('cq-my-phone', calcQuoteMeta.myPhone || '');
   setVal('cq-my-email', calcQuoteMeta.myEmail || '');
   setVal('cq-client-name', calcQuoteMeta.clientName || '');
+  setVal('cq-client-phone', calcQuoteMeta.clientPhone || '');
   setVal('cq-client-email', calcQuoteMeta.clientEmail || '');
   setVal('cq-bank-name', calcQuoteMeta.bankName || 'الراجحي');
   setVal('cq-components', calcQuoteMeta.components || '');
@@ -2283,6 +2286,7 @@ function calcSyncQuoteMeta(){
   calcQuoteMeta.myPhone = document.getElementById('cq-my-phone').value.trim();
   calcQuoteMeta.myEmail = document.getElementById('cq-my-email').value.trim();
   calcQuoteMeta.clientName = document.getElementById('cq-client-name').value.trim();
+  calcQuoteMeta.clientPhone = document.getElementById('cq-client-phone').value.trim();
   calcQuoteMeta.clientEmail = document.getElementById('cq-client-email').value.trim();
   calcQuoteMeta.bankName = document.getElementById('cq-bank-name').value.trim() || 'الراجحي';
   calcQuoteMeta.components = document.getElementById('cq-components').value.trim();
@@ -2976,6 +2980,58 @@ function calcExportPDF(){
   .scope-plan-frame { border: 1px solid #E3E3E3; border-radius: 14px; min-height: 210mm; padding: 8mm; display: flex; align-items: center; justify-content: center; background: #FAFAFA; }
   .scope-plan-frame img { max-width: 100%; max-height: 195mm; object-fit: contain; display: block; }
   .scope-plan-empty { color: #999; font-weight: 800; font-size: 14px; }
+
+  .brand-block {
+    width: 48mm;
+    flex-shrink: 0;
+    text-align: right;
+  }
+  .brand-block .logo-img {
+    margin-bottom: 3mm;
+  }
+  .brand-info {
+    font-size: 10px;
+    line-height: 1.55;
+    color: #333;
+    font-weight: 600;
+  }
+  .brand-info strong {
+    display: block;
+    font-size: 11px;
+    font-weight: 900;
+    color: #111;
+    margin-bottom: 1mm;
+  }
+  .brand-info .muted {
+    color: #777;
+    font-weight: 500;
+  }
+  .customer-box {
+    border: 1px solid #E9E9E9;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #FAFAFA;
+    margin-bottom: 5mm;
+  }
+  .customer-row {
+    display: grid;
+    grid-template-columns: 28mm 1fr;
+    border-top: 1px solid #F1F1F1;
+    font-size: 10.5px;
+  }
+  .customer-row:first-child { border-top: none; }
+  .customer-row .label {
+    background: #F4F4F4;
+    color: #777;
+    font-weight: 800;
+    padding: 6px 10px;
+    border-left: 1px solid #E9E9E9;
+  }
+  .customer-row .value {
+    padding: 6px 10px;
+    font-weight: 850;
+    color: #111;
+  }
 </style>
 </head>
 <body>
@@ -2991,7 +3047,14 @@ function calcExportPDF(){
         صالح لمدة ${calcQuoteMeta.validityDays || 7} أيام
       </div>
     </div>
-    ${logoHtml}
+    <div class="brand-block">
+      ${logoHtml}
+      <div class="brand-info">
+        <strong>Rakeez Design</strong>
+        ${calcQuoteMeta.myPhone ? `<div>Telephone : ${calcQuoteMeta.myPhone}</div>` : ''}
+        ${calcQuoteMeta.myEmail ? `<div>Email : ${calcQuoteMeta.myEmail}</div>` : ''}
+      </div>
+    </div>
   </div>
 
   <div class="meta-grid">
@@ -3001,17 +3064,10 @@ function calcExportPDF(){
     <div class="meta-box"><div class="meta-label">مدة الصلاحية</div><div class="meta-value">صالح لمدة ${calcQuoteMeta.validityDays || 7} أيام</div></div>
   </div>
 
-  <div class="contact-grid">
-    <div class="contact-box">
-      <div class="contact-title">بيانات المصمم</div>
-      <div class="contact-row"><span>الجوال</span><span>${calcQuoteMeta.myPhone || '—'}</span></div>
-      <div class="contact-row"><span>البريد الإلكتروني</span><span>${calcQuoteMeta.myEmail || '—'}</span></div>
-    </div>
-    <div class="contact-box">
-      <div class="contact-title">بيانات العميل</div>
-      <div class="contact-row"><span>اسم العميل</span><span>${calcQuoteMeta.clientName || '—'}</span></div>
-      <div class="contact-row"><span>إيميل العميل</span><span>${calcQuoteMeta.clientEmail || '—'}</span></div>
-    </div>
+  <div class="customer-box">
+    <div class="customer-row"><div class="label">الاسم</div><div class="value">${calcQuoteMeta.clientName || '—'}</div></div>
+    <div class="customer-row"><div class="label">رقم الجوال</div><div class="value">${calcQuoteMeta.clientPhone || '—'}</div></div>
+    <div class="customer-row"><div class="label">البريد الإلكتروني</div><div class="value">${calcQuoteMeta.clientEmail || '—'}</div></div>
   </div>
 
   <div class="sec-title">تفاصيل ما ستحصلون عليه</div>
