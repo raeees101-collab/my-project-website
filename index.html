@@ -326,33 +326,194 @@ button:active { transform: scale(0.96); }
 .calc-logo-note { font-size: 11px; color: #888; }
 
 /* PDF hidden */
-#pdfOutput { display: none; direction: rtl; font-family: system-ui,sans-serif; padding: 0; color: #111; font-size: 13px; background: #fff; }
-#pdfOutput .pdf-page { width: 100%; background: #fff; border: 1px solid #ececec; border-radius: 18px; padding: 28px 30px 24px; }
-#pdfOutput .pdf-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 20px; }
-#pdfOutput .pdf-head-main { flex: 1; }
-#pdfOutput .pdf-title { font-size: 25px; font-weight: 800; margin-bottom: 6px; color: #15866A; }
-#pdfOutput .pdf-sub { font-size: 12px; color: #6b7280; line-height: 1.8; }
-#pdfOutput .pdf-logo-box { width: 94px; height: 94px; border: 1px solid #ececec; border-radius: 16px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #fff; flex-shrink: 0; }
+#pdfOutput { 
+  display: none; 
+  direction: rtl; 
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; 
+  color: #111827; 
+  background: #fff; 
+  width: 190mm; 
+  box-sizing: border-box;
+}
+#pdfOutput .pdf-page { 
+  width: 190mm; 
+  min-height: 277mm; 
+  background: #fff; 
+  padding: 14mm 16mm 12mm; 
+  box-sizing: border-box; 
+}
+#pdfOutput .pdf-head { 
+  display: flex; 
+  align-items: flex-start; 
+  justify-content: space-between; 
+  gap: 14mm; 
+  margin-bottom: 10mm; 
+}
+#pdfOutput .pdf-head-main { flex: 1; text-align: right; }
+#pdfOutput .pdf-title { 
+  font-size: 22px; 
+  font-weight: 850; 
+  margin-bottom: 5px; 
+  color: #15866A; 
+  line-height: 1.25;
+}
+#pdfOutput .pdf-sub { 
+  font-size: 11px; 
+  color: #8A8A8A; 
+  line-height: 1.7; 
+}
+#pdfOutput .pdf-logo-box { 
+  width: 25mm; 
+  height: 25mm; 
+  border: 1px solid #eeeeee; 
+  border-radius: 10px; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  overflow: hidden; 
+  background: #fff; 
+  flex-shrink: 0; 
+}
 #pdfOutput .pdf-logo-box img { width: 100%; height: 100%; object-fit: contain; }
-#pdfOutput .pdf-logo-placeholder { font-size: 11px; color: #9ca3af; text-align: center; line-height: 1.5; padding: 8px; }
-#pdfOutput .pdf-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
-#pdfOutput .pdf-meta-box { background: #FAFAFA; border: 1px solid #EAEAEA; border-radius: 12px; padding: 11px 14px; min-height: 64px; }
-#pdfOutput .pdf-meta-label { font-size: 11px; color: #8b8b8b; margin-bottom: 6px; font-weight: 700; }
-#pdfOutput .pdf-meta-value { font-size: 14px; color: #111; font-weight: 700; line-height: 1.6; word-break: break-word; }
-#pdfOutput .pdf-section { font-size: 12px; font-weight: 800; color: #7b7b7b; letter-spacing: .03em; margin-bottom: 8px; margin-top: 20px; }
-#pdfOutput table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
-#pdfOutput table th { font-size: 11px; color: #7c7c7c; font-weight: 700; padding: 10px 12px; border-bottom: 1px solid #e8e8e8; background: #fafafa; text-align: right; }
-#pdfOutput table th.amt { text-align: left; }
-#pdfOutput table td { font-size: 13px; padding: 10px 12px; border-bottom: 1px solid #f0f0f0; text-align: right; }
-#pdfOutput table td.amt { text-align: left; font-weight: 700; white-space: nowrap; }
-#pdfOutput .pdf-grp td { background: #f8faf9; font-size: 11px; font-weight: 800; color: #4b5563; padding: 7px 12px; }
-#pdfOutput .pdf-pay-table td, #pdfOutput .pdf-pay-table th { padding: 10px 12px; }
-#pdfOutput .pdf-total { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; padding-top: 12px; border-top: 2px solid #1D9E75; font-size: 18px; font-weight: 800; }
-#pdfOutput .pdf-total span:last-child { color: #15866A; }
-#pdfOutput .pdf-note { margin-top: 16px; background: #FAFAFA; border: 1px solid #EAEAEA; border-radius: 12px; padding: 12px 14px; }
-#pdfOutput .pdf-note-label { font-size: 11px; font-weight: 800; color: #888; margin-bottom: 4px; }
-#pdfOutput .pdf-note-text { font-size: 13px; color: #333; line-height: 1.8; white-space: pre-line; }
-#pdfOutput .pdf-footer { margin-top: 22px; font-size: 11px; color: #9ca3af; border-top: 1px solid #eee; padding-top: 12px; text-align: center; }
+#pdfOutput .pdf-logo-placeholder { font-size: 10px; color: #aaa; text-align: center; line-height: 1.5; padding: 6px; }
+#pdfOutput .pdf-meta { 
+  display: grid; 
+  grid-template-columns: 1fr 1fr; 
+  gap: 5mm; 
+  margin-bottom: 8mm; 
+}
+#pdfOutput .pdf-meta-box { 
+  background: #FCFCFC; 
+  border: 1px solid #E9E9E9; 
+  border-radius: 9px; 
+  padding: 8px 10px; 
+  min-height: 43px; 
+  box-sizing: border-box;
+}
+#pdfOutput .pdf-meta-label { font-size: 10px; color: #9A9A9A; margin-bottom: 4px; font-weight: 700; }
+#pdfOutput .pdf-meta-value { font-size: 12px; color: #111; font-weight: 800; line-height: 1.45; word-break: break-word; }
+#pdfOutput .pdf-section { 
+  font-size: 11px; 
+  font-weight: 850; 
+  color: #8B8B8B; 
+  margin-bottom: 5px; 
+  margin-top: 7mm; 
+}
+#pdfOutput table { width: 100%; border-collapse: collapse; margin-bottom: 4mm; table-layout: fixed; }
+#pdfOutput table th { 
+  font-size: 10px; 
+  color: #858585; 
+  font-weight: 750; 
+  padding: 7px 9px; 
+  border-bottom: 1px solid #e8e8e8; 
+  background: #FAFAFA; 
+  text-align: right; 
+}
+#pdfOutput table th.amt { text-align: left; width: 34mm; }
+#pdfOutput table td { 
+  font-size: 11.5px; 
+  padding: 7px 9px; 
+  border-bottom: 1px solid #f0f0f0; 
+  text-align: right; 
+  line-height: 1.35;
+}
+#pdfOutput table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
+#pdfOutput .pdf-grp td { background: #f8faf9; font-size: 10px; font-weight: 850; color: #4b5563; padding: 6px 9px; }
+#pdfOutput .pdf-pay-table td, #pdfOutput .pdf-pay-table th { padding: 7px 9px; }
+#pdfOutput .pdf-total { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  margin-top: 5mm; 
+  padding-top: 4mm; 
+  border-top: 2px solid #1D9E75; 
+  font-size: 15px; 
+  font-weight: 850; 
+}
+#pdfOutput .pdf-total span:last-child { color: #15866A; direction: ltr; }
+#pdfOutput .pdf-note { 
+  margin-top: 6mm; 
+  background: #FCFCFC; 
+  border: 1px solid #E9E9E9; 
+  border-radius: 9px; 
+  padding: 9px 11px; 
+}
+#pdfOutput .pdf-note-label { font-size: 10px; font-weight: 850; color: #888; margin-bottom: 4px; }
+#pdfOutput .pdf-note-text { font-size: 11px; color: #333; line-height: 1.65; white-space: pre-line; }
+
+#pdfOutput .pdf-services-layout {
+  display: grid;
+  grid-template-columns: 42mm 1fr;
+  gap: 10mm;
+  align-items: start;
+  margin-top: 8mm;
+  margin-bottom: 8mm;
+}
+#pdfOutput .pdf-side-card {
+  border: 1px solid #DFDFDF;
+  margin-bottom: 8mm;
+}
+#pdfOutput .pdf-side-title, #pdfOutput .pdf-work-title {
+  background: #F3F3F3;
+  border-bottom: 1px solid #DFDFDF;
+  font-size: 15px;
+  font-weight: 900;
+  padding: 8px 10px;
+  text-align: center;
+}
+#pdfOutput .pdf-side-body {
+  font-size: 12px;
+  line-height: 1.75;
+  padding: 9px 10px;
+  text-align: center;
+  white-space: pre-line;
+}
+#pdfOutput .pdf-work-box {
+  border: 1px solid #DFDFDF;
+}
+#pdfOutput .pdf-work-row {
+  padding: 9px 12px;
+  border-top: 1px solid #E6E6E6;
+  font-size: 12px;
+  line-height: 1.8;
+  white-space: pre-line;
+  text-align: right;
+}
+#pdfOutput .pdf-work-row:first-child { border-top: none; }
+#pdfOutput .pdf-work-row strong {
+  font-weight: 900;
+}
+#pdfOutput .pdf-account-box {
+  margin-top: 6mm;
+  border: 1px solid #E4E4E4;
+  border-radius: 8px;
+  padding: 9px 11px;
+  background: #FCFCFC;
+}
+#pdfOutput .pdf-account-title {
+  font-size: 11px;
+  color: #8b8b8b;
+  font-weight: 850;
+  margin-bottom: 6px;
+}
+#pdfOutput .pdf-account-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+  padding: 4px 0;
+  border-top: 1px solid #F0F0F0;
+}
+#pdfOutput .pdf-account-row:first-of-type { border-top: none; }
+#pdfOutput .pdf-account-row span:last-child { font-weight: 850; direction: ltr; text-align: left; }
+#pdfOutput .pdf-footer { 
+  margin-top: 8mm; 
+  font-size: 10px; 
+  color: #aaa; 
+  border-top: 1px solid #eee; 
+  padding-top: 8px; 
+  text-align: center; 
+}
 </style>
 </head>
 <body>
@@ -531,6 +692,11 @@ button:active { transform: scale(0.96); }
         <div class="calc-quote-field"><label>موقع المشروع</label><input id="cq-location" type="text" placeholder="المدينة / الحي" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>مساحة المشروع</label><input id="cq-area" type="text" placeholder="مثال: 300 م²" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>مدة الصلاحية (أيام)</label><input id="cq-validity" type="number" min="1" value="7" oninput="calcSyncQuoteMeta()"></div>
+        <div class="calc-quote-field"><label>رقم الحساب / الآيبان</label><input id="cq-account-number" type="text" placeholder="اكتب رقم الحساب أو IBAN" oninput="calcSyncQuoteMeta()"></div>
+        <div class="calc-quote-field"><label>اسم الحساب</label><input id="cq-account-name" type="text" placeholder="خالد حسن العجمي" oninput="calcSyncQuoteMeta()"></div>
+        <div class="calc-quote-field calc-quote-full"><label>نوع العمل</label><textarea id="cq-work-type" placeholder="مثال: تصميم معماري&#10;تصميم داخلي" oninput="calcSyncQuoteMeta()"></textarea></div>
+        <div class="calc-quote-field calc-quote-full"><label>مكونات المشروع</label><textarea id="cq-components" placeholder="- الواجهة المعمارية&#10;- التصميم الداخلي" oninput="calcSyncQuoteMeta()"></textarea></div>
+        <div class="calc-quote-field calc-quote-full"><label>وصف العمل / تفاصيل ما ستحصلون عليه</label><textarea id="cq-work-desc" placeholder="اكتب وصف الخدمات هنا..." oninput="calcSyncQuoteMeta()" style="min-height:180px"></textarea></div>
         <div class="calc-quote-field calc-quote-full"><label>ملاحظات إضافية</label><textarea id="cq-notes" placeholder="مثال: الأسعار لا تشمل التنفيذ أو تعتمد بعد اعتماد العرض النهائي" oninput="calcSyncQuoteMeta()"></textarea></div>
       </div>
       <div class="calc-logo-tools">
@@ -1350,6 +1516,11 @@ let calcQuoteMeta = {
   projectLocation: '',
   projectArea: '',
   validityDays: 7,
+  workType: 'تصميم معماري\nتصميم داخلي',
+  components: '- الواجهة المعمارية\n- التصميم الداخلي\n- تصميم الحدائق والمسطحات الخارجية',
+  workDescription: 'تصميم المبنى المعماري والداخلي لمساحة 625 م²\n\nعدد زيارتين إشرافية\n\nلوحة الأفكار (المودبورد):\nتشمل مجموعة من الصور والعناصر التي نرغب في استخدامها في التصميم المعماري والداخلي لتوضيح الأفكار، اختيار المواد، توزيع وأشكال الأثاث، الألوان، بالإضافة إلى الإضاءة والديكورات.\n\nتصميم الثلاثي الأبعاد:\nتقديم لقطات ثلاثية الأبعاد توضح تصميم معماري والداخلي من خلال لقطات واقعية توضح التصميم بشكل واقعي قبل التنفيذ.\n\nالمخططات التنفيذية:\nتشمل إعداد المخططات الفنية اللازمة للتنفيذ، مثل مخططات نقاط الكهرباء، توزيع الإضاءة، ومواقع نقاط المياه.\n\nجدول الكميات (BOQ):\nجدول كميات للمواد والأثاث المستخدمة ومواصفاتها بملف Excel',
+  accountName: 'خالد حسن العجمي',
+  accountNumber: '',
   notes: '',
   logoData: ''
 };
@@ -1373,6 +1544,11 @@ function calcFillQuoteMetaForm(){
   setVal('cq-location', calcQuoteMeta.projectLocation || '');
   setVal('cq-area', calcQuoteMeta.projectArea || '');
   setVal('cq-validity', calcQuoteMeta.validityDays || 7);
+  setVal('cq-work-type', calcQuoteMeta.workType || '');
+  setVal('cq-components', calcQuoteMeta.components || '');
+  setVal('cq-work-desc', calcQuoteMeta.workDescription || '');
+  setVal('cq-account-name', calcQuoteMeta.accountName || 'خالد حسن العجمي');
+  setVal('cq-account-number', calcQuoteMeta.accountNumber || '');
   setVal('cq-notes', calcQuoteMeta.notes || '');
   renderCalcLogoPreview();
 }
@@ -1382,6 +1558,11 @@ function calcSyncQuoteMeta(){
   calcQuoteMeta.projectLocation = document.getElementById('cq-location').value.trim();
   calcQuoteMeta.projectArea = document.getElementById('cq-area').value.trim();
   calcQuoteMeta.validityDays = Math.max(1, parseInt(document.getElementById('cq-validity').value) || 7);
+  calcQuoteMeta.workType = document.getElementById('cq-work-type').value.trim();
+  calcQuoteMeta.components = document.getElementById('cq-components').value.trim();
+  calcQuoteMeta.workDescription = document.getElementById('cq-work-desc').value.trim();
+  calcQuoteMeta.accountName = document.getElementById('cq-account-name').value.trim() || 'خالد حسن العجمي';
+  calcQuoteMeta.accountNumber = document.getElementById('cq-account-number').value.trim();
   calcQuoteMeta.notes = document.getElementById('cq-notes').value.trim();
   saveCalcQuoteMeta();
 }
@@ -1522,6 +1703,16 @@ function calcExp(){
   const txt=`${calcQuoteMeta.title || 'عرض سعر'}\n\n${metaLines ? metaLines + '\n\n' : ''}بنود المشروع:\n${lines}\nالإجمالي الكلي: SAR ${fmtN(total)}\n\nآلية السداد:\n• الدفعة الأولى (${p1}%): ${fmtN(Math.round(total*p1/100))} ر.س\n• الدفعة الثانية (${p2}%): ${fmtN(Math.round(total*p2/100))} ر.س\n• الدفعة الأخيرة (${p3}%): ${fmtN(Math.round(total*p3/100))} ر.س${notesBlock}\n\nالعرض صالح لمدة ${calcQuoteMeta.validityDays||7} أيام.`;
   navigator.clipboard ? navigator.clipboard.writeText(txt).then(()=>showToast("✓ تم نسخ العرض")) : showToast("⚠️ انسخ يدوياً");
 }
+
+function pdfRichLines(text){
+  return esc(text || '').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+}
+function pdfWorkRows(text){
+  const source = (text || '').trim();
+  if(!source) return '';
+  const chunks = source.split(/\n\s*\n/).map(s=>s.trim()).filter(Boolean);
+  return chunks.map(chunk => `<div class="pdf-work-row">${pdfRichLines(chunk)}</div>`).join('');
+}
 function calcExportPDF(){
   calcSyncQuoteMeta();
   const activeTypes=CALC_ORDER.filter(t=>calcActive.has(t));
@@ -1532,7 +1723,11 @@ function calcExportPDF(){
   activeTypes.forEach(t=>{
     const info=CALC_TYPE_INFO[t],items=calcItemsFor(t),bud=calcBudgets[t]||0;
     if(multi)rows+=`<tr class="pdf-grp"><td colspan="2">${info.label} — ${fmtN(bud)} ر.س</td></tr>`;
-    items.forEach(d=>{const pct=calcItemPct[d.id]??d.pct,amt=Math.round(bud*pct/100/100)*100;rows+=`<tr><td>${d.label}</td><td class="amt">${fmtN(amt)} ر.س</td></tr>`;});
+    items.forEach(d=>{
+      const pct=calcItemPct[d.id]??d.pct;
+      const amt=Math.round(bud*pct/100/100)*100;
+      rows+=`<tr><td>${esc(d.label)}</td><td class="amt">${fmtN(amt)} ر.س</td></tr>`;
+    });
   });
 
   const payRows = `
@@ -1550,13 +1745,24 @@ function calcExportPDF(){
     <div class="pdf-meta-box"><div class="pdf-meta-label">مساحة المشروع</div><div class="pdf-meta-value">${esc(calcQuoteMeta.projectArea || '—')}</div></div>
     <div class="pdf-meta-box"><div class="pdf-meta-label">مدة الصلاحية</div><div class="pdf-meta-value">صالح لمدة ${esc(String(calcQuoteMeta.validityDays || 7))} أيام</div></div>`;
 
+  const workTypeHtml = `<div class="pdf-side-card"><div class="pdf-side-title">نوع العمل</div><div class="pdf-side-body">${esc(calcQuoteMeta.workType || '—')}</div></div>`;
+  const componentsHtml = `<div class="pdf-side-card"><div class="pdf-side-title">مكونات المشروع</div><div class="pdf-side-body">${esc(calcQuoteMeta.components || '—')}</div></div>`;
+  const workDescHtml = `<div class="pdf-work-box"><div class="pdf-work-title">وصف العمل (ما سيتم القيام به)</div>${pdfWorkRows(calcQuoteMeta.workDescription || '')}</div>`;
+
+  const accountHtml = `
+    <div class="pdf-account-box">
+      <div class="pdf-account-title">بيانات الحساب</div>
+      <div class="pdf-account-row"><span>اسم الحساب</span><span>${esc(calcQuoteMeta.accountName || 'خالد حسن العجمي')}</span></div>
+      <div class="pdf-account-row"><span>رقم الحساب / الآيبان</span><span>${esc(calcQuoteMeta.accountNumber || '—')}</span></div>
+    </div>`;
+
   const notesHtml = calcQuoteMeta.notes
     ? `<div class="pdf-note"><div class="pdf-note-label">ملاحظات إضافية</div><div class="pdf-note-text">${esc(calcQuoteMeta.notes)}</div></div>`
     : '';
 
   const el=document.getElementById('pdfOutput');
   el.innerHTML=`
-    <div class="pdf-page">
+    <div class="pdf-page" id="pdfPage">
       <div class="pdf-head">
         <div class="pdf-head-main">
           <div class="pdf-title">${esc(calcQuoteMeta.title || 'عرض سعر')}</div>
@@ -1567,7 +1773,13 @@ function calcExportPDF(){
 
       <div class="pdf-meta">${metaBoxes}</div>
 
-      <div class="pdf-section">بنود المشروع</div>
+      <div class="pdf-section">تفاصيل ما ستحصلون عليه</div>
+      <div class="pdf-services-layout">
+        <div>${workTypeHtml}${componentsHtml}</div>
+        <div>${workDescHtml}</div>
+      </div>
+
+      <div class="pdf-section">بنود المشروع والتسعيرة</div>
       <table>
         <thead><tr><th>البند</th><th class="amt">المبلغ</th></tr></thead>
         <tbody>${rows}</tbody>
@@ -1580,17 +1792,38 @@ function calcExportPDF(){
       </table>
 
       <div class="pdf-total"><span>الإجمالي الكلي</span><span>SAR ${fmtN(total)}</span></div>
+      ${accountHtml}
       ${notesHtml}
-      <div class="pdf-footer">جميع الأسعار بالريال السعودي (ر.س) — تم إنشاء العرض من Project Tracker</div>
+      <div class="pdf-footer">جميع الأسعار بالريال السعودي (ر.س)</div>
     </div>`;
+
   el.style.display='block';
+  el.style.position='fixed';
+  el.style.top='0';
+  el.style.left='0';
+  el.style.zIndex='-1';
+  el.style.opacity='0';
+  el.style.width='190mm';
+  el.style.background='#fff';
+
+  const page=document.getElementById('pdfPage');
   html2pdf().set({
     margin:[8,8,8,8],
     filename:'عرض_سعر.pdf',
     image:{type:'jpeg',quality:0.98},
-    html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff'},
-    jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}
-  }).from(el).save().then(()=>el.style.display='none');
+    html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff',scrollX:0,scrollY:0},
+    jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
+    pagebreak:{mode:['avoid-all','css','legacy']}
+  }).from(page).save().then(()=>{
+    el.removeAttribute('style');
+    el.style.display='none';
+    el.innerHTML='';
+  }).catch(()=>{
+    el.removeAttribute('style');
+    el.style.display='none';
+    el.innerHTML='';
+    showToast('حدث خطأ أثناء تصدير PDF');
+  });
 }
 </script>
 </body>
