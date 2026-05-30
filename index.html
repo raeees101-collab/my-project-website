@@ -2780,6 +2780,16 @@ function calcExportPDF(){
   .page-1 .work-item:last-child { margin-bottom: 0 !important; }
   .page-1 .work-body strong { margin-bottom: 2px; }
   .page-1 .work-body p { line-height: 1.45; }
+
+  /* Larger work-description area on first A4 page */
+  .page-1 .work-box {
+    min-height: 138mm;
+    display: flex;
+    flex-direction: column;
+  }
+  .page-1 .work-list {
+    flex: 1;
+  }
   .page-1 * { break-inside: avoid; }
   @page { size: A4 portrait; margin: 0; }
 </style>
