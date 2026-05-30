@@ -2432,7 +2432,7 @@ function calcExportPDF(){
   let itemRows = '';
   activeTypes.forEach(t => {
     const info = CALC_TYPE_INFO[t], items = calcItemsFor(t), bud = calcBudgets[t]||0;
-    if (multi) itemRows += `<tr class="grp-row"><td colspan="2">${info.label} — ${fmtN(bud)} ر.س</td></tr>`;
+    if (multi) itemRows += `<tr class="grp-row"><td colspan="2"><span class="grp-label">${info.label}</span><span class="grp-amount">${fmtN(bud)} ر.س</span></td></tr>`;
     items.forEach(d => {
       const pct = calcItemPct[d.id] ?? d.pct;
       const amt = Math.round(bud * pct / 100 / 100) * 100;
@@ -2502,7 +2502,9 @@ function calcExportPDF(){
   .page-1 { padding-top: 9mm; }
   @media print {
     html, body { margin: 0; padding: 0; }
-    .page { width: 210mm; height: 297mm; margin: 0; padding: 11mm 13mm 10mm; page-break-after: always; overflow: hidden; }
+    .page { width: 210mm; margin: 0; padding: 11mm 13mm 10mm; page-break-after: always; }
+    .page-1 { height: 297mm; overflow: hidden; }
+    .page-2 { height: auto; min-height: 297mm; overflow: visible; page-break-after: auto; }
     .page:last-child { page-break-after: avoid; }
     .print-btn { display: none !important; }
   }
@@ -2792,6 +2794,45 @@ function calcExportPDF(){
   }
   .page-1 * { break-inside: avoid; }
   @page { size: A4 portrait; margin: 0; }
+
+  /* Pricing page: allow long tables to continue instead of hiding rows */
+  .page-2 {
+    height: auto !important;
+    min-height: 297mm !important;
+    overflow: visible !important;
+    page-break-after: auto;
+  }
+  .page-2 table,
+  .page-2 tr,
+  .page-2 td,
+  .page-2 th {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .grp-row td {
+    background: #EEF7F4 !important;
+    color: #126B56 !important;
+    font-weight: 900 !important;
+    border-top: 2px solid #15866A !important;
+    border-bottom: 1px solid #D7EDE6 !important;
+    padding: 8px 12px !important;
+  }
+  .grp-label {
+    display: inline-flex;
+    align-items: center;
+    background: #15866A;
+    color: #fff;
+    border-radius: 999px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 900;
+    margin-left: 8px;
+  }
+  .grp-amount {
+    color: #126B56;
+    font-size: 11px;
+    font-weight: 900;
+  }
 </style>
 </head>
 <body>
@@ -2837,7 +2878,7 @@ function calcExportPDF(){
 </div>
 
 <!-- ════ PAGE 2 ════ -->
-<div class="page">
+<div class="page page-2">
   <div class="page-title">بنود المشروع والتسعيرة</div>
   <table>
     <thead><tr><th>البند</th><th class="num">المبلغ</th></tr></thead>
