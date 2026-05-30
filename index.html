@@ -75,6 +75,14 @@ button:active { transform: scale(0.96); }
 .review-days-badge.urgent { background: #DC2626; color: #fff; animation: pulse 1.5s infinite; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.7} }
 
+.review-stage-pill { display: inline-flex; align-items: center; gap: 4px; background:#FFF7ED; color:#9A3412; border:1px solid #FDBA74; border-radius: 9px; padding: 2px 7px; font-size: 11px; font-weight: 800; }
+.review-toggle-btn { border:none; border-radius:10px; padding:8px 12px; font-size:12px; font-weight:800; cursor:pointer; font-family:inherit; margin-top:10px; width:100%; }
+.review-toggle-btn.on { background:#FFF7ED; color:#9A3412; border:1.5px solid #FDBA74; }
+.review-toggle-btn.off { background:#F8F7F4; color:#57534E; border:1.5px solid #E7E5E0; }
+.amounts-hidden .money-value { color: transparent !important; text-shadow: 0 0 11px rgba(28,25,23,.45); filter: blur(5px); user-select:none; }
+.amounts-hidden .money-value::selection { background: transparent; }
+
+
 /* ─── DETAILS ─── */
 .card-details { border-top: 1px solid #F3F2EF; padding: 16px; animation: slideDown 0.2s ease; }
 @keyframes slideDown { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
@@ -169,6 +177,26 @@ button:active { transform: scale(0.96); }
 .revision-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
 .revision-form-label { font-size: 10px; font-weight: 700; color: #78716C; margin-bottom: 4px; }
 .revision-save { background: #1C1917; color: #fff; border: none; border-radius: 10px; padding: 9px 18px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; width: 100%; }
+
+.rich-box-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 12px; border-top: 1px solid #F0EEE9; padding-top: 10px; margin-bottom: 6px; }
+.rich-box-title { font-size: 11px; font-weight: 700; color: #A8A29E; letter-spacing: 1px; }
+.rich-tools { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.rich-tool-btn { background: #F8F7F4; border: 1.5px solid #E7E5E0; color: #57534E; border-radius: 8px; width: 30px; height: 28px; font-size: 12px; font-weight: 800; cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; justify-content: center; }
+.rich-tool-btn:hover { border-color: #D4A853; color: #1C1917; }
+.rich-editor { width: 100%; min-height: 92px; background: #F8F7F4; border: 1.5px solid #E7E5E0; border-radius: 12px; padding: 11px 13px; font-size: 13px; font-family: inherit; direction: rtl; outline: none; line-height: 1.7; color: #1C1917; overflow-y: auto; }
+.rich-editor:focus { border-color: #D4A853; background: #fff; }
+.rich-editor:empty:before { content: attr(data-placeholder); color: #A8A29E; }
+.rich-editor ol, .rich-editor ul, .revision-desc ol, .revision-desc ul { padding-right: 22px; margin: 6px 0; }
+.rich-editor b, .rich-editor strong, .revision-desc b, .revision-desc strong { font-weight: 900; }
+.revision-editor { min-height: 96px; margin-bottom: 8px; background: #fff; border-color: #E7E5E0; }
+.rich-modal-dialog { width: 100%; max-width: 720px; height: min(86vh, 760px); text-align: right; display: flex; flex-direction: column; padding: 20px; }
+.rich-modal-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.rich-modal-title { font-size: 16px; font-weight: 900; }
+.rich-modal-editor { flex: 1; min-height: 340px; font-size: 15px; background: #fff; }
+.rich-modal-actions { display: flex; gap: 10px; margin-top: 14px; }
+.rich-modal-actions button { flex: 1; border: none; border-radius: 14px; padding: 13px; font-size: 14px; font-weight: 800; cursor: pointer; font-family: inherit; }
+.rich-modal-cancel { background: #F3F2EF; color: #1C1917; }
+.rich-modal-save { background: #1C1917; color: #fff; }
 .open-revisions-badge { display: inline-flex; align-items: center; gap: 3px; background: #FEF3C7; color: #92400E; border-radius: 8px; padding: 2px 7px; font-size: 11px; font-weight: 700; }
 .overdue-revisions-badge { display: inline-flex; align-items: center; gap: 3px; background: #FEE2E2; color: #B91C1C; border-radius: 8px; padding: 2px 7px; font-size: 11px; font-weight: 700; }
 
@@ -330,6 +358,7 @@ button:active { transform: scale(0.96); }
         <div class="header-title">PROJECT TRACKER</div>
       </div>
       <div class="header-actions">
+        <button class="icon-btn" title="إخفاء/إظهار المبالغ" id="privacy-btn" onclick="toggleAmountPrivacy()">🙈</button>
         <button class="icon-btn" title="حاسبة التسعيرة" onclick="openCalc()">🧮</button>
         <button class="icon-btn" onclick="openIO()">⇅</button>
         <img class="user-avatar" id="user-avatar" src="" onclick="openUserMenu()" onerror="this.style.display='none'">
@@ -345,7 +374,7 @@ button:active { transform: scale(0.96); }
   </div>
   <div class="tabs">
     <button class="tab active" onclick="setTab('active',this)">🔥 نشط</button>
-    <button class="tab" onclick="setTab('client_review',this)">👁 مراجعة العميل</button>
+    <button class="tab" onclick="setTab('under_review',this)">👁 تحت مراجعة العميل</button>
     <button class="tab" onclick="setTab('pending_approval',this)">⏳ بانتظار الاعتماد</button>
     <button class="tab" onclick="setTab('completed',this)">✅ مكتمل</button>
     <button class="tab" onclick="setTab('all',this)">الكل</button>
@@ -354,6 +383,27 @@ button:active { transform: scale(0.96); }
 </div>
 
 <div class="saved-toast" id="toast"></div>
+
+
+<!-- Rich Text Modal -->
+<div class="overlay-center" id="rich-editor-overlay">
+  <div class="dialog rich-modal-dialog" onclick="event.stopPropagation()">
+    <div class="rich-modal-top">
+      <div class="rich-modal-title" id="rich-modal-title">تعديل النص</div>
+      <div class="rich-tools">
+        <button class="rich-tool-btn" onclick="richCmd('bold')"><b>B</b></button>
+        <button class="rich-tool-btn" onclick="richCmd('insertOrderedList')">1.</button>
+        <button class="rich-tool-btn" onclick="richCmd('insertUnorderedList')">•</button>
+        <button class="rich-tool-btn" onclick="richCmd('removeFormat')">Tx</button>
+      </div>
+    </div>
+    <div class="rich-editor rich-modal-editor" id="rich-modal-editor" contenteditable="true" data-placeholder="اكتب هنا..."></div>
+    <div class="rich-modal-actions">
+      <button class="rich-modal-cancel" onclick="closeRichEditor()">إلغاء</button>
+      <button class="rich-modal-save" onclick="saveRichEditorModal()">حفظ</button>
+    </div>
+  </div>
+</div>
 
 <!-- Status Sheet -->
 <div class="overlay" id="status-overlay" onclick="closeStatusSheet()">
@@ -548,23 +598,81 @@ window._deleteFromDb = async (id) => {
 <script>
 window._projects = window._projects || [];
 
-// ─── STAGES (added client_review) ───
+// ─── STAGES ───
 const STAGES = [
   { id:"pending_approval", label:"بانتظار الاعتماد",    emoji:"⏳", color:"#F59E0B", bg:"#FEF3C7", dark:"#92400E" },
   { id:"first_meeting",    label:"الاجتماع الأول",      emoji:"🤝", color:"#6366F1", bg:"#EEF2FF", dark:"#3730A3" },
   { id:"moodboard",        label:"المود بورد",           emoji:"🎨", color:"#EC4899", bg:"#FDF2F8", dark:"#9D174D" },
   { id:"3d_design",        label:"التصميم ثلاثي الأبعاد",emoji:"📐", color:"#8B5CF6", bg:"#F5F3FF", dark:"#5B21B6" },
   { id:"floor_plans",      label:"المخططات",             emoji:"🗺️", color:"#0EA5E9", bg:"#F0F9FF", dark:"#075985" },
-  { id:"client_review",    label:"مراجعة العميل",        emoji:"👁",  color:"#F97316", bg:"#FFF7ED", dark:"#9A3412" },
   { id:"completed",        label:"مكتمل",                emoji:"✅", color:"#10B981", bg:"#ECFDF5", dark:"#065F46" },
 ];
 
 let currentTab = "active", expandedId = null, openStageNotes = {};
 let statusTargetId = null, deleteTargetId = null, editId = null, formStatus = "first_meeting";
 let calcTargetProjectId = null;
+let hideAmounts = false;
+function toggleAmountPrivacy() {
+  hideAmounts = !hideAmounts;
+  document.body.classList.toggle("amounts-hidden", hideAmounts);
+  const btn = document.getElementById("privacy-btn");
+  if (btn) btn.textContent = hideAmounts ? "👁️" : "🙈";
+  showToast(hideAmounts ? "تم إخفاء المبالغ" : "تم إظهار المبالغ");
+}
+function moneySpan(html) { return `<span class="money-value">${html}</span>`; }
 
 function getStage(id) { return STAGES.find(s => s.id === id) || STAGES[0]; }
 function esc(s) { return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+function stripHtml(html) {
+  const tmp = document.createElement("div");
+  tmp.innerHTML = html || "";
+  return (tmp.textContent || tmp.innerText || "").trim();
+}
+function cleanRichHtml(html) {
+  const box = document.createElement("div");
+  box.innerHTML = html || "";
+  box.querySelectorAll("script,style,iframe,object,embed,form,input,button,textarea,select").forEach(el => el.remove());
+  box.querySelectorAll("*").forEach(el => {
+    const tag = el.tagName.toLowerCase();
+    const allowed = ["b","strong","i","em","u","ol","ul","li","br","div","p","span"];
+    if (!allowed.includes(tag)) {
+      el.replaceWith(document.createTextNode(el.textContent || ""));
+      return;
+    }
+    [...el.attributes].forEach(a => el.removeAttribute(a.name));
+  });
+  return box.innerHTML.trim();
+}
+function renderRich(html) {
+  const cleaned = cleanRichHtml(html || "");
+  return cleaned || "";
+}
+function richEditorHtml(id, value, placeholder, extraClass="") {
+  return `<div class="rich-editor ${extraClass}" id="${id}" contenteditable="true" data-placeholder="${esc(placeholder||"اكتب هنا...")}">${renderRich(value||"")}</div>`;
+}
+function richCmd(cmd) { document.execCommand(cmd, false, null); }
+let richModalTarget = null;
+function openRichEditor(targetId, title) {
+  const src = document.getElementById(targetId);
+  if (!src) return;
+  richModalTarget = targetId;
+  document.getElementById("rich-modal-title").textContent = title || "تعديل النص";
+  document.getElementById("rich-modal-editor").innerHTML = src.innerHTML;
+  document.getElementById("rich-editor-overlay").classList.add("show");
+  setTimeout(()=>document.getElementById("rich-modal-editor").focus(), 80);
+}
+function closeRichEditor() {
+  richModalTarget = null;
+  document.getElementById("rich-editor-overlay").classList.remove("show");
+}
+function saveRichEditorModal() {
+  if (!richModalTarget) return closeRichEditor();
+  const target = document.getElementById(richModalTarget);
+  const modal = document.getElementById("rich-modal-editor");
+  if (target && modal) target.innerHTML = cleanRichHtml(modal.innerHTML);
+  closeRichEditor();
+}
 function formatDate(d) {
   if (!d) return "—";
   const [y,m,day] = d.split("-");
@@ -621,7 +729,6 @@ function setTab(tab, el) {
 }
 function paymentIsReceived(pay) { return pay.done !== false; }
 function statusPriority(status) {
-  if (status === "client_review") return 0;
   if (status !== "completed" && status !== "pending_approval") return 1;
   if (status === "pending_approval") return 2;
   return 3;
@@ -631,10 +738,10 @@ function getFilteredProjects() {
   const projects = window._projects || [];
   let filtered = projects.filter(p => {
     if (currentTab === "all") return true;
-    if (currentTab === "client_review") return p.status === "client_review";
+    if (currentTab === "under_review") return !!p.activeReview || p.status === "client_review";
     if (currentTab === "pending_approval") return p.status === "pending_approval";
     if (currentTab === "completed") return p.status === "completed";
-    if (currentTab === "active") return p.status !== "completed" && p.status !== "pending_approval" && p.status !== "client_review";
+    if (currentTab === "active") return p.status !== "completed" && p.status !== "pending_approval";
     return true;
   });
   return [...filtered].sort((a, b) => {
@@ -646,29 +753,37 @@ function getFilteredProjects() {
   });
 }
 
-// ─── CLIENT REVIEW BANNER ───
+// ─── CLIENT REVIEW SMART STATE ───
+function normalizeProject(pr) {
+  if (pr.status === "client_review") {
+    return { ...pr, status: pr.reviewStageId || "moodboard", activeReview: pr.activeReview || { stageId: pr.reviewStageId || "moodboard", startDate: pr.reviewStartDate || todayStr() } };
+  }
+  return pr;
+}
+function getActiveReview(pr) { return pr.activeReview || null; }
+function isStageUnderReview(pr, sid) { const r = getActiveReview(pr); return !!(r && r.stageId === sid); }
+function reviewDaysText(days) {
+  if (days === 0) return "بدأت اليوم";
+  if (days === 1) return "منذ يوم واحد";
+  return `منذ ${days} أيام`;
+}
 function clientReviewBannerHtml(pr) {
-  if (pr.status !== "client_review") return "";
-  const reviewDate = pr.reviewStartDate || todayStr();
-  const days = daysSince(reviewDate);
+  const review = getActiveReview(pr);
+  if (!review) return "";
+  const st = getStage(review.stageId);
+  const days = daysSince(review.startDate || todayStr());
   const urgent = days >= 5;
-  let msg = "";
-  if (days === 0) msg = "بدأت المراجعة اليوم";
-  else if (days === 1) msg = "مضى يوم على الإرسال للعميل";
-  else msg = `مضت ${days} أيام على الإرسال للعميل`;
-
   return `<div class="review-banner">
     <div class="review-banner-left">
       <span class="review-banner-icon">👁</span>
       <div>
-        <div class="review-banner-title">في انتظار رد العميل</div>
-        <div class="review-banner-sub">${msg}</div>
+        <div class="review-banner-title">العميل يراجع: ${st.emoji} ${st.label}</div>
+        <div class="review-banner-sub">${reviewDaysText(days)} — المشروع ما زال محسوب على نفس المرحلة</div>
       </div>
     </div>
     <span class="review-days-badge ${urgent ? 'urgent' : ''}">${days} يوم</span>
   </div>`;
 }
-
 // ─── REVISION TIMING HELPERS ───
 function revisionDaysBadgeHtml(r) {
   if (r.done) return `<span class="revision-days-badge" style="background:#ECFDF5;color:#065F46">✅ منتهي</span>`;
@@ -692,7 +807,7 @@ function render() {
   const projects = window._projects || [];
   document.getElementById("stat-total").textContent = projects.length;
   document.getElementById("stat-pending").textContent = projects.filter(p=>p.status==="pending_approval").length;
-  document.getElementById("stat-active").textContent = projects.filter(p=>p.status!=="completed"&&p.status!=="pending_approval"&&p.status!=="client_review").length;
+  document.getElementById("stat-active").textContent = projects.filter(p=>p.status!=="completed"&&p.status!=="pending_approval").length;
   document.getElementById("stat-completed").textContent = projects.filter(p=>p.status==="completed").length;
 
   const filtered = getFilteredProjects();
@@ -702,7 +817,8 @@ function render() {
     return;
   }
 
-  list.innerHTML = filtered.map((pr, idx) => {
+  list.innerHTML = filtered.map((projectRaw, idx) => {
+    const pr = normalizeProject(projectRaw);
     const stage = getStage(pr.status);
     const days = daysLeft(pr.deliveryDate);
     const isExp = expandedId === pr.id;
@@ -714,7 +830,7 @@ function render() {
       const txt = days<0?`تأخر ${Math.abs(days)} يوم`:days===0?"التسليم اليوم!":`${days} يوم متبقي`;
       daysHtml = `<span class="card-days" style="color:${c}">${txt}</span>`;
     }
-    const priceStr = pr.price ? Number(pr.price).toLocaleString()+" "+(pr.currency||"SAR") : "—";
+    const priceStr = pr.price ? moneySpan(Number(pr.price).toLocaleString()+" "+(pr.currency||"SAR")) : "—";
     const currency = pr.currency || "SAR";
 
     const payments = pr.payments || [];
@@ -738,6 +854,8 @@ function render() {
     const revBadge = totalOverdueRevisions > 0
       ? `<span class="overdue-revisions-badge">⚠ ${totalOverdueRevisions} متأخر</span>`
       : totalOpenRevisions > 0 ? `<span class="open-revisions-badge">✏️ ${totalOpenRevisions} تعديل</span>` : "";
+    const activeReview = getActiveReview(pr);
+    const reviewBadge = activeReview ? `<span class="review-stage-pill">👁 ${getStage(activeReview.stageId).label} — ${reviewDaysText(daysSince(activeReview.startDate || todayStr()))}</span>` : "";
 
     const stagesHtml = STAGES.map(s => {
       const note = (pr.stageNotes && pr.stageNotes[s.id]) || "";
@@ -748,8 +866,9 @@ function render() {
       const stageRevisions = (pr.stageRevisions && pr.stageRevisions[s.id]) || [];
       const openRevisions = stageRevisions.filter(r => !r.done).length;
       const overdueRevisions = stageRevisions.filter(r => !r.done && r.dueDate && r.dueDate < today).length;
-      const hasNote = note.trim().length > 0;
+      const hasNote = stripHtml(note).length > 0;
       const isOpen = openStageNotes[pr.id] === s.id;
+      const allowStageNotes = s.id !== "3d_design";
       let actualDays = null;
       if (startDate && endDate) {
         const diff = Math.ceil((new Date(endDate+"T00:00:00") - new Date(startDate+"T00:00:00")) / 86400000) + 1;
@@ -768,12 +887,16 @@ function render() {
       const revisionsBadge = overdueRevisions > 0
         ? `<span class="overdue-revisions-badge">⚠ ${overdueRevisions} متأخر</span>`
         : openRevisions > 0 ? `<span class="open-revisions-badge">✏️ ${openRevisions} تعديل</span>` : "";
+      const stageIsReview = isStageUnderReview(pr, s.id);
+      const stageReview = stageIsReview ? getActiveReview(pr) : null;
+      const stageReviewDays = stageReview ? daysSince(stageReview.startDate || todayStr()) : 0;
+      const stageReviewPill = stageIsReview ? `<span class="review-stage-pill">👁 مراجعة العميل ${reviewDaysText(stageReviewDays)}</span>` : "";
 
       const revisionsHtml = stageRevisions.map((r, ri) => {
         const isOverdue = !r.done && r.dueDate && r.dueDate < today;
         return `<div class="revision-item ${r.done?'done':''} ${isOverdue?'overdue':''}">
           <div class="revision-top">
-            <span class="revision-desc">${esc(r.desc)}</span>
+            <span class="revision-desc">${renderRich(r.descHtml || esc(r.desc || ""))}</span>
             <div class="revision-actions">
               <button class="revision-toggle" style="background:${r.done?'#ECFDF5':'#FEF3C7'};color:${r.done?'#065F46':'#92400E'}" onclick="toggleRevision('${pr.id}','${s.id}',${ri})">${r.done?'✅ منتهي':'🔄 جاري'}</button>
               <button class="revision-del" onclick="deleteRevision('${pr.id}','${s.id}',${ri})">✕</button>
@@ -805,6 +928,7 @@ function render() {
               <span class="stage-row-label" style="color:${s.dark}">${s.label}</span>
               ${hasNote ? `<span class="stage-row-has-note"></span>` : ""}
               ${revisionsBadge}
+              ${stageReviewPill}
             </div>
             ${timingPills ? `<div class="stage-timing-summary">${timingPills}</div>` : ""}
           </div>
@@ -837,10 +961,19 @@ function render() {
             </div>
           </div>
           <button class="stage-note-save" onclick="saveStageTime('${pr.id}','${s.id}')">حفظ التوقيت</button>
+          <button class="review-toggle-btn ${stageIsReview ? 'on' : 'off'}" onclick="toggleClientReview('${pr.id}','${s.id}')">${stageIsReview ? `✓ إنهاء مراجعة العميل — ${reviewDaysText(stageReviewDays)}` : '👁 تشغيل مراجعة العميل لهذه المرحلة'}</button>
 
-          <div style="margin-top:12px;border-top:1px solid #F0EEE9;padding-top:10px;font-size:11px;font-weight:700;color:#A8A29E;letter-spacing:1px;margin-bottom:6px">📝 ملاحظات</div>
-          <textarea class="stage-note-ta" id="sn-${pr.id}-${s.id}" rows="3" placeholder="اكتب ملاحظاتك هنا...">${esc(note)}</textarea>
-          <button class="stage-note-save" onclick="saveStageNote('${pr.id}','${s.id}')">حفظ الملاحظات</button>
+          ${allowStageNotes ? `<div class="rich-box-head">
+            <span class="rich-box-title">📝 ملاحظات</span>
+            <div class="rich-tools">
+              <button class="rich-tool-btn" onclick="event.stopPropagation();richCmd('bold')"><b>B</b></button>
+              <button class="rich-tool-btn" onclick="event.stopPropagation();richCmd('insertOrderedList')">1.</button>
+              <button class="rich-tool-btn" onclick="event.stopPropagation();richCmd('insertUnorderedList')">•</button>
+              <button class="rich-tool-btn" onclick="event.stopPropagation();openRichEditor('sn-${pr.id}-${s.id}','ملاحظات ${esc(s.label)}')">⛶</button>
+            </div>
+          </div>
+          ${richEditorHtml(`sn-${pr.id}-${s.id}`, note, 'اكتب ملاحظاتك هنا...')}
+          <button class="stage-note-save" onclick="saveStageNote('${pr.id}','${s.id}')">حفظ الملاحظات</button>` : `<div style="margin-top:12px;border-top:1px solid #F0EEE9;padding-top:10px;color:#78716C;font-size:12px;line-height:1.7;background:#FAFAF8;border-radius:12px;padding:12px">ملاحظات التصميم ثلاثي الأبعاد صارت ضمن سجل التعديلات بالأسفل.</div>`}
 
           <div class="revisions-section">
             <div class="revisions-header">
@@ -849,8 +982,16 @@ function render() {
             </div>
             ${stageRevisions.length === 0 ? `<div style="text-align:center;color:#A8A29E;font-size:12px;padding:6px 0">لا توجد تعديلات</div>` : revisionsHtml}
             <div class="revision-form" id="rf-${pr.id}-${s.id}">
-              <div class="revision-input" style="font-size:11px;font-weight:700;color:#78716C;background:none;border:none;padding:0;margin-bottom:6px;direction:rtl">وصف التعديل</div>
-              <input class="revision-input" id="ri-desc-${pr.id}-${s.id}" placeholder="مثال: تغيير لون الجدار في غرفة النوم">
+              <div class="rich-box-head" style="margin-top:0;border-top:none;padding-top:0">
+                <span class="rich-box-title">وصف التعديل</span>
+                <div class="rich-tools">
+                  <button class="rich-tool-btn" onclick="event.stopPropagation();richCmd('bold')"><b>B</b></button>
+                  <button class="rich-tool-btn" onclick="event.stopPropagation();richCmd('insertOrderedList')">1.</button>
+                  <button class="rich-tool-btn" onclick="event.stopPropagation();richCmd('insertUnorderedList')">•</button>
+                  <button class="rich-tool-btn" onclick="event.stopPropagation();openRichEditor('ri-desc-${pr.id}-${s.id}','وصف التعديل')">⛶</button>
+                </div>
+              </div>
+              ${richEditorHtml(`ri-desc-${pr.id}-${s.id}`, '', 'مثال: تغيير لون الجدار في غرفة النوم', 'revision-editor')}
               <div class="revision-form-row">
                 <div>
                   <div class="revision-form-label">📅 تاريخ الطلب</div>
@@ -872,7 +1013,7 @@ function render() {
       const received = paymentIsReceived(p);
       return `<div class="payment-item">
         <div class="payment-item-right">
-          <span class="payment-item-amount" style="color:${received?"#10B981":"#D97706"}">${received?"+":"⏳"} ${Number(p.amount||0).toLocaleString()} ${currency}</span>
+          <span class="payment-item-amount" style="color:${received?"#10B981":"#D97706"}">${received?"+":"⏳"} ${moneySpan(Number(p.amount||0).toLocaleString()+" "+currency)}</span>
           <span class="payment-item-label">${esc(p.label || "دفعة")}</span>
           ${p.date ? `<span class="payment-item-date">${formatDate(p.date)}</span>` : ""}
         </div>
@@ -887,8 +1028,8 @@ function render() {
     const paidPctBar = totalPrice > 0 ? Math.min(100, Math.round((totalPaid/totalPrice)*100)) : 0;
     const paymentSummaryHtml = totalPrice > 0 ? `
       <div class="payment-summary">
-        <div class="payment-sum-box" style="background:#ECFDF5"><div class="payment-sum-label" style="color:#065F46">✅ المُستلم</div><div class="payment-sum-val" style="color:#10B981">${totalPaid.toLocaleString()} ${currency}</div></div>
-        <div class="payment-sum-box" style="background:${remaining>0?"#FEF3C7":"#ECFDF5"}"><div class="payment-sum-label" style="color:${remaining>0?"#92400E":"#065F46"}">${remaining>0?"⏳ المتبقي":"✔ مكتمل"}</div><div class="payment-sum-val" style="color:${remaining>0?"#D97706":"#10B981"}">${Math.abs(remaining).toLocaleString()} ${currency}</div></div>
+        <div class="payment-sum-box" style="background:#ECFDF5"><div class="payment-sum-label" style="color:#065F46">✅ المُستلم</div><div class="payment-sum-val" style="color:#10B981">${moneySpan(totalPaid.toLocaleString()+" "+currency)}</div></div>
+        <div class="payment-sum-box" style="background:${remaining>0?"#FEF3C7":"#ECFDF5"}"><div class="payment-sum-label" style="color:${remaining>0?"#92400E":"#065F46"}">${remaining>0?"⏳ المتبقي":"✔ مكتمل"}</div><div class="payment-sum-val" style="color:${remaining>0?"#D97706":"#10B981"}">${moneySpan(Math.abs(remaining).toLocaleString()+" "+currency)}</div></div>
       </div>
       <div class="payment-progress-bg"><div class="payment-progress-fill" style="width:${paidPctBar}%"></div></div>` : "";
 
@@ -937,6 +1078,7 @@ function render() {
         </div>
         <div class="card-row2">
           <span class="card-price">${priceStr}</span>
+          ${reviewBadge}
           ${paymentBadge}
           ${revBadge}
           ${daysHtml}
@@ -953,9 +1095,10 @@ function toggleExpand(id) { expandedId = expandedId===id?null:id; render(); }
 function toggleStageNote(pid,sid) { openStageNotes[pid]=openStageNotes[pid]===sid?null:sid; render(); }
 
 async function saveStageNote(pid,sid) {
-  const ta = document.getElementById(`sn-${pid}-${sid}`);
-  if (!ta) return;
-  window._projects = window._projects.map(p => p.id!==pid?p:{...p,stageNotes:{...(p.stageNotes||{}),[sid]:ta.value}});
+  const box = document.getElementById(`sn-${pid}-${sid}`);
+  if (!box) return;
+  const value = cleanRichHtml(box.innerHTML);
+  window._projects = window._projects.map(p => p.id!==pid?p:{...p,stageNotes:{...(p.stageNotes||{}),[sid]:value}});
   await window._saveToDb(); showToast("✓ تم حفظ الملاحظات"); render();
 }
 async function saveStageTime(pid,sid) {
@@ -1014,15 +1157,23 @@ function openStatusSheet(id) {
 }
 function closeStatusSheet(){document.getElementById("status-overlay").classList.remove("show");}
 async function changeStatus(status) {
-  // If moving to client_review, record the date
   window._projects=window._projects.map(p=>{
     if(p.id!==statusTargetId)return p;
-    const update={...p,status};
-    if(status==="client_review"&&!p.reviewStartDate)update.reviewStartDate=todayStr();
-    if(status!=="client_review")update.reviewStartDate=null;
-    return update;
+    const activeReview = (p.activeReview && p.activeReview.stageId === status) ? p.activeReview : null;
+    return {...p,status,activeReview,reviewStartDate:null,reviewStageId:null};
   });
-  await window._saveToDb(); closeStatusSheet();
+  await window._saveToDb(); closeStatusSheet(); render();
+}
+async function toggleClientReview(pid, sid) {
+  window._projects=window._projects.map(p=>{
+    if(p.id!==pid)return p;
+    const current = p.activeReview;
+    if(current && current.stageId === sid) return {...p,activeReview:null,reviewStartDate:null,reviewStageId:null};
+    return {...p,status:sid,activeReview:{stageId:sid,startDate:todayStr()},reviewStartDate:null,reviewStageId:null};
+  });
+  await window._saveToDb();
+  showToast("✓ تم تحديث مراجعة العميل");
+  render();
 }
 
 // ─── DELETE ───
@@ -1069,7 +1220,7 @@ function openForm(){
 }
 function openEditForm(id){
   const pr=window._projects.find(p=>p.id===id);if(!pr)return;
-  editId=id;formStatus=pr.status;
+  editId=id;formStatus=pr.status === "client_review" ? (pr.reviewStageId || "moodboard") : pr.status;
   document.getElementById("f-name").value=pr.name;
   document.getElementById("f-client").value=pr.client;
   document.getElementById("f-price").value=pr.price||"";
@@ -1087,7 +1238,7 @@ async function saveProject(){
   const client=document.getElementById("f-client").value.trim();
   if(!name||!client){alert("يرجى إدخال اسم المشروع واسم العميل");return;}
   const data={name,client,price:document.getElementById("f-price").value,currency:document.getElementById("f-currency").value,startDate:document.getElementById("f-start").value,deliveryDate:document.getElementById("f-delivery").value,status:formStatus};
-  if(editId){window._projects=window._projects.map(p=>p.id===editId?{...p,...data}:p);}
+  if(editId){window._projects=window._projects.map(p=>p.id===editId?{...p,...data,activeReview:(p.activeReview&&p.activeReview.stageId===data.status)?p.activeReview:null,reviewStartDate:null,reviewStageId:null}:p);}
   else{const maxOrder=window._projects.length?Math.max(...window._projects.map(p=>Number(p.manualOrder??0))):0;window._projects.push({...data,id:Date.now().toString(),stageNotes:{},stageTiming:{},payments:[],stageRevisions:{},manualOrder:maxOrder+10});}
   await window._saveToDb();closeForm();showToast("✓ تم الحفظ");
 }
@@ -1099,14 +1250,16 @@ function toggleRevisionForm(pid,sid){
   if(form.classList.contains("open")){const inp=document.getElementById(`ri-desc-${pid}-${sid}`);if(inp)inp.focus();}
 }
 async function addRevision(pid,sid){
-  const inp=document.getElementById(`ri-desc-${pid}-${sid}`);if(!inp)return;
-  const desc=inp.value.trim();if(!desc){showToast("⚠️ اكتب وصف التعديل");return;}
+  const box=document.getElementById(`ri-desc-${pid}-${sid}`);if(!box)return;
+  const descHtml=cleanRichHtml(box.innerHTML);
+  const desc=stripHtml(descHtml);
+  if(!desc){showToast("⚠️ اكتب وصف التعديل");return;}
   const requestDate=document.getElementById(`ri-req-${pid}-${sid}`)?.value||todayStr();
   const dueDate=document.getElementById(`ri-due-${pid}-${sid}`)?.value||"";
   window._projects=window._projects.map(p=>{
     if(p.id!==pid)return p;
     const existing=(p.stageRevisions&&p.stageRevisions[sid])||[];
-    return{...p,stageRevisions:{...(p.stageRevisions||{}),[sid]:[...existing,{desc,requestDate,dueDate,done:false}]}};
+    return{...p,stageRevisions:{...(p.stageRevisions||{}),[sid]:[...existing,{desc,descHtml,requestDate,dueDate,done:false}]}};
   });
   await window._saveToDb();showToast("✓ تم إضافة التعديل");render();
 }
