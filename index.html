@@ -705,6 +705,111 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
   text-align: center; 
 }
 
+
+/* Improved PDF pages and tables */
+.pdf-page-break {
+  break-before: page;
+  page-break-before: always;
+  height: 0;
+}
+.pdf-page-title {
+  font-size: 18px;
+  font-weight: 900;
+  color: #111827;
+  margin: 0 0 9mm;
+  padding-bottom: 4mm;
+  border-bottom: 2px solid #111827;
+  text-align: right;
+}
+.pdf-clean-table {
+  border: 1px solid #E3E3E3;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 7mm !important;
+}
+.pdf-clean-table thead th {
+  background: #F4F4F4 !important;
+  color: #666 !important;
+  font-weight: 850 !important;
+}
+.pdf-clean-table tbody tr:nth-child(even) td {
+  background: #FCFCFC;
+}
+.pdf-clean-table td, .pdf-clean-table th {
+  border-bottom: 1px solid #EDEDED !important;
+}
+.pdf-clean-table tbody tr:last-child td {
+  border-bottom: none !important;
+}
+#pdfOutput .pdf-services-layout, .pdf-services-layout {
+  display: grid;
+  grid-template-columns: 44mm 1fr;
+  gap: 9mm;
+  align-items: start;
+  margin-top: 6mm;
+  margin-bottom: 0;
+}
+#pdfOutput .pdf-side-card, .pdf-side-card {
+  border: 1px solid #D9D9D9;
+  border-radius: 0;
+  margin-bottom: 7mm;
+  overflow: hidden;
+  background: #fff;
+}
+#pdfOutput .pdf-side-title, .pdf-side-title,
+#pdfOutput .pdf-work-title, .pdf-work-title {
+  background: #F1F1F1;
+  border-bottom: 1px solid #D9D9D9;
+  font-size: 14px;
+  font-weight: 900;
+  padding: 8px 10px;
+  text-align: center;
+  color: #111;
+}
+#pdfOutput .pdf-side-body, .pdf-side-body {
+  font-size: 11.5px;
+  line-height: 1.8;
+  padding: 9px 10px;
+  text-align: center;
+  white-space: pre-line;
+}
+#pdfOutput .pdf-work-box, .pdf-work-box {
+  border: 1px solid #D9D9D9;
+  overflow: hidden;
+  background: #fff;
+}
+#pdfOutput .pdf-work-row, .pdf-work-row {
+  padding: 9px 12px;
+  border-top: 1px solid #E4E4E4;
+  font-size: 11.5px;
+  line-height: 1.75;
+  white-space: pre-line;
+  text-align: right;
+}
+#pdfOutput .pdf-work-row:first-child, .pdf-work-row:first-child { border-top: none; }
+#pdfOutput .pdf-work-row strong, .pdf-work-row strong { font-weight: 900; }
+#pdfOutput .pdf-meta-box, .pdf-meta-box {
+  border-radius: 10px;
+}
+#pdfOutput .pdf-head, .pdf-head {
+  margin-bottom: 12mm;
+}
+#pdfOutput .pdf-section, .pdf-section {
+  font-size: 12px;
+  font-weight: 850;
+  color: #777;
+  margin-bottom: 5mm;
+  margin-top: 0;
+  text-align: right;
+}
+#pdfOutput .pdf-total, .pdf-total {
+  margin-top: 7mm;
+}
+#pdfOutput .pdf-account-box, .pdf-account-box,
+#pdfOutput .pdf-note, .pdf-note {
+  border-radius: 10px;
+}
+
 </style>
 </head>
 <body>
@@ -887,7 +992,7 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
         <div class="calc-quote-field"><label>اسم الحساب</label><input id="cq-account-name" type="text" placeholder="خالد حسن العجمي" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field calc-quote-full"><label>نوع العمل</label><textarea id="cq-work-type" placeholder="مثال: تصميم معماري&#10;تصميم داخلي" oninput="calcSyncQuoteMeta()"></textarea></div>
         <div class="calc-quote-field calc-quote-full"><label>مكونات المشروع</label><textarea id="cq-components" placeholder="- الواجهة المعمارية&#10;- التصميم الداخلي" oninput="calcSyncQuoteMeta()"></textarea></div>
-        <div class="calc-quote-field calc-quote-full"><label>وصف العمل / تفاصيل ما ستحصلون عليه</label><textarea id="cq-work-desc" placeholder="اكتب وصف الخدمات هنا..." oninput="calcSyncQuoteMeta()" style="min-height:180px"></textarea></div>
+        <div class="calc-quote-field calc-quote-full"><label>وصف العمل / تفاصيل ما ستحصلون عليه</label><textarea id="cq-work-desc" placeholder="اكتب وصف العمل والخدمات هنا..." oninput="calcSyncQuoteMeta()" style="min-height:180px"></textarea></div>
         <div class="calc-quote-field calc-quote-full"><label>ملاحظات إضافية</label><textarea id="cq-notes" placeholder="مثال: الأسعار لا تشمل التنفيذ أو تعتمد بعد اعتماد العرض النهائي" oninput="calcSyncQuoteMeta()"></textarea></div>
       </div>
       <div class="calc-logo-tools">
@@ -1709,7 +1814,7 @@ let calcQuoteMeta = {
   validityDays: 7,
   workType: 'تصميم معماري\nتصميم داخلي',
   components: '- الواجهة المعمارية\n- التصميم الداخلي\n- تصميم الحدائق والمسطحات الخارجية',
-  workDescription: 'تصميم المبنى المعماري والداخلي لمساحة 625 م²\n\nعدد زيارتين إشرافية\n\nلوحة الأفكار (المودبورد):\nتشمل مجموعة من الصور والعناصر التي نرغب في استخدامها في التصميم المعماري والداخلي لتوضيح الأفكار، اختيار المواد، توزيع وأشكال الأثاث، الألوان، بالإضافة إلى الإضاءة والديكورات.\n\nتصميم الثلاثي الأبعاد:\nتقديم لقطات ثلاثية الأبعاد توضح تصميم معماري والداخلي من خلال لقطات واقعية توضح التصميم بشكل واقعي قبل التنفيذ.\n\nالمخططات التنفيذية:\nتشمل إعداد المخططات الفنية اللازمة للتنفيذ، مثل مخططات نقاط الكهرباء، توزيع الإضاءة، ومواقع نقاط المياه.\n\nجدول الكميات (BOQ):\nجدول كميات للمواد والأثاث المستخدمة ومواصفاتها بملف Excel',
+  workDescription: 'تصميم المبنى المعماري والداخلي لمساحة 625 م²\n\nعدد زيارتين إشرافيتين\n\nلوحة الأفكار (المود بورد):\nتشمل مجموعة من الصور والعناصر المراد استخدامها في التصميم المعماري والداخلي لتوضيح الأفكار، واختيار المواد، وتوزيع الأثاث وأشكاله، والألوان، بالإضافة إلى الإضاءة والديكورات.\n\nالتصميم ثلاثي الأبعاد:\nتقديم لقطات ثلاثية الأبعاد توضح التصميم المعماري والداخلي بشكل واقعي قبل التنفيذ.\n\nالمخططات التنفيذية:\nإعداد المخططات الفنية اللازمة للتنفيذ، مثل مخططات نقاط الكهرباء، وتوزيع الإضاءة، ومواقع نقاط المياه.\n\nجدول الكميات (BOQ):\nجدول كميات للمواد والأثاث المستخدمة ومواصفاتها بصيغة Excel',
   accountName: 'خالد حسن العجمي',
   accountNumber: '',
   notes: '',
@@ -1903,8 +2008,18 @@ function calcExp(){
   navigator.clipboard ? navigator.clipboard.writeText(txt).then(()=>showToast("✓ تم نسخ العرض")) : showToast("⚠️ انسخ يدوياً");
 }
 
+
+function normalizeArabicTextForPdf(text){
+  return String(text || '')
+    .replace(/تصميم\s*الثلاثي\s*الأبعاد/g, 'التصميم ثلاثي الأبعاد')
+    .replace(/مود\s*بورد/g, 'المود بورد')
+    .replace(/اشرافية/g, 'إشرافية')
+    .replace(/زيارتين إشرافية/g, 'زيارتين إشرافيتين')
+    .replace(/ماسيتم/g, 'ما سيتم')
+    .replace(/اسم المشروع/g, 'اسم المشروع');
+}
 function pdfRichLines(text){
-  return esc(text || '').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+  return esc(normalizeArabicTextForPdf(text || '')).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
 }
 function pdfWorkRows(text){
   const source = (text || '').trim();
@@ -1925,7 +2040,7 @@ function calcExportPDF(){
     items.forEach(d=>{
       const pct=calcItemPct[d.id]??d.pct;
       const amt=Math.round(bud*pct/100/100)*100;
-      rows+=`<tr><td>${esc(d.label)}</td><td class="amt">${fmtN(amt)} ر.س</td></tr>`;
+      rows+=`<tr><td>${esc(normalizeArabicTextForPdf(d.label))}</td><td class="amt">${fmtN(amt)} ر.س</td></tr>`;
     });
   });
 
@@ -1941,11 +2056,11 @@ function calcExportPDF(){
   const metaBoxes = `
     <div class="pdf-meta-box"><div class="pdf-meta-label">اسم المشروع</div><div class="pdf-meta-value">${esc(calcQuoteMeta.projectName || '—')}</div></div>
     <div class="pdf-meta-box"><div class="pdf-meta-label">موقع المشروع</div><div class="pdf-meta-value">${esc(calcQuoteMeta.projectLocation || '—')}</div></div>
-    <div class="pdf-meta-box"><div class="pdf-meta-label">مساحة المشروع</div><div class="pdf-meta-value">${esc(projectAreaForDisplay())}</div></div>
+    <div class="pdf-meta-box"><div class="pdf-meta-label">مساحة المشروع</div><div class="pdf-meta-value">${esc(projectAreaForDisplay ? projectAreaForDisplay() : (calcQuoteMeta.projectArea || '—'))}</div></div>
     <div class="pdf-meta-box"><div class="pdf-meta-label">مدة الصلاحية</div><div class="pdf-meta-value">صالح لمدة ${esc(String(calcQuoteMeta.validityDays || 7))} أيام</div></div>`;
 
-  const workTypeHtml = `<div class="pdf-side-card"><div class="pdf-side-title">نوع العمل</div><div class="pdf-side-body">${esc(calcQuoteMeta.workType || '—')}</div></div>`;
-  const componentsHtml = `<div class="pdf-side-card"><div class="pdf-side-title">مكونات المشروع</div><div class="pdf-side-body">${esc(calcQuoteMeta.components || '—')}</div></div>`;
+  const workTypeHtml = `<div class="pdf-side-card"><div class="pdf-side-title">نوع العمل</div><div class="pdf-side-body">${esc(normalizeArabicTextForPdf(calcQuoteMeta.workType || '—'))}</div></div>`;
+  const componentsHtml = `<div class="pdf-side-card"><div class="pdf-side-title">مكونات المشروع</div><div class="pdf-side-body">${esc(normalizeArabicTextForPdf(calcQuoteMeta.components || '—'))}</div></div>`;
   const workDescHtml = `<div class="pdf-work-box"><div class="pdf-work-title">وصف العمل (ما سيتم القيام به)</div>${pdfWorkRows(calcQuoteMeta.workDescription || '')}</div>`;
 
   const accountHtml = `
@@ -1961,39 +2076,45 @@ function calcExportPDF(){
 
   const el=document.getElementById('pdfOutput');
   el.innerHTML=`
-    <div class="pdf-page" id="pdfPage">
-      <div class="pdf-head">
-        <div class="pdf-head-main">
-          <div class="pdf-title">${esc(calcQuoteMeta.title || 'عرض سعر')}</div>
-          <div class="pdf-sub">تاريخ الإصدار: ${issueDate}<br>صالح لمدة ${esc(String(calcQuoteMeta.validityDays || 7))} أيام</div>
+    <div id="pdfPage">
+      <div class="pdf-page">
+        <div class="pdf-head">
+          <div class="pdf-head-main">
+            <div class="pdf-title">${esc(calcQuoteMeta.title || 'عرض سعر')}</div>
+            <div class="pdf-sub">تاريخ الإصدار: ${issueDate}<br>صالح لمدة ${esc(String(calcQuoteMeta.validityDays || 7))} أيام</div>
+          </div>
+          ${logoHtml}
         </div>
-        ${logoHtml}
+
+        <div class="pdf-meta">${metaBoxes}</div>
+
+        <div class="pdf-section" style="text-align:center;margin-top:4mm;">تفاصيل ما ستحصلون عليه</div>
+        <div class="pdf-services-layout">
+          <div>${workTypeHtml}${componentsHtml}</div>
+          <div>${workDescHtml}</div>
+        </div>
       </div>
 
-      <div class="pdf-meta">${metaBoxes}</div>
+      <div class="pdf-page-break"></div>
 
-      <div class="pdf-section">تفاصيل ما ستحصلون عليه</div>
-      <div class="pdf-services-layout">
-        <div>${workTypeHtml}${componentsHtml}</div>
-        <div>${workDescHtml}</div>
+      <div class="pdf-page">
+        <div class="pdf-page-title">بنود المشروع والتسعيرة</div>
+        <table class="pdf-clean-table">
+          <thead><tr><th>البند</th><th class="amt">المبلغ</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+
+        <div class="pdf-page-title" style="margin-top:10mm;">آلية السداد</div>
+        <table class="pdf-pay-table pdf-clean-table">
+          <thead><tr><th>البند</th><th class="amt">المبلغ</th></tr></thead>
+          <tbody>${payRows}</tbody>
+        </table>
+
+        <div class="pdf-total"><span>الإجمالي الكلي</span><span>SAR ${fmtN(total)}</span></div>
+        ${accountHtml}
+        ${notesHtml}
+        <div class="pdf-footer">جميع الأسعار بالريال السعودي (ر.س)</div>
       </div>
-
-      <div class="pdf-section">بنود المشروع والتسعيرة</div>
-      <table>
-        <thead><tr><th>البند</th><th class="amt">المبلغ</th></tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
-
-      <div class="pdf-section">آلية السداد</div>
-      <table class="pdf-pay-table">
-        <thead><tr><th>البند</th><th class="amt">المبلغ</th></tr></thead>
-        <tbody>${payRows}</tbody>
-      </table>
-
-      <div class="pdf-total"><span>الإجمالي الكلي</span><span>SAR ${fmtN(total)}</span></div>
-      ${accountHtml}
-      ${notesHtml}
-      <div class="pdf-footer">جميع الأسعار بالريال السعودي (ر.س)</div>
     </div>`;
 
   el.style.display='block';
@@ -2011,7 +2132,7 @@ function calcExportPDF(){
     image:{type:'jpeg',quality:0.98},
     html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff',scrollX:0,scrollY:0},
     jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
-    pagebreak:{mode:['css','legacy']}
+    pagebreak:{mode:['css','legacy'], before:'.pdf-page-break'}
   }).from(page).save().then(()=>{
     el.removeAttribute('style');
     el.style.display='none';
