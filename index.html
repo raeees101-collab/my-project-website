@@ -690,7 +690,7 @@ button:active { transform: scale(0.96); }
         <div class="calc-quote-field"><label>عنوان العرض</label><input id="cq-title" type="text" placeholder="عرض سعر" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>اسم المشروع</label><input id="cq-project" type="text" placeholder="مثال: تصميم داخلي لفيلا" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>موقع المشروع</label><input id="cq-location" type="text" placeholder="المدينة / الحي" oninput="calcSyncQuoteMeta()"></div>
-        <div class="calc-quote-field"><label>مساحة المشروع</label><input id="cq-area" type="text" placeholder="مثال: 300 م²" oninput="calcSyncQuoteMeta()"></div>
+        <div class="calc-quote-field"><label>مساحة المشروع</label><input id="cq-area" type="number" min="0" step="1" placeholder="اكتب الرقم فقط" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>مدة الصلاحية (أيام)</label><input id="cq-validity" type="number" min="1" value="7" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>رقم الحساب / الآيبان</label><input id="cq-account-number" type="text" placeholder="اكتب رقم الحساب أو IBAN" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>اسم الحساب</label><input id="cq-account-name" type="text" placeholder="خالد حسن العجمي" oninput="calcSyncQuoteMeta()"></div>
@@ -1528,6 +1528,14 @@ let calcQuoteMeta = {
 function calcInitPcts(){CALC_ORDER.forEach(t=>{CALC_BASE[t].forEach(d=>{calcItemPct[d.id]=d.pct;});});calcItemPct[CALC_SURVEY.id]=2;}
 calcInitPcts();
 
+function cleanProjectAreaValue(value){
+  return String(value || '').replace(/[^\d.]/g,'').trim();
+}
+function projectAreaForDisplay(){
+  const area = cleanProjectAreaValue(calcQuoteMeta.projectArea);
+  return area ? `${area} م²` : '—';
+}
+
 function loadCalcQuoteMeta(){
   try {
     const saved = JSON.parse(localStorage.getItem('calcQuoteMeta') || '{}');
@@ -1542,7 +1550,7 @@ function calcFillQuoteMetaForm(){
   setVal('cq-title', calcQuoteMeta.title || 'عرض سعر');
   setVal('cq-project', calcQuoteMeta.projectName || '');
   setVal('cq-location', calcQuoteMeta.projectLocation || '');
-  setVal('cq-area', calcQuoteMeta.projectArea || '');
+  setVal('cq-area', cleanProjectAreaValue(calcQuoteMeta.projectArea) || '');
   setVal('cq-validity', calcQuoteMeta.validityDays || 7);
   setVal('cq-work-type', calcQuoteMeta.workType || '');
   setVal('cq-components', calcQuoteMeta.components || '');
@@ -1556,7 +1564,7 @@ function calcSyncQuoteMeta(){
   calcQuoteMeta.title = document.getElementById('cq-title').value.trim() || 'عرض سعر';
   calcQuoteMeta.projectName = document.getElementById('cq-project').value.trim();
   calcQuoteMeta.projectLocation = document.getElementById('cq-location').value.trim();
-  calcQuoteMeta.projectArea = document.getElementById('cq-area').value.trim();
+  calcQuoteMeta.projectArea = cleanProjectAreaValue(document.getElementById('cq-area').value);
   calcQuoteMeta.validityDays = Math.max(1, parseInt(document.getElementById('cq-validity').value) || 7);
   calcQuoteMeta.workType = document.getElementById('cq-work-type').value.trim();
   calcQuoteMeta.components = document.getElementById('cq-components').value.trim();
@@ -1696,7 +1704,7 @@ function calcExp(){
   const metaLines = [
     calcQuoteMeta.projectName ? `اسم المشروع: ${calcQuoteMeta.projectName}` : '',
     calcQuoteMeta.projectLocation ? `موقع المشروع: ${calcQuoteMeta.projectLocation}` : '',
-    calcQuoteMeta.projectArea ? `مساحة المشروع: ${calcQuoteMeta.projectArea}` : '',
+    cleanProjectAreaValue(calcQuoteMeta.projectArea) ? `مساحة المشروع: ${projectAreaForDisplay()}` : '',
     `مدة الصلاحية: ${calcQuoteMeta.validityDays||7} أيام`
   ].filter(Boolean).join('\n');
   const notesBlock = calcQuoteMeta.notes ? `\n\nملاحظات إضافية:\n${calcQuoteMeta.notes}` : '';
@@ -1742,7 +1750,7 @@ function calcExportPDF(){
   const metaBoxes = `
     <div class="pdf-meta-box"><div class="pdf-meta-label">اسم المشروع</div><div class="pdf-meta-value">${esc(calcQuoteMeta.projectName || '—')}</div></div>
     <div class="pdf-meta-box"><div class="pdf-meta-label">موقع المشروع</div><div class="pdf-meta-value">${esc(calcQuoteMeta.projectLocation || '—')}</div></div>
-    <div class="pdf-meta-box"><div class="pdf-meta-label">مساحة المشروع</div><div class="pdf-meta-value">${esc(calcQuoteMeta.projectArea || '—')}</div></div>
+    <div class="pdf-meta-box"><div class="pdf-meta-label">مساحة المشروع</div><div class="pdf-meta-value">${esc(projectAreaForDisplay())}</div></div>
     <div class="pdf-meta-box"><div class="pdf-meta-label">مدة الصلاحية</div><div class="pdf-meta-value">صالح لمدة ${esc(String(calcQuoteMeta.validityDays || 7))} أيام</div></div>`;
 
   const workTypeHtml = `<div class="pdf-side-card"><div class="pdf-side-title">نوع العمل</div><div class="pdf-side-body">${esc(calcQuoteMeta.workType || '—')}</div></div>`;
