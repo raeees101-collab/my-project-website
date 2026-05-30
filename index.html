@@ -2440,6 +2440,10 @@ function calcExportPDF(){
     });
   });
 
+  const itemCount = activeTypes.reduce((sum, t) => sum + calcItemsFor(t).length, 0);
+  const groupCount = multi ? activeTypes.length : 0;
+  const paymentPageClass = (itemCount + groupCount >= 16) ? ' payment-own-page' : '';
+
   // Build components list
   const compLines = splitManualLines(calcQuoteMeta.components || '');
   const compHtml = compLines.map(c => `<li>${c}</li>`).join('');
@@ -2884,6 +2888,21 @@ function calcExportPDF(){
   .payment-block {
     margin-top: 10mm;
   }
+
+  /* If pricing list is long, payment starts on a separate page */
+  .payment-own-page {
+    page-break-before: always;
+    break-before: page;
+    margin-top: 0 !important;
+    padding-top: 0;
+  }
+  @media print {
+    .payment-own-page {
+      page-break-before: always;
+      break-before: page;
+      margin-top: 0 !important;
+    }
+  }
 </style>
 </head>
 <body>
@@ -2936,7 +2955,7 @@ function calcExportPDF(){
     <tbody>${itemRows}</tbody>
   </table>
 
-  <div class="payment-block">
+  <div class="payment-block${paymentPageClass}">
   <div class="page-title" style="margin-top:10mm;">آلية السداد</div>
   <table>
     <thead><tr><th>البند</th><th class="num">المبلغ</th></tr></thead>
