@@ -2833,6 +2833,57 @@ function calcExportPDF(){
     font-size: 11px;
     font-weight: 900;
   }
+
+  /* Final print-flow fix: page 1 stays designed, page 2+ never clips */
+  .quote-flow-page,
+  .page-2 {
+    height: auto !important;
+    min-height: 297mm !important;
+    overflow: visible !important;
+    page-break-after: auto !important;
+  }
+  @media print {
+    .quote-flow-page,
+    .page-2 {
+      height: auto !important;
+      min-height: 297mm !important;
+      overflow: visible !important;
+      page-break-after: auto !important;
+    }
+    .page-2 table { page-break-inside: auto; break-inside: auto; }
+    .page-2 tr { page-break-inside: avoid; break-inside: avoid; }
+    .payment-block {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+  }
+  .grp-row td {
+    background: #EAF6F1 !important;
+    color: #126B56 !important;
+    font-weight: 900 !important;
+    border-top: 2px solid #15866A !important;
+    border-bottom: 1px solid #D7EDE6 !important;
+    padding: 8px 12px !important;
+  }
+  .grp-label {
+    display: inline-flex;
+    align-items: center;
+    background: #15866A;
+    color: #fff;
+    border-radius: 999px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 900;
+    margin-left: 8px;
+  }
+  .grp-amount {
+    color: #126B56;
+    font-size: 11px;
+    font-weight: 900;
+  }
+  .payment-block {
+    margin-top: 10mm;
+  }
 </style>
 </head>
 <body>
@@ -2878,13 +2929,14 @@ function calcExportPDF(){
 </div>
 
 <!-- ════ PAGE 2 ════ -->
-<div class="page page-2">
+<div class="page page-2 quote-flow-page">
   <div class="page-title">بنود المشروع والتسعيرة</div>
   <table>
     <thead><tr><th>البند</th><th class="num">المبلغ</th></tr></thead>
     <tbody>${itemRows}</tbody>
   </table>
 
+  <div class="payment-block">
   <div class="page-title" style="margin-top:10mm;">آلية السداد</div>
   <table>
     <thead><tr><th>البند</th><th class="num">المبلغ</th></tr></thead>
@@ -2908,6 +2960,7 @@ function calcExportPDF(){
 
   ${notesHtml}
   <div class="footer">جميع الأسعار بالريال السعودي (ر.س)</div>
+  </div>
 </div>
 
 <script>
