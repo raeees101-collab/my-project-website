@@ -1366,6 +1366,7 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
           </select></div>
         <div class="calc-quote-field"><label>مساحة المشروع</label><input id="cq-area" type="number" min="0" step="1" placeholder="اكتب الرقم فقط" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>موقع المشروع</label><input id="cq-location" type="text" placeholder="المدينة / الحي" oninput="calcSyncQuoteMeta()"></div>
+        <div class="calc-quote-field"><label>الاسم تحت الشعار</label><input id="cq-brand-name" type="text" placeholder="Rakeez Design" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>رقم الجوال</label><input id="cq-my-phone" type="text" placeholder="05xxxxxxxx" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>البريد الإلكتروني</label><input id="cq-my-email" type="email" placeholder="example@email.com" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>اسم العميل</label><input id="cq-client-name" type="text" placeholder="اختياري" oninput="calcSyncQuoteMeta()"></div>
@@ -2220,6 +2221,7 @@ let calcQuoteMeta = {
   validityDays: 7,
   components: "- الواجهة المعمارية\n- التصميم الداخلي\n- تصميم الحدائق والمسطحات الخارجية",
   workDescription: "تصميم المبنى المعماري والداخلي لمساحة 300 م²\n\nعدد زيارتين إشرافيتين.\n\nلوحة الأفكار (المود بورد):\nتشمل مجموعة من الصور والعناصر المراد استخدامها في التصميم المعماري والداخلي؛ لتوضيح الأفكار، واختيار المواد، وتوزيع الأثاث وأشكاله، وتحديد الألوان، بالإضافة إلى الإضاءة والديكورات.\n\nالتصميم ثلاثي الأبعاد:\nتقديم لقطات ثلاثية الأبعاد توضح التصميم المعماري والداخلي بشكل واقعي قبل التنفيذ.\n\nالمخططات التنفيذية:\nإعداد المخططات الفنية اللازمة للتنفيذ، مثل مخططات نقاط الكهرباء، وتوزيع الإضاءة، ومواقع نقاط المياه.\n\nجدول الكميات (BOQ):\nجدول كميات للمواد والأثاث المستخدمة ومواصفاتها بصيغة Excel.",
+  brandName: 'Rakeez Design',
   myPhone: '',
   myEmail: '',
   clientName: '',
@@ -2302,6 +2304,7 @@ function loadCalcQuoteMeta(){
     if(!calcQuoteMeta.bankName) calcQuoteMeta.bankName = 'الراجحي';
     if(!calcQuoteMeta.accountName) calcQuoteMeta.accountName = 'خالد حسن العجمي';
     if(typeof calcQuoteMeta.includeDesignScope === 'undefined') calcQuoteMeta.includeDesignScope = true;
+    if(!calcQuoteMeta.brandName) calcQuoteMeta.brandName = 'Rakeez Design';
   } catch(e) {}
 }
 function saveCalcQuoteMeta(){
@@ -2315,6 +2318,7 @@ function calcFillQuoteMetaForm(){
   setVal('cq-area', cleanProjectAreaValue(calcQuoteMeta.projectArea) || '');
   setVal('cq-location', calcQuoteMeta.projectLocation || '');
   setVal('cq-validity', calcQuoteMeta.validityDays || 7);
+  setVal('cq-brand-name', calcQuoteMeta.brandName || 'Rakeez Design');
   setVal('cq-my-phone', calcQuoteMeta.myPhone || '');
   setVal('cq-my-email', calcQuoteMeta.myEmail || '');
   setVal('cq-client-name', calcQuoteMeta.clientName || '');
@@ -2339,6 +2343,7 @@ function calcSyncQuoteMeta(){
   calcQuoteMeta.projectArea = cleanProjectAreaValue(document.getElementById('cq-area').value);
   calcQuoteMeta.projectLocation = document.getElementById('cq-location').value.trim();
   calcQuoteMeta.validityDays = Math.max(1, parseInt(document.getElementById('cq-validity').value) || 7);
+  calcQuoteMeta.brandName = document.getElementById('cq-brand-name').value.trim() || 'Rakeez Design';
   calcQuoteMeta.myPhone = document.getElementById('cq-my-phone').value.trim();
   calcQuoteMeta.myEmail = document.getElementById('cq-my-email').value.trim();
   calcQuoteMeta.clientName = document.getElementById('cq-client-name').value.trim();
@@ -3130,6 +3135,43 @@ function calcExportPDF(){
     background: #FAFAFA;
     margin-top: 4mm;
   }
+
+  /* Logo block pinned to the far left with its text */
+  .brand-block {
+    width: 56mm !important;
+    flex-shrink: 0;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+    direction: ltr !important;
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+  }
+  .brand-block .logo-img {
+    display: block !important;
+    align-self: flex-start !important;
+    margin: 0 0 3mm 0 !important;
+    border: none !important;
+    outline: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+  .brand-info {
+    width: 100%;
+    text-align: left !important;
+    direction: ltr !important;
+    font-size: 10px;
+    line-height: 1.55;
+    color: #333;
+    font-weight: 600;
+  }
+  .brand-info strong,
+  .brand-info div {
+    text-align: left !important;
+  }
 </style>
 </head>
 <body>
@@ -3147,7 +3189,7 @@ function calcExportPDF(){
     <div class="brand-block">
       ${logoHtml}
       <div class="brand-info">
-        <strong>Rakeez Design</strong>
+        <strong>${calcQuoteMeta.brandName || 'Rakeez Design'}</strong>
         ${calcQuoteMeta.myPhone ? `<div>Telephone : ${calcQuoteMeta.myPhone}</div>` : ''}
         ${calcQuoteMeta.myEmail ? `<div>Email : ${calcQuoteMeta.myEmail}</div>` : ''}
       </div>
@@ -3217,11 +3259,6 @@ ${calcQuoteMeta.includeDesignScope !== false ? `<!-- ════ DESIGN SCOPE P
   <div class="total-row">
     <span>الإجمالي الكلي</span>
     <span class="total-val">SAR ${fmtN(total)}</span>
-  </div>
-
-  <div class="terms-box">
-    <div class="account-label">شروط العرض</div>
-    <div class="account-row"><span>مدة الصلاحية</span><span>صالح لمدة ${calcQuoteMeta.validityDays || 7} أيام</span></div>
   </div>
 
   <div class="account-box">
