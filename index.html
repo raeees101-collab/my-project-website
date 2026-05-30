@@ -2491,14 +2491,18 @@ function calcExportPDF(){
   /* ── PAGE ── */
   .page {
     width: 210mm;
-    min-height: 297mm;
+    height: 297mm;
     margin: 0 auto;
-    padding: 18mm 16mm 14mm;
+    padding: 10mm 12mm 9mm;
     background: #fff;
+    overflow: hidden;
+    page-break-after: always;
   }
+  .page:last-of-type { page-break-after: auto; }
+  .page-1 { padding-top: 9mm; }
   @media print {
     html, body { margin: 0; padding: 0; }
-    .page { width: 100%; margin: 0; padding: 14mm 12mm 10mm; page-break-after: always; }
+    .page { width: 210mm; height: 297mm; margin: 0; padding: 10mm 12mm 9mm; page-break-after: always; overflow: hidden; }
     .page:last-child { page-break-after: avoid; }
     .print-btn { display: none !important; }
   }
@@ -2526,21 +2530,21 @@ function calcExportPDF(){
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    margin-bottom: 10mm;
-    gap: 10mm;
+    margin-bottom: 5mm;
+    gap: 8mm;
   }
   .header-main { flex: 1; text-align: right; }
   .doc-title {
-    font-size: 26px;
+    font-size: 22px;
     font-weight: 900;
     color: #15866A;
-    margin-bottom: 6px;
+    margin-bottom: 3px;
     letter-spacing: -0.3px;
   }
-  .doc-sub { font-size: 11px; color: #888; line-height: 1.8; }
+  .doc-sub { font-size: 9.5px; color: #888; line-height: 1.45; }
   .logo-img {
-    width: 25mm;
-    height: 25mm;
+    width: 20mm;
+    height: 20mm;
     object-fit: contain;
     border-radius: 10px;
     border: 1px solid #eee;
@@ -2551,34 +2555,35 @@ function calcExportPDF(){
   .meta-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 5mm;
-    margin-bottom: 8mm;
+    gap: 3mm;
+    margin-bottom: 4mm;
   }
   .meta-box {
     background: #FAFAFA;
     border: 1px solid #E9E9E9;
-    border-radius: 10px;
-    padding: 9px 12px;
+    border-radius: 9px;
+    padding: 6px 9px;
+    min-height: 11mm;
   }
-  .meta-label { font-size: 10px; color: #999; font-weight: 700; margin-bottom: 3px; }
-  .meta-value { font-size: 13px; font-weight: 800; color: #111; }
+  .meta-label { font-size: 8.8px; color: #999; font-weight: 700; margin-bottom: 1px; }
+  .meta-value { font-size: 10.8px; font-weight: 800; color: #111; line-height: 1.3; }
 
   /* ── SECTION TITLE ── */
   .sec-title {
-    font-size: 12px;
+    font-size: 10px;
     font-weight: 800;
     color: #777;
     text-align: center;
-    margin: 8mm 0 5mm;
-    letter-spacing: 0.5px;
+    margin: 4mm 0 3mm;
+    letter-spacing: 0.2px;
   }
 
   /* ── SCOPE GRID ── */
   .scope-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 6mm;
-    margin-bottom: 6mm;
+    gap: 4mm;
+    margin-bottom: 4mm;
   }
   .info-card {
     border: 1px solid #E0E0E0;
@@ -2588,18 +2593,18 @@ function calcExportPDF(){
   .info-card-title {
     background: #F4F4F4;
     border-bottom: 1px solid #E0E0E0;
-    padding: 8px 12px;
-    font-size: 13px;
+    padding: 5px 9px;
+    font-size: 10.8px;
     font-weight: 900;
   }
-  .info-card-body { padding: 10px 12px; }
+  .info-card-body { padding: 6px 9px; }
   .info-card-body ul { list-style: none; }
   .info-card-body li {
     position: relative;
-    padding-right: 14px;
-    padding-bottom: 4px;
-    font-size: 12px;
-    line-height: 1.7;
+    padding-right: 12px;
+    padding-bottom: 2px;
+    font-size: 9.8px;
+    line-height: 1.45;
   }
   .info-card-body li::before {
     content: "•";
@@ -2612,45 +2617,52 @@ function calcExportPDF(){
   /* ── WORK ITEMS ── */
   .work-box {
     border: 1px solid #E0E0E0;
-    border-radius: 14px;
+    border-radius: 12px;
     overflow: hidden;
-    margin-bottom: 8mm;
+    margin-bottom: 0;
   }
   .work-box-title {
     background: #F4F4F4;
     border-bottom: 1px solid #E0E0E0;
-    padding: 10px 14px;
-    font-size: 14px;
+    padding: 6px 10px;
+    font-size: 11.2px;
     font-weight: 900;
   }
-  .work-list { padding: 10px 12px 12px; }
+  .work-list { 
+    padding: 6px 8px 8px; 
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+  }
   .work-item {
     display: flex;
     align-items: flex-start;
-    gap: 10px;
+    gap: 6px;
     border: 1px solid #EFEFEF;
-    border-radius: 10px;
-    padding: 10px 12px;
-    margin-bottom: 8px;
+    border-radius: 8px;
+    padding: 6px 7px;
+    margin-bottom: 0;
     background: #FDFDFD;
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
   .work-num {
-    width: 24px;
-    height: 24px;
+    width: 17px;
+    height: 17px;
     border-radius: 50%;
     background: #15866A;
     color: #fff;
-    font-size: 11px;
+    font-size: 8px;
     font-weight: 900;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    margin-top: 2px;
+    margin-top: 1px;
   }
-  .work-body { flex: 1; text-align: right; }
-  .work-body strong { display: block; font-size: 13px; font-weight: 900; margin-bottom: 3px; }
-  .work-body p { font-size: 12px; color: #444; line-height: 1.75; }
+  .work-body { flex: 1; text-align: right; min-width: 0; }
+  .work-body strong { display: block; font-size: 9.8px; font-weight: 900; margin-bottom: 1px; line-height: 1.35; }
+  .work-body p { font-size: 8.8px; color: #444; line-height: 1.42; }
 
   /* ── PAGE 2 TITLE ── */
   .page-title {
@@ -2752,13 +2764,16 @@ function calcExportPDF(){
     padding-top: 6px;
     text-align: center;
   }
+
+  .page-1 * { break-inside: avoid; }
+  @page { size: A4 portrait; margin: 0; }
 </style>
 </head>
 <body>
 <button class="print-btn" onclick="window.print()">🖨️ طباعة / حفظ PDF</button>
 
 <!-- ════ PAGE 1 ════ -->
-<div class="page">
+<div class="page page-1">
   <div class="header">
     <div class="header-main">
       <div class="doc-title">${calcQuoteMeta.title || 'عرض سعر'}</div>
