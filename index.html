@@ -934,6 +934,135 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
   padding-right: 18px;
 }
 
+
+/* Scope preview and graphic PDF layout */
+.calc-auto-scope {
+  background: #FAFAF8;
+  border: 1.5px solid #E7E5E0;
+  border-radius: 16px;
+  padding: 14px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+.calc-auto-label {
+  font-size: 13px;
+  font-weight: 900;
+  color: #1C1917;
+  margin-bottom: 4px;
+}
+.calc-auto-sub {
+  font-size: 11px;
+  color: #78716C;
+}
+.calc-auto-preview {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+  max-width: 520px;
+}
+.calc-auto-chip {
+  background: #fff;
+  border: 1px solid #E7E5E0;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #57534E;
+}
+.pdf-scope-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6mm;
+  margin: 6mm 0 7mm;
+}
+.pdf-info-card {
+  border: 1px solid #E0E0E0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+.pdf-info-title {
+  background: #F4F4F4;
+  border-bottom: 1px solid #E0E0E0;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 900;
+  color: #111;
+  text-align: right;
+}
+.pdf-chip-list {
+  padding: 10px 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-start;
+}
+.pdf-chip {
+  border: 1px solid #E6E6E6;
+  background: #FCFCFC;
+  border-radius: 999px;
+  padding: 5px 9px;
+  font-size: 11px;
+  font-weight: 750;
+  color: #333;
+}
+.pdf-work-graphic {
+  border: 1px solid #E0E0E0;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fff;
+  margin-top: 4mm;
+}
+.pdf-work-graphic-title {
+  background: #F4F4F4;
+  border-bottom: 1px solid #E0E0E0;
+  padding: 9px 12px;
+  font-size: 14px;
+  font-weight: 900;
+  color: #111;
+  text-align: right;
+}
+.pdf-work-list {
+  padding: 10px 12px 12px;
+  display: grid;
+  gap: 7px;
+}
+.pdf-work-item {
+  display: grid;
+  grid-template-columns: 26px 1fr;
+  gap: 8px;
+  align-items: start;
+  border: 1px solid #EFEFEF;
+  background: #FDFDFD;
+  border-radius: 10px;
+  padding: 9px 10px;
+}
+.pdf-work-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #15866A;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 900;
+}
+.pdf-work-text {
+  font-size: 11.5px;
+  line-height: 1.65;
+  color: #222;
+  text-align: right;
+  white-space: pre-line;
+}
+.pdf-work-text strong {
+  font-weight: 900;
+}
+
 </style>
 </head>
 <body>
@@ -1114,9 +1243,17 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
         <div class="calc-quote-field"><label>مدة صلاحية العرض (أيام)</label><input id="cq-validity" type="number" min="1" value="7" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>رقم الحساب / الآيبان</label><input id="cq-account-number" type="text" placeholder="اكتب رقم الحساب أو IBAN" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>اسم الحساب</label><input id="cq-account-name" type="text" placeholder="خالد حسن العجمي" oninput="calcSyncQuoteMeta()"></div>
-        <div class="calc-quote-field calc-quote-full"><label>نوع العمل</label><textarea id="cq-work-type" rows="2" placeholder="مثال: تصميم معماري&#10;تصميم داخلي" oninput="calcSyncQuoteMeta()"></textarea></div>
+        <div class="calc-quote-field calc-quote-full">
+          <div class="calc-auto-scope">
+            <div>
+              <div class="calc-auto-label">نوع العمل</div>
+              <div class="calc-auto-sub">يتم توليده تلقائيًا حسب نوع التسعيرة المختار بالأعلى</div>
+            </div>
+            <div class="calc-auto-preview" id="calcAutoScopePreview"></div>
+          </div>
+        </div>
         <div class="calc-quote-field calc-quote-full"><label>مكونات المشروع</label><textarea id="cq-components" rows="4" placeholder="- الواجهة المعمارية&#10;- التصميم الداخلي" oninput="calcSyncQuoteMeta()"></textarea></div>
-        <div class="calc-quote-field calc-quote-full"><label>وصف العمل — تفاصيل ما ستحصلون عليه</label><textarea id="cq-work-desc" rows="10" placeholder="اكتب وصف العمل والخدمات هنا..." oninput="calcSyncQuoteMeta()" style="min-height:180px"></textarea></div>
+        <div class="calc-quote-field calc-quote-full"><label>وصف ما سيتم القيام به</label><textarea id="cq-work-desc" rows="10" placeholder="اكتب وصف العمل والخدمات هنا..." oninput="calcSyncQuoteMeta()" style="min-height:180px"></textarea></div>
         <div class="calc-quote-field calc-quote-full"><label>ملاحظات إضافية</label><textarea id="cq-notes" rows="3" placeholder="مثال: الأسعار لا تشمل التنفيذ أو تعتمد بعد اعتماد العرض النهائي" oninput="calcSyncQuoteMeta()"></textarea></div>
       </div>
       <div class="calc-logo-tools">
@@ -1936,7 +2073,6 @@ let calcQuoteMeta = {
   projectLocation: '',
   projectArea: '',
   validityDays: 7,
-  workType: 'تصميم معماري\\nتصميم داخلي',
   components: "- الواجهة المعمارية\n- التصميم الداخلي\n- تصميم الحدائق والمسطحات الخارجية",
   workDescription: "تصميم المبنى المعماري والداخلي لمساحة 300 م²\n\nعدد زيارتين إشرافيتين.\n\nلوحة الأفكار (المود بورد):\nتشمل مجموعة من الصور والعناصر المراد استخدامها في التصميم المعماري والداخلي؛ لتوضيح الأفكار، واختيار المواد، وتوزيع الأثاث وأشكاله، وتحديد الألوان، بالإضافة إلى الإضاءة والديكورات.\n\nالتصميم ثلاثي الأبعاد:\nتقديم لقطات ثلاثية الأبعاد توضح التصميم المعماري والداخلي بشكل واقعي قبل التنفيذ.\n\nالمخططات التنفيذية:\nإعداد المخططات الفنية اللازمة للتنفيذ، مثل مخططات نقاط الكهرباء، وتوزيع الإضاءة، ومواقع نقاط المياه.\n\nجدول الكميات (BOQ):\nجدول كميات للمواد والأثاث المستخدمة ومواصفاتها بصيغة Excel.",
   accountName: 'خالد حسن العجمي',
@@ -1947,6 +2083,32 @@ let calcQuoteMeta = {
 
 function calcInitPcts(){CALC_ORDER.forEach(t=>{CALC_BASE[t].forEach(d=>{calcItemPct[d.id]=d.pct;});});calcItemPct[CALC_SURVEY.id]=2;}
 calcInitPcts();
+
+function calcAutoScope(){
+  const activeTypes = CALC_ORDER.filter(t => calcActive.has(t));
+  const typeMap = {
+    interior: 'تصميم داخلي',
+    arch: 'تصميم معماري',
+    landscape: 'تصميم لاند سكيب'
+  };
+  const workTypes = activeTypes.map(t => typeMap[t]).filter(Boolean);
+  return { workTypes };
+}
+function renderCalcAutoScopePreview(){
+  const box = document.getElementById('calcAutoScopePreview');
+  if(!box) return;
+  const scope = calcAutoScope();
+  const chips = [...scope.workTypes];
+  box.innerHTML = chips.length ? chips.map(c => `<span class="calc-auto-chip">${esc(c)}</span>`).join('') : '<span class="calc-auto-chip">اختر نوع التسعيرة</span>';
+}
+function pdfChips(items){
+  return (items || []).map(item => `<span class="pdf-chip">${esc(normalizeArabicTextForPdf(item))}</span>`).join('');
+}
+function pdfWorkGraphic(text){
+  const chunks = String(text || '').split(/\n\s*\n/).map(s => s.trim()).filter(Boolean);
+  if(!chunks.length) return '';
+  return chunks.map((chunk, i) => `<div class="pdf-work-item"><div class="pdf-work-num">${i+1}</div><div class="pdf-work-text">${pdfRichLines(chunk)}</div></div>`).join('');
+}
 
 function cleanProjectAreaValue(value){
   return String(value || '').replace(/[^\d.]/g,'').trim();
@@ -1960,6 +2122,7 @@ function loadCalcQuoteMeta(){
   try {
     const saved = JSON.parse(localStorage.getItem('calcQuoteMeta') || '{}');
     calcQuoteMeta = {...calcQuoteMeta, ...saved};
+    if(!calcQuoteMeta.components) calcQuoteMeta.components = '- الواجهة المعمارية\n- التصميم الداخلي\n- تصميم الحدائق والمسطحات الخارجية';
   } catch(e) {}
 }
 function saveCalcQuoteMeta(){
@@ -1972,9 +2135,9 @@ function calcFillQuoteMetaForm(){
   setVal('cq-location', calcQuoteMeta.projectLocation || '');
   setVal('cq-area', cleanProjectAreaValue(calcQuoteMeta.projectArea) || '');
   setVal('cq-validity', calcQuoteMeta.validityDays || 7);
-  setVal('cq-work-type', calcQuoteMeta.workType || '');
   setVal('cq-components', calcQuoteMeta.components || '');
   setVal('cq-work-desc', calcQuoteMeta.workDescription || '');
+  renderCalcAutoScopePreview();
   setVal('cq-account-name', calcQuoteMeta.accountName || 'خالد حسن العجمي');
   setVal('cq-account-number', calcQuoteMeta.accountNumber || '');
   setVal('cq-notes', calcQuoteMeta.notes || '');
@@ -1986,9 +2149,9 @@ function calcSyncQuoteMeta(){
   calcQuoteMeta.projectLocation = document.getElementById('cq-location').value.trim();
   calcQuoteMeta.projectArea = cleanProjectAreaValue(document.getElementById('cq-area').value);
   calcQuoteMeta.validityDays = Math.max(1, parseInt(document.getElementById('cq-validity').value) || 7);
-  calcQuoteMeta.workType = document.getElementById('cq-work-type').value.trim();
   calcQuoteMeta.components = document.getElementById('cq-components').value.trim();
   calcQuoteMeta.workDescription = document.getElementById('cq-work-desc').value.trim();
+  renderCalcAutoScopePreview();
   calcQuoteMeta.accountName = document.getElementById('cq-account-name').value.trim() || 'خالد حسن العجمي';
   calcQuoteMeta.accountNumber = document.getElementById('cq-account-number').value.trim();
   calcQuoteMeta.notes = document.getElementById('cq-notes').value.trim();
@@ -2028,7 +2191,7 @@ function calcTog(t){
   if(calcActive.has(t)){if(calcActive.size===1)return;calcActive.delete(t);}else calcActive.add(t);
   document.querySelectorAll('.calc-tc').forEach(c=>c.classList.toggle('on',calcActive.has(c.dataset.t)));
   document.getElementById('calcSurveyRow').style.display=calcActive.has('interior')?'flex':'none';
-  calcRenderBudgets();calcRender();
+  calcRenderBudgets();calcRender();renderCalcAutoScopePreview();
 }
 function calcToggleSurvey(){
   calcSurveyOn=document.getElementById('calcSurveyChk').checked;
@@ -2135,6 +2298,8 @@ function calcExp(){
 
 function normalizeArabicTextForPdf(text){
   return String(text || '')
+    .replace(/وصف\s*العمل\s*\(\s*ما\s*\)\s*سيتم\s*القيام\s*به/g, 'وصف ما سيتم القيام به')
+    .replace(/وصف\s*العمل\s*\(ما\s*سيتم\s*القيام\s*به\)/g, 'وصف ما سيتم القيام به')
     .replace(/تصميم\s*الثلاثي\s*الأبعاد/g, 'التصميم ثلاثي الأبعاد')
     .replace(/تصميم\s*ثلاثي\s*الأبعاد/g, 'التصميم ثلاثي الأبعاد')
     .replace(/مود\s*بورد/g, 'المود بورد')
@@ -2144,8 +2309,7 @@ function normalizeArabicTextForPdf(text){
     .replace(/اسم\s*المشروع/g, 'اسم المشروع')
     .replace(/موقع\s*المشروع/g, 'موقع المشروع')
     .replace(/مساحة\s*المشروع/g, 'مساحة المشروع');
-}
-function pdfRichLines(text){
+}function pdfRichLines(text){
   return esc(normalizeArabicTextForPdf(text || '')).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
 }
 function pdfWorkRows(text){
@@ -2157,6 +2321,7 @@ function pdfWorkRows(text){
 function calcExportPDF(){
   calcSyncQuoteMeta();
   const activeTypes=CALC_ORDER.filter(t=>calcActive.has(t));
+  const scope = calcAutoScope();
   const multi=activeTypes.length>1,total=calcGrandTotal();
   const p1=parseInt(document.getElementById('cp1').value)||0,p2=parseInt(document.getElementById('cp2').value)||0,p3=parseInt(document.getElementById('cp3').value)||0;
   const issueDate=new Date().toLocaleDateString('ar-SA');
@@ -2186,10 +2351,6 @@ function calcExportPDF(){
     <div class="pdf-meta-box"><div class="pdf-meta-label">مساحة المشروع</div><div class="pdf-meta-value">${esc(projectAreaForDisplay ? projectAreaForDisplay() : (calcQuoteMeta.projectArea || '—'))}</div></div>
     <div class="pdf-meta-box"><div class="pdf-meta-label">مدة الصلاحية</div><div class="pdf-meta-value">صالح لمدة ${esc(String(calcQuoteMeta.validityDays || 7))} أيام</div></div>`;
 
-  const workTypeHtml = `<div class="pdf-side-card"><div class="pdf-side-title">نوع العمل</div><div class="pdf-side-body">${esc(normalizeArabicTextForPdf(calcQuoteMeta.workType || '—'))}</div></div>`;
-  const componentsHtml = `<div class="pdf-side-card"><div class="pdf-side-title">مكونات المشروع</div><div class="pdf-side-body">${esc(normalizeArabicTextForPdf(calcQuoteMeta.components || '—'))}</div></div>`;
-  const workDescHtml = `<div class="pdf-work-box"><div class="pdf-work-title">وصف العمل (ما سيتم القيام به)</div>${pdfWorkRows(calcQuoteMeta.workDescription || '')}</div>`;
-
   const accountHtml = `
     <div class="pdf-account-box">
       <div class="pdf-account-title">بيانات الحساب</div>
@@ -2216,9 +2377,20 @@ function calcExportPDF(){
         <div class="pdf-meta">${metaBoxes}</div>
 
         <div class="pdf-section" style="text-align:center;margin-top:4mm;">تفاصيل ما ستحصلون عليه</div>
-        <div class="pdf-services-layout">
-          <div>${workTypeHtml}${componentsHtml}</div>
-          <div>${workDescHtml}</div>
+        <div class="pdf-scope-grid">
+          <div class="pdf-info-card">
+            <div class="pdf-info-title">نوع العمل</div>
+            <div class="pdf-chip-list">${pdfChips(scope.workTypes)}</div>
+          </div>
+          <div class="pdf-info-card">
+            <div class="pdf-info-title">مكونات المشروع</div>
+            <div class="pdf-chip-list">${pdfChips(String(calcQuoteMeta.components || '').split(/\n+/).map(s => s.trim()).filter(Boolean))}</div>
+          </div>
+        </div>
+
+        <div class="pdf-work-graphic">
+          <div class="pdf-work-graphic-title">وصف ما سيتم القيام به</div>
+          <div class="pdf-work-list">${pdfWorkGraphic(calcQuoteMeta.workDescription || '')}</div>
         </div>
       </div>
 
