@@ -2462,7 +2462,11 @@ function calcRender(){
   document.getElementById('calcTbody').innerHTML=html;
   const total=calcGrandTotal(),p1=parseInt(document.getElementById('cp1').value)||0,p2=parseInt(document.getElementById('cp2').value)||0,p3=parseInt(document.getElementById('cp3').value)||0;
   const warn=(p1+p2+p3)!==100?`<div style="font-size:11px;color:#c0392b;background:#fdecea;border-radius:6px;padding:6px 10px;margin-bottom:8px">⚠ مجموع نسب الدفعات ${p1+p2+p3}%</div>`:'';
-  document.getElementById('calcPaySec').innerHTML=warn+`<div class="calc-pay-row"><span class="pl">الدفعة الأولى (${p1}%) — قبل بدء العمل</span><span class="pv">${fmtN(Math.round(total*p1/100))} ر.س</span></div><div class="calc-pay-row"><span class="pl">الدفعة الثانية (${p2}%) — بعد اعتماد التصميم</span><span class="pv">${fmtN(Math.round(total*p2/100))} ر.س</span></div><div class="calc-pay-row"><span class="pl">الدفعة الأخيرة (${p3}%) — قبل تسليم المخططات</span><span class="pv">${fmtN(Math.round(total*p3/100))} ر.س</span></div><div class="calc-total-row"><span class="tl">الإجمالي الكلي</span><span class="tv">SAR ${fmtN(total)}</span></div>`;
+  document.getElementById('calcPaySec').innerHTML = warn
+    + `<div class="calc-pay-row"><span class="pl">الدفعة الأولى (${p1}%) — قبل بدء العمل</span><span class="pv">${fmtN(Math.round(total*p1/100))} ر.س</span></div>`
+    + (p2 > 0 ? `<div class="calc-pay-row"><span class="pl">الدفعة الثانية (${p2}%) — بعد اعتماد التصميم</span><span class="pv">${fmtN(Math.round(total*p2/100))} ر.س</span></div>` : '')
+    + `<div class="calc-pay-row"><span class="pl">الدفعة الأخيرة (${p3}%) — قبل تسليم المخططات</span><span class="pv">${fmtN(Math.round(total*p3/100))} ر.س</span></div>`
+    + `<div class="calc-total-row"><span class="tl">الإجمالي الكلي</span><span class="tv">SAR ${fmtN(total)}</span></div>`;
 }
 
 function openCalc(){
@@ -3226,7 +3230,7 @@ function calcExportPDF(){
       <div class="doc-title">${calcQuoteMeta.title || 'عرض سعر'}</div>
       <div class="doc-sub">
         تاريخ الإصدار: ${issueDate}<br>
-        عرض السعر صالح لمدة أسبوع من التاريخ
+        التسعيرة صالحة لمدة أسبوع من التاريخ
       </div>
     </div>
     <div class="brand-block">
@@ -3294,7 +3298,7 @@ ${calcQuoteMeta.includeDesignScope !== false ? `<!-- ════ DESIGN SCOPE P
     <thead><tr><th>البند</th><th class="num">المبلغ</th></tr></thead>
     <tbody>
       <tr><td>الدفعة الأولى — قبل بدء العمل (${p1}%)</td><td class="num">${fmtN(Math.round(total*p1/100))} ر.س</td></tr>
-      <tr><td>الدفعة الثانية — بعد اعتماد التصميم (${p2}%)</td><td class="num">${fmtN(Math.round(total*p2/100))} ر.س</td></tr>
+      ${p2 > 0 ? `<tr><td>الدفعة الثانية — بعد اعتماد التصميم (${p2}%)</td><td class="num">${fmtN(Math.round(total*p2/100))} ر.س</td></tr>` : ''}
       <tr><td>الدفعة الأخيرة — قبل تسليم المخططات (${p3}%)</td><td class="num">${fmtN(Math.round(total*p3/100))} ر.س</td></tr>
     </tbody>
   </table>
