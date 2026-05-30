@@ -1264,6 +1264,102 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
   accent-color: #1D9E75;
 }
 
+
+/* FORCE visible email/password login */
+#login-screen .email-login-card {
+  width: 100% !important;
+  max-width: 340px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  margin: 0 auto 14px !important;
+  animation: floatIn 1.05s ease !important;
+}
+#login-screen .email-login-card input {
+  width: 100% !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  display: block !important;
+  border: 1px solid rgba(255,255,255,0.18) !important;
+  background: rgba(255,255,255,0.10) !important;
+  color: #fff !important;
+  border-radius: 14px !important;
+  padding: 0 15px !important;
+  font-size: 15px !important;
+  font-family: inherit !important;
+  outline: none !important;
+  direction: ltr !important;
+  text-align: left !important;
+}
+#login-screen .email-login-card input::placeholder { color: #A8A29E !important; }
+#login-screen .email-login-card input:focus {
+  border-color: #D4A853 !important;
+  background: rgba(255,255,255,0.14) !important;
+  box-shadow: 0 0 0 3px rgba(212,168,83,0.14) !important;
+}
+#login-screen .email-login-btn {
+  width: 100% !important;
+  min-height: 46px !important;
+  border: none !important;
+  border-radius: 14px !important;
+  padding: 12px 14px !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  cursor: pointer !important;
+  font-family: inherit !important;
+}
+#login-screen .email-login-btn.primary {
+  background: linear-gradient(135deg, #D4A853, #E8C070) !important;
+  color: #1C1917 !important;
+}
+#login-screen .email-login-btn.secondary {
+  background: rgba(255,255,255,0.12) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255,255,255,0.16) !important;
+}
+#login-screen .forgot-link {
+  background: transparent !important;
+  border: none !important;
+  color: #D4A853 !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  font-family: inherit !important;
+  padding: 4px 0 0 !important;
+}
+#login-screen .login-divider {
+  width: 100% !important;
+  max-width: 340px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  color: #78716C !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  margin: 10px 0 14px !important;
+}
+#login-screen .login-divider::before,
+#login-screen .login-divider::after {
+  content: "" !important;
+  height: 1px !important;
+  flex: 1 !important;
+  background: rgba(255,255,255,0.12) !important;
+}
+
+
+.calc-profile-hint {
+  max-width: 980px;
+  margin: 0 auto 10px;
+  padding: 10px 12px;
+  border-radius: 13px;
+  background: #F7F3EA;
+  color: #6B5B3E;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.7;
+  border: 1px solid #E8D9B9;
+}
+
 </style>
 </head>
 <body>
@@ -1460,16 +1556,16 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
           </select></div>
         <div class="calc-quote-field"><label>مساحة المشروع</label><input id="cq-area" type="number" min="0" step="1" placeholder="اكتب الرقم فقط" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>موقع المشروع</label><input id="cq-location" type="text" placeholder="المدينة / الحي" oninput="calcSyncQuoteMeta()"></div>
-        <div class="calc-quote-field"><label>الاسم تحت الشعار</label><input id="cq-brand-name" type="text" placeholder="Rakeez Design" oninput="calcSyncQuoteMeta()"></div>
-        <div class="calc-quote-field"><label>رقم الجوال</label><input id="cq-my-phone" type="text" placeholder="05xxxxxxxx" oninput="calcSyncQuoteMeta()"></div>
-        <div class="calc-quote-field"><label>البريد الإلكتروني</label><input id="cq-my-email" type="email" placeholder="example@email.com" oninput="calcSyncQuoteMeta()"></div>
+        <div class="calc-quote-field"><label>الاسم تحت الشعار</label><input id="cq-brand-name" type="text" placeholder="مثال: اسم الشركة أو اسم الشخص" oninput="calcSyncQuoteMeta()"></div>
+        <div class="calc-quote-field"><label>رقم الجوال</label><input id="cq-my-phone" type="text" placeholder="مثال: 05xxxxxxxx" oninput="calcSyncQuoteMeta()"></div>
+        <div class="calc-quote-field"><label>البريد الإلكتروني</label><input id="cq-my-email" type="email" placeholder="مثال: name@email.com" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>اسم العميل</label><input id="cq-client-name" type="text" placeholder="اختياري" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>رقم العميل</label><input id="cq-client-phone" type="text" placeholder="اختياري" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>إيميل العميل</label><input id="cq-client-email" type="email" placeholder="اختياري" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>مدة الصلاحية (أيام)</label><input id="cq-validity" type="number" min="1" value="7" oninput="calcSyncQuoteMeta()"></div>
-        <div class="calc-quote-field"><label>اسم البنك</label><input id="cq-bank-name" type="text" placeholder="الراجحي" oninput="calcSyncQuoteMeta()"></div>
+        <div class="calc-quote-field"><label>اسم البنك</label><input id="cq-bank-name" type="text" placeholder="مثال: الراجحي" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>رقم الحساب / الآيبان</label><input id="cq-account-number" type="text" placeholder="اكتب رقم الحساب أو IBAN" oninput="calcSyncQuoteMeta()"></div>
-        <div class="calc-quote-field"><label>اسم الحساب</label><input id="cq-account-name" type="text" placeholder="خالد حسن العجمي" oninput="calcSyncQuoteMeta()"></div>
+        <div class="calc-quote-field"><label>اسم الحساب</label><input id="cq-account-name" type="text" placeholder="مثال: اسم صاحب الحساب" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field calc-quote-full">
           <div class="calc-auto-scope">
             <div>
@@ -1590,8 +1686,20 @@ onAuthStateChanged(auth, user => {
     window._uid = user.uid;
     window._db = db;
     window._ref = ref;
+    window._setDb = set;
+    window._profileRef = ref(db, `users/${user.uid}/quoteProfile`);
+    onValue(window._profileRef, snap => {
+      const profile = snap.val();
+      if (profile) {
+        applyCalcProfile(profile);
+        localStorage.setItem('calcQuoteProfile', JSON.stringify(getCalcProfilePayload()));
+        const calcOverlay = document.getElementById('calc-overlay');
+        if (calcOverlay && calcOverlay.classList.contains('show')) calcFillQuoteMetaForm();
+      }
+    });
   } else {
     currentUser = null;
+    window._profileRef = null;
     document.getElementById("login-screen").style.display = "flex";
     document.getElementById("app-screen").classList.remove("show");
   }
@@ -2381,14 +2489,14 @@ let calcQuoteMeta = {
   validityDays: 7,
   components: "- الواجهة المعمارية\n- التصميم الداخلي\n- تصميم الحدائق والمسطحات الخارجية",
   workDescription: "تصميم المبنى المعماري والداخلي لمساحة 300 م²\n\nعدد زيارتين إشرافيتين.\n\nلوحة الأفكار (المود بورد):\nتشمل مجموعة من الصور والعناصر المراد استخدامها في التصميم المعماري والداخلي؛ لتوضيح الأفكار، واختيار المواد، وتوزيع الأثاث وأشكاله، وتحديد الألوان، بالإضافة إلى الإضاءة والديكورات.\n\nالتصميم ثلاثي الأبعاد:\nتقديم لقطات ثلاثية الأبعاد توضح التصميم المعماري والداخلي بشكل واقعي قبل التنفيذ.\n\nالمخططات التنفيذية:\nإعداد المخططات الفنية اللازمة للتنفيذ، مثل مخططات نقاط الكهرباء، وتوزيع الإضاءة، ومواقع نقاط المياه.\n\nجدول الكميات (BOQ):\nجدول كميات للمواد والأثاث المستخدمة ومواصفاتها بصيغة Excel.",
-  brandName: 'Rakeez Design',
+  brandName: '',
   myPhone: '',
   myEmail: '',
   clientName: '',
   clientPhone: '',
   clientEmail: '',
-  bankName: 'الراجحي',
-  accountName: 'خالد حسن العجمي',
+  bankName: '',
+  accountName: '',
   accountNumber: '',
   notes: '',
   logoData: '',
@@ -2456,19 +2564,60 @@ function projectAreaForDisplay(){
   return area ? `${area} م²` : '—';
 }
 
+const CALC_PROFILE_FIELDS = [
+  'brandName','myPhone','myEmail',
+  'bankName','accountName','accountNumber',
+  'logoData',
+  'components','workDescription',
+  'validityDays','includeDesignScope'
+];
+
+function applyCalcProfile(profile = {}) {
+  CALC_PROFILE_FIELDS.forEach(k => {
+    if (profile[k] !== undefined && profile[k] !== null) calcQuoteMeta[k] = profile[k];
+  });
+  if (calcQuoteMeta.includeDesignScope === undefined) calcQuoteMeta.includeDesignScope = true;
+}
+
+function getCalcProfilePayload() {
+  const payload = {};
+  CALC_PROFILE_FIELDS.forEach(k => payload[k] = calcQuoteMeta[k] ?? '');
+  payload.includeDesignScope = calcQuoteMeta.includeDesignScope !== false;
+  return payload;
+}
+
 function loadCalcQuoteMeta(){
   try {
-    const saved = JSON.parse(localStorage.getItem('calcQuoteMeta') || '{}');
-    calcQuoteMeta = {...calcQuoteMeta, ...saved};
-    if(!calcQuoteMeta.components) calcQuoteMeta.components = '- الواجهة المعمارية\n- التصميم الداخلي\n- تصميم الحدائق والمسطحات الخارجية';
-    if(!calcQuoteMeta.bankName) calcQuoteMeta.bankName = 'الراجحي';
-    if(!calcQuoteMeta.accountName) calcQuoteMeta.accountName = 'خالد حسن العجمي';
-    if(typeof calcQuoteMeta.includeDesignScope === 'undefined') calcQuoteMeta.includeDesignScope = true;
-    if(!calcQuoteMeta.brandName) calcQuoteMeta.brandName = 'Rakeez Design';
+    // الحسابات القديمة كانت تحفظ كل بيانات العرض، فنهاجر فقط معلوماتك والقوالب
+    const oldAll = JSON.parse(localStorage.getItem('calcQuoteMeta') || '{}');
+    const savedProfile = JSON.parse(localStorage.getItem('calcQuoteProfile') || '{}');
+    const migrated = {};
+    CALC_PROFILE_FIELDS.forEach(k => {
+      if (savedProfile[k] !== undefined) migrated[k] = savedProfile[k];
+      else if (oldAll[k] !== undefined) migrated[k] = oldAll[k];
+    });
+    applyCalcProfile(migrated);
   } catch(e) {}
 }
+
 function saveCalcQuoteMeta(){
-  localStorage.setItem('calcQuoteMeta', JSON.stringify(calcQuoteMeta));
+  const profile = getCalcProfilePayload();
+  localStorage.setItem('calcQuoteProfile', JSON.stringify(profile));
+  // لا نحفظ اسم العميل/رقمه/إيميله ولا بيانات المشروع حتى ما تظهر مع عرض جديد
+  try {
+    if (window._profileRef && window._setDb) window._setDb(window._profileRef, profile);
+  } catch(e) {}
+}
+
+function resetQuoteTransientFields(){
+  calcQuoteMeta.projectName = '';
+  calcQuoteMeta.projectActivity = '';
+  calcQuoteMeta.projectArea = '';
+  calcQuoteMeta.projectLocation = '';
+  calcQuoteMeta.clientName = '';
+  calcQuoteMeta.clientPhone = '';
+  calcQuoteMeta.clientEmail = '';
+  calcQuoteMeta.scopePlanData = '';
 }
 function calcFillQuoteMetaForm(){
   const setVal = (id,val) => { const el=document.getElementById(id); if(el) el.value = val ?? ''; };
@@ -2478,17 +2627,17 @@ function calcFillQuoteMetaForm(){
   setVal('cq-area', cleanProjectAreaValue(calcQuoteMeta.projectArea) || '');
   setVal('cq-location', calcQuoteMeta.projectLocation || '');
   setVal('cq-validity', calcQuoteMeta.validityDays || 7);
-  setVal('cq-brand-name', calcQuoteMeta.brandName || 'Rakeez Design');
+  setVal('cq-brand-name', calcQuoteMeta.brandName || '');
   setVal('cq-my-phone', calcQuoteMeta.myPhone || '');
   setVal('cq-my-email', calcQuoteMeta.myEmail || '');
-  setVal('cq-client-name', calcQuoteMeta.clientName || '');
-  setVal('cq-client-phone', calcQuoteMeta.clientPhone || '');
-  setVal('cq-client-email', calcQuoteMeta.clientEmail || '');
-  setVal('cq-bank-name', calcQuoteMeta.bankName || 'الراجحي');
+  setVal('cq-client-name', '');
+  setVal('cq-client-phone', '');
+  setVal('cq-client-email', '');
+  setVal('cq-bank-name', calcQuoteMeta.bankName || '');
   setVal('cq-components', calcQuoteMeta.components || '');
   setVal('cq-work-desc', calcQuoteMeta.workDescription || '');
   renderCalcAutoScopePreview();
-  setVal('cq-account-name', calcQuoteMeta.accountName || 'خالد حسن العجمي');
+  setVal('cq-account-name', calcQuoteMeta.accountName || '');
   setVal('cq-account-number', calcQuoteMeta.accountNumber || '');
   setVal('cq-notes', calcQuoteMeta.notes || '');
   renderCalcLogoPreview();
@@ -2503,17 +2652,17 @@ function calcSyncQuoteMeta(){
   calcQuoteMeta.projectArea = cleanProjectAreaValue(document.getElementById('cq-area').value);
   calcQuoteMeta.projectLocation = document.getElementById('cq-location').value.trim();
   calcQuoteMeta.validityDays = Math.max(1, parseInt(document.getElementById('cq-validity').value) || 7);
-  calcQuoteMeta.brandName = document.getElementById('cq-brand-name').value.trim() || 'Rakeez Design';
+  calcQuoteMeta.brandName = document.getElementById('cq-brand-name').value.trim();
   calcQuoteMeta.myPhone = document.getElementById('cq-my-phone').value.trim();
   calcQuoteMeta.myEmail = document.getElementById('cq-my-email').value.trim();
   calcQuoteMeta.clientName = document.getElementById('cq-client-name').value.trim();
   calcQuoteMeta.clientPhone = document.getElementById('cq-client-phone').value.trim();
   calcQuoteMeta.clientEmail = document.getElementById('cq-client-email').value.trim();
-  calcQuoteMeta.bankName = document.getElementById('cq-bank-name').value.trim() || 'الراجحي';
+  calcQuoteMeta.bankName = document.getElementById('cq-bank-name').value.trim();
   calcQuoteMeta.components = document.getElementById('cq-components').value.trim();
   calcQuoteMeta.workDescription = document.getElementById('cq-work-desc').value.trim();
   renderCalcAutoScopePreview();
-  calcQuoteMeta.accountName = document.getElementById('cq-account-name').value.trim() || 'خالد حسن العجمي';
+  calcQuoteMeta.accountName = document.getElementById('cq-account-name').value.trim();
   calcQuoteMeta.accountNumber = document.getElementById('cq-account-number').value.trim();
   calcQuoteMeta.notes = document.getElementById('cq-notes').value.trim();
   const scopeToggle = document.getElementById('cq-scope-toggle');
@@ -2631,6 +2780,7 @@ function calcRender(){
 
 function openCalc(){
   calcTargetProjectId=null;
+  resetQuoteTransientFields();
   document.getElementById('calcApplyBtn').style.display='none';
   document.getElementById('calc-overlay').classList.add('show');
   calcFillQuoteMetaForm();
@@ -2638,6 +2788,7 @@ function openCalc(){
 }
 function openCalcForProject(pid){
   calcTargetProjectId=pid;
+  resetQuoteTransientFields();
   const pr=window._projects.find(p=>p.id===pid);
   if(pr&&pr.price){
     // Pre-fill interior budget with project price
@@ -3410,7 +3561,7 @@ function calcExportPDF(){
     <div class="brand-block">
       ${logoHtml}
       <div class="brand-info">
-        <strong>${calcQuoteMeta.brandName || 'Rakeez Design'}</strong>
+        ${calcQuoteMeta.brandName ? `<strong>${calcQuoteMeta.brandName}</strong>` : ''}
         ${calcQuoteMeta.myPhone ? `<div>Telephone : ${calcQuoteMeta.myPhone}</div>` : ''}
         ${calcQuoteMeta.myEmail ? `<div>Email : ${calcQuoteMeta.myEmail}</div>` : ''}
       </div>
@@ -3484,7 +3635,7 @@ ${calcQuoteMeta.includeDesignScope !== false ? `<!-- ════ DESIGN SCOPE P
 
   <div class="account-box">
     <div class="account-label">بيانات الحساب</div>
-    <div class="account-row"><span>اسم البنك</span><span>${calcQuoteMeta.bankName || 'الراجحي'}</span></div>
+    <div class="account-row"><span>اسم البنك</span><span>${calcQuoteMeta.bankName || '—'}</span></div>
     <div class="account-row"><span>اسم الحساب</span><span>${calcQuoteMeta.accountName || '—'}</span></div>
     <div class="account-row"><span>رقم الحساب / الآيبان</span><span>${calcQuoteMeta.accountNumber || '—'}</span></div>
   </div>
