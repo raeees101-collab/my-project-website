@@ -1774,16 +1774,22 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
 }
 
 
-/* Quote confirm must appear above calculator sheet */
+/* Force quote register confirm above calculator */
 #quote-register-overlay {
-  z-index: 9999 !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147483647 !important;
+  background: rgba(0,0,0,0.62) !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 20px !important;
 }
 #quote-register-overlay.show {
   display: flex !important;
 }
 #quote-register-overlay .quote-register-dialog {
-  position: relative;
-  z-index: 10000;
+  position: relative !important;
+  z-index: 2147483647 !important;
 }
 
 </style>
@@ -3369,14 +3375,21 @@ function quoteSnapshotForProject(total) {
 
 function showQuoteRegisterConfirm(){
   const overlay = document.getElementById("quote-register-overlay");
-  if (overlay) {
-    overlay.style.zIndex = "9999";
-    overlay.classList.add("show");
-  }
+  if (!overlay) return;
+  // انقل المودال لآخر body عشان يطلع فوق الحاسبة مهما كان ترتيب العناصر
+  document.body.appendChild(overlay);
+  overlay.style.position = "fixed";
+  overlay.style.inset = "0";
+  overlay.style.zIndex = "2147483647";
+  overlay.style.display = "flex";
+  overlay.classList.add("show");
 }
 function resolveQuoteRegisterConfirm(value, silent){
   const overlay = document.getElementById("quote-register-overlay");
-  if (overlay) overlay.classList.remove("show");
+  if (overlay) {
+    overlay.classList.remove("show");
+    overlay.style.display = "none";
+  }
 }
 
 async function createProjectFromQuoteSilent(){
