@@ -162,23 +162,58 @@ button:active { transform: scale(0.96); }
 .review-toggle-btn { border:none; border-radius:10px; padding:8px 12px; font-size:12px; font-weight:800; cursor:pointer; font-family:inherit; margin-top:10px; width:100%; }
 .review-toggle-btn.on { background:#FFF7ED; color:#9A3412; border:1.5px solid #FDBA74; }
 .review-toggle-btn.off { background:#F8F7F4; color:#57534E; border:1.5px solid #E7E5E0; }
-.amounts-hidden .money-value {
-  color: transparent !important;
-  text-shadow: none !important;
-  filter: none !important;
-  position: relative;
-  user-select: none;
-  white-space: nowrap;
+
+.money-value{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  white-space:nowrap;
+  direction:ltr;
+  unicode-bidi:isolate;
+  vertical-align:middle;
 }
-.amounts-hidden .money-value::before {
-  content: "ريال ******";
-  color: #D4A853;
-  font-weight: 900;
-  letter-spacing: 3px;
-  direction: rtl;
-  unicode-bidi: isolate;
+.money-currency{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  color:#D4A853;
+  font-weight:900;
+  line-height:1;
+  flex:0 0 auto;
 }
-.amounts-hidden .money-value::selection { background: transparent; }
+.money-currency.sar-currency{
+  font-size:1.05em;
+  letter-spacing:0;
+}
+.money-amount{
+  display:inline-block;
+  position:relative;
+  color:inherit;
+  font-weight:inherit;
+  line-height:1.1;
+}
+.amounts-hidden .money-value{
+  user-select:none;
+}
+.amounts-hidden .money-currency{
+  color:#D4A853 !important;
+}
+.amounts-hidden .money-amount{
+  color:transparent !important;
+}
+.amounts-hidden .money-amount::after{
+  content:"******";
+  position:absolute;
+  inset:0;
+  color:#D4A853;
+  font-weight:900;
+  letter-spacing:2px;
+}
+.amounts-hidden .money-value::selection,
+.amounts-hidden .money-amount::selection{
+  background:transparent;
+}
+
 
 
 /* ─── DETAILS ─── */
@@ -1583,6 +1618,19 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
   transform: translateY(-1px);
 }
 
+
+.user-menu-note {
+  background: #F8F7F4;
+  border: 1px solid #E7E5E0;
+  border-radius: 13px;
+  padding: 11px 12px;
+  color: #78716C;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.7;
+  text-align: center;
+}
+
 </style>
 </head>
 <body>
@@ -1699,7 +1747,7 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
       <img id="menu-avatar" src="" style="width:48px;height:48px;border-radius:50%;object-fit:cover" onerror="this.style.display='none'">
       <div><div class="user-menu-name" id="menu-name"></div><div class="user-menu-email" id="menu-email"></div></div>
     </div>
-    <button class="signout-btn" onclick="doSignOut()"><i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج والدخول بحساب آخر</button>
+    
   </div>
 </div>
 
@@ -2050,7 +2098,13 @@ function toggleAmountPrivacy() {
   if (btn) btn.innerHTML = hideAmounts ? '<i class="fa-regular fa-eye-slash"></i>' : '<i class="fa-regular fa-eye"></i>';
   showToast(hideAmounts ? "تم إخفاء المبالغ" : "تم إظهار المبالغ");
 }
-function moneySpan(html) { return `<span class="money-value">${html}</span>`; }
+function moneySpan(amount, currency = "SAR") {
+  const cur = String(currency || "SAR").trim().toUpperCase();
+  const currencyHtml = cur === "SAR"
+    ? `<span class="money-currency sar-currency" aria-label="ريال سعودي">﷼</span>`
+    : `<span class="money-currency currency-code" aria-label="${cur}">${cur}</span>`;
+  return `<span class="money-value" data-currency="${cur}">${currencyHtml}<span class="money-amount">${amount}</span></span>`;
+}
 
 function getStage(id) { return STAGES.find(s => s.id === id) || STAGES[0]; }
 function getProjectStageLabel(pr, sid) {
@@ -2279,7 +2333,7 @@ function render() {
       const txt = days<0?`تأخر ${Math.abs(days)} يوم`:days===0?"التسليم اليوم!":`${days} يوم متبقي`;
       daysHtml = `<span class="card-days" style="color:${c}">${txt}</span>`;
     }
-    const priceStr = pr.price ? moneySpan(Number(pr.price).toLocaleString()+" "+(pr.currency||"SAR")) : "—";
+    const priceStr = pr.price ? moneySpan(Number(pr.price).toLocaleString(), (pr.currency||"SAR")) : "—";
     const currency = pr.currency || "SAR";
 
     const payments = pr.payments || [];
@@ -2463,7 +2517,7 @@ function render() {
       const received = paymentIsReceived(p);
       return `<div class="payment-item">
         <div class="payment-item-right">
-          <span class="payment-item-amount" style="color:${received?"#10B981":"#D97706"}">${received?"+":"⏳"} ${moneySpan(Number(p.amount||0).toLocaleString()+" "+currency)}</span>
+          <span class="payment-item-amount" style="color:${received?"#10B981":"#D97706"}">${received?"+":"⏳"} ${moneySpan(Number(p.amount||0).toLocaleString(), currency)}</span>
           <span class="payment-item-label">${esc(p.label || "دفعة")}</span>
           ${p.date ? `<span class="payment-item-date">${formatDate(p.date)}</span>` : ""}
         </div>
@@ -2478,8 +2532,8 @@ function render() {
     const paidPctBar = totalPrice > 0 ? Math.min(100, Math.round((totalPaid/totalPrice)*100)) : 0;
     const paymentSummaryHtml = totalPrice > 0 ? `
       <div class="payment-summary">
-        <div class="payment-sum-box" style="background:#ECFDF5"><div class="payment-sum-label" style="color:#065F46">✅ المُستلم</div><div class="payment-sum-val" style="color:#10B981">${moneySpan(totalPaid.toLocaleString()+" "+currency)}</div></div>
-        <div class="payment-sum-box" style="background:${remaining>0?"#FEF3C7":"#ECFDF5"}"><div class="payment-sum-label" style="color:${remaining>0?"#92400E":"#065F46"}">${remaining>0?"⏳ المتبقي":"✔ مكتمل"}</div><div class="payment-sum-val" style="color:${remaining>0?"#D97706":"#10B981"}">${moneySpan(Math.abs(remaining).toLocaleString()+" "+currency)}</div></div>
+        <div class="payment-sum-box" style="background:#ECFDF5"><div class="payment-sum-label" style="color:#065F46">✅ المُستلم</div><div class="payment-sum-val" style="color:#10B981">${moneySpan(totalPaid.toLocaleString(), currency)}</div></div>
+        <div class="payment-sum-box" style="background:${remaining>0?"#FEF3C7":"#ECFDF5"}"><div class="payment-sum-label" style="color:${remaining>0?"#92400E":"#065F46"}">${remaining>0?"⏳ المتبقي":"✔ مكتمل"}</div><div class="payment-sum-val" style="color:${remaining>0?"#D97706":"#10B981"}">${moneySpan(Math.abs(remaining).toLocaleString(), currency)}</div></div>
       </div>
       <div class="payment-progress-bg"><div class="payment-progress-fill" style="width:${paidPctBar}%"></div></div>` : "";
 
@@ -3024,11 +3078,11 @@ function calcUpdatePct(id,newVal,typeKey){
 function calcRenderBudgets(){
   const card=document.getElementById('calcBudgetsCard');
   let html=CALC_ORDER.filter(t=>calcActive.has(t)).map(t=>{const info=CALC_TYPE_INFO[t];return`<div class="calc-budget-row"><div class="calc-b-tag ${info.cls}">${info.label}</div><input class="calc-budget-input" type="number" step="500" min="0" value="${calcBudgets[t]}" oninput="calcBudgets['${t}']=parseFloat(this.value)||0;calcRender();"></div>`;}).join('');
-  html+=`<div class="calc-grand-total"><span class="gl">إجمالي العقد</span><span class="gv" id="calcGtv">${fmtN(calcGrandTotal())} ر.س</span></div>`;
+  html+=`<div class="calc-grand-total"><span class="gl">إجمالي العقد</span><span class="gv" id="calcGtv">${moneySpan(fmtN(calcGrandTotal()), "SAR")}</span></div>`;
   card.innerHTML=html;
 }
 function calcRender(){
-  const gtv=document.getElementById('calcGtv');if(gtv)gtv.textContent=fmtN(calcGrandTotal())+' ر.س';
+  const gtv=document.getElementById('calcGtv');if(gtv)gtv.innerHTML=moneySpan(fmtN(calcGrandTotal()), 'SAR');
   const activeTypes=CALC_ORDER.filter(t=>calcActive.has(t));
   const multi=activeTypes.length>1;
   let html='';
@@ -3046,7 +3100,7 @@ function calcRender(){
     + `<div class="calc-pay-row"><span class="pl">الدفعة الأولى (${p1}%) — قبل بدء العمل</span><span class="pv">${fmtN(Math.round(total*p1/100))} ر.س</span></div>`
     + (p2 > 0 ? `<div class="calc-pay-row"><span class="pl">الدفعة الثانية (${p2}%) — بعد اعتماد التصميم</span><span class="pv">${fmtN(Math.round(total*p2/100))} ر.س</span></div>` : '')
     + `<div class="calc-pay-row"><span class="pl">الدفعة الأخيرة (${p3}%) — قبل تسليم المخططات</span><span class="pv">${fmtN(Math.round(total*p3/100))} ر.س</span></div>`
-    + `<div class="calc-total-row"><span class="tl">الإجمالي الكلي</span><span class="tv">SAR ${fmtN(total)}</span></div>`;
+    + `<div class="calc-total-row"><span class="tl">الإجمالي الكلي</span><span class="tv">${moneySpan(fmtN(total), "SAR")}</span></div>`;
 }
 
 function openCalc(){
@@ -3201,7 +3255,7 @@ function exportProjectPDF(pid){
     <div class="report-grid">
       <div class="report-box"><div class="report-label">اسم المشروع</div><div class="report-val">${esc(pr.name || "—")}</div></div>
       <div class="report-box"><div class="report-label">العميل</div><div class="report-val">${esc(pr.client || "—")}</div></div>
-      <div class="report-box"><div class="report-label">قيمة المشروع</div><div class="report-val">${total ? total.toLocaleString()+" "+esc(currency) : "—"}</div></div>
+      <div class="report-box"><div class="report-label">قيمة المشروع</div><div class="report-val">${total ? moneySpan(total.toLocaleString(), currency) : "—"}</div></div>
       <div class="report-box"><div class="report-label">تاريخ البدء</div><div class="report-val">${pr.startDate?formatDate(pr.startDate):"—"}</div></div>
       <div class="report-box"><div class="report-label">التسليم النهائي</div><div class="report-val">${pr.deliveryDate?formatDate(pr.deliveryDate):"—"}</div></div>
       ${quoteInfo}
@@ -4049,7 +4103,7 @@ ${calcQuoteMeta.includeDesignScope !== false ? `<!-- ════ DESIGN SCOPE P
 
   <div class="total-row">
     <span>الإجمالي الكلي</span>
-    <span class="total-val">SAR ${fmtN(total)}</span>
+    <span class="total-val">${moneySpan(fmtN(total), "SAR")}</span>
   </div>
 
   <div class="account-box">
