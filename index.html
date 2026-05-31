@@ -1362,6 +1362,76 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
   border: 1px solid #E8D9B9;
 }
 
+
+.quote-to-project {
+  background: #1C1917 !important;
+  color: #fff !important;
+}
+.project-report-page {
+  direction: rtl;
+  font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  background: #fff;
+  color: #111;
+  padding: 18mm 16mm;
+  width: 210mm;
+  min-height: 297mm;
+}
+.project-report-title {
+  font-size: 25px;
+  font-weight: 900;
+  margin-bottom: 4mm;
+  color: #15866A;
+}
+.project-report-sub {
+  color: #777;
+  font-size: 11px;
+  line-height: 1.7;
+  margin-bottom: 7mm;
+}
+.report-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4mm;
+  margin-bottom: 6mm;
+}
+.report-box {
+  border: 1px solid #E7E5E0;
+  border-radius: 12px;
+  padding: 8px 11px;
+  background: #FAFAF8;
+}
+.report-label { font-size: 10px; color: #888; font-weight: 800; margin-bottom: 3px; }
+.report-val { font-size: 13px; font-weight: 900; }
+.report-section-title {
+  font-size: 16px;
+  font-weight: 900;
+  border-bottom: 2px solid #111;
+  padding-bottom: 6px;
+  margin: 8mm 0 4mm;
+}
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  margin-bottom: 5mm;
+}
+.report-table th {
+  background: #F4F4F4;
+  color: #555;
+  text-align: right;
+  padding: 8px;
+  border: 1px solid #E5E5E5;
+}
+.report-table td {
+  padding: 8px;
+  border: 1px solid #EDEDED;
+  vertical-align: top;
+}
+.report-note {
+  white-space: pre-line;
+  line-height: 1.7;
+}
+
 </style>
 </head>
 <body>
@@ -1408,8 +1478,8 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
         <div class="header-title">PROJECT TRACKER</div>
       </div>
       <div class="header-actions">
-        <button class="icon-btn" title="إخفاء/إظهار المبالغ" id="privacy-btn" onclick="toggleAmountPrivacy()">🙈</button>
-        <button class="icon-btn" title="حاسبة التسعيرة" onclick="openCalc()">🧮</button>
+        <button class="icon-btn" title="إخفاء/إظهار المبالغ" aria-label="إخفاء/إظهار المبالغ" id="privacy-btn" onclick="toggleAmountPrivacy()"><i class="fa-regular fa-eye"></i></button>
+        <button class="icon-btn" title="حاسبة التسعيرة" aria-label="حاسبة التسعيرة" onclick="openCalc()"><i class="fa-solid fa-calculator"></i></button>
         <button class="icon-btn" onclick="openIO()">⇅</button>
         <img class="user-avatar" id="user-avatar" src="" onclick="openUserMenu()" onerror="this.style.display='none'">
         <button class="add-btn" onclick="openForm()">+</button>
@@ -1521,7 +1591,11 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
       <div><label class="form-label">تاريخ البدء</label><input class="form-input" id="f-start" type="date"></div>
       <div><label class="form-label">التسليم النهائي</label><input class="form-input" id="f-delivery" type="date"></div>
     </div>
-    <div class="form-group"><label class="form-label">حالة المشروع</label><div id="status-select"></div></div>
+    <div class="form-group" id="stage-labels-group" style="display:none">
+      <label class="form-label">مسميات المراحل</label>
+      <textarea class="form-input" id="f-stage-labels" rows="6" style="resize:vertical;min-height:120px;line-height:1.8" placeholder="كل مرحلة في سطر"></textarea>
+      <div style="font-size:11px;color:#78716C;font-weight:700;margin-top:6px;line-height:1.7">تظهر هذه المسميات داخل هذا المشروع فقط، وبنفس ترتيب المراحل.</div>
+    </div>
     <div class="form-btns">
       <button class="form-cancel" onclick="closeForm()">إلغاء</button>
       <button class="form-save" id="form-save-btn" onclick="saveProject()">إضافة المشروع</button>
@@ -1624,6 +1698,7 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
     <div class="calc-btn-row" style="margin-top:10px">
       <button class="calc-export-btn" onclick="calcExp()"><i class="fa-solid fa-paper-plane"></i> نص للعميل</button>
       <button class="calc-export-btn primary" onclick="calcExportPDF()"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+      <button class="calc-export-btn quote-to-project" onclick="createProjectFromQuote()"><i class="fa-solid fa-folder-plus"></i> تسجيل كمشروع</button>
     </div>
     <button class="calc-apply-btn" id="calcApplyBtn" onclick="applyCalcToProject()" style="display:none">✓ تطبيق السعر على المشروع</button>
   </div>
@@ -1641,7 +1716,7 @@ import { getDatabase, ref, onValue, set, remove }
 
 const firebaseConfig = {
   apiKey: "AIzaSyCBwMrw2w4nZiIE779TmRi2kT-0Oco_ni8",
-  authDomain: "projects-tracker-sa.vercel.app",
+  authDomain: "my-project-165ea.firebaseapp.com",
   databaseURL: "https://my-project-165ea-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "my-project-165ea",
   storageBucket: "my-project-165ea.firebasestorage.app",
@@ -1801,12 +1876,30 @@ function toggleAmountPrivacy() {
   hideAmounts = !hideAmounts;
   document.body.classList.toggle("amounts-hidden", hideAmounts);
   const btn = document.getElementById("privacy-btn");
-  if (btn) btn.textContent = hideAmounts ? "👁️" : "🙈";
+  if (btn) btn.innerHTML = hideAmounts ? '<i class="fa-regular fa-eye-slash"></i>' : '<i class="fa-regular fa-eye"></i>';
   showToast(hideAmounts ? "تم إخفاء المبالغ" : "تم إظهار المبالغ");
 }
 function moneySpan(html) { return `<span class="money-value">${html}</span>`; }
 
 function getStage(id) { return STAGES.find(s => s.id === id) || STAGES[0]; }
+function getProjectStageLabel(pr, sid) {
+  const st = getStage(sid);
+  const custom = pr && pr.customStageLabels && pr.customStageLabels[sid];
+  return (custom && String(custom).trim()) || st.label;
+}
+function getStageLabelsFromTextarea() {
+  const raw = document.getElementById("f-stage-labels")?.value || "";
+  const lines = raw.split(/\n+/).map(s => s.trim());
+  const obj = {};
+  STAGES.forEach((s, i) => {
+    const val = lines[i] || "";
+    if (val && val !== s.label) obj[s.id] = val;
+  });
+  return obj;
+}
+function stageLabelsToTextarea(labels = {}) {
+  return STAGES.map(s => labels[s.id] || s.label).join("\n");
+}
 function esc(s) { return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 
 function stripHtml(html) {
@@ -1962,7 +2055,7 @@ function clientReviewBannerHtml(pr) {
     <div class="review-banner-left">
       <span class="review-banner-icon">👁</span>
       <div>
-        <div class="review-banner-title">العميل يراجع: ${st.emoji} ${st.label}</div>
+        <div class="review-banner-title">العميل يراجع: ${st.emoji} ${getProjectStageLabel(pr, review.stageId)}</div>
         <div class="review-banner-sub">${reviewDaysText(days)} — المشروع ما زال محسوب على نفس المرحلة</div>
       </div>
     </div>
@@ -2040,9 +2133,10 @@ function render() {
       ? `<span class="overdue-revisions-badge">⚠ ${totalOverdueRevisions} متأخر</span>`
       : totalOpenRevisions > 0 ? `<span class="open-revisions-badge">✏️ ${totalOpenRevisions} تعديل</span>` : "";
     const activeReview = getActiveReview(pr);
-    const reviewBadge = activeReview ? `<span class="review-stage-pill">👁 ${getStage(activeReview.stageId).label} — ${reviewDaysText(daysSince(activeReview.startDate || todayStr()))}</span>` : "";
+    const reviewBadge = activeReview ? `<span class="review-stage-pill">👁 ${getProjectStageLabel(pr, activeReview.stageId)} — ${reviewDaysText(daysSince(activeReview.startDate || todayStr()))}</span>` : "";
 
     const stagesHtml = STAGES.map(s => {
+      const sLabel = getProjectStageLabel(pr, s.id);
       const note = (pr.stageNotes && pr.stageNotes[s.id]) || "";
       const stageTiming = (pr.stageTiming && pr.stageTiming[s.id]) || {};
       const plannedDays = stageTiming.plannedDays || "";
@@ -2110,7 +2204,7 @@ function render() {
           <div class="stage-row-left">
             <div class="stage-row-title">
               <span class="stage-row-emoji">${s.emoji}</span>
-              <span class="stage-row-label" style="color:${s.dark}">${s.label}</span>
+              <span class="stage-row-label" style="color:${s.dark}">${sLabel}</span>
               ${hasNote ? `<span class="stage-row-has-note"></span>` : ""}
               ${revisionsBadge}
               ${stageReviewPill}
@@ -2154,7 +2248,7 @@ function render() {
               <button class="rich-tool-btn" onclick="event.stopPropagation();richCmd('bold')"><b>B</b></button>
               <button class="rich-tool-btn" onclick="event.stopPropagation();richCmd('insertOrderedList')">1.</button>
               <button class="rich-tool-btn" onclick="event.stopPropagation();richCmd('insertUnorderedList')">•</button>
-              <button class="rich-tool-btn" onclick="event.stopPropagation();openRichEditor('sn-${pr.id}-${s.id}','ملاحظات ${esc(s.label)}')">⛶</button>
+              <button class="rich-tool-btn" onclick="event.stopPropagation();openRichEditor('sn-${pr.id}-${s.id}','ملاحظات ${esc(sLabel)}')">⛶</button>
             </div>
           </div>
           ${richEditorHtml(`sn-${pr.id}-${s.id}`, note, 'اكتب ملاحظاتك هنا...')}
@@ -2245,7 +2339,8 @@ function render() {
       </div>
       <div class="stages-section"><div class="stages-title">ملاحظات المراحل</div>${stagesHtml}</div>
       <div class="card-actions">
-        <button class="calc-btn" onclick="openCalcForProject('${pr.id}')">🧮</button>
+        <button class="calc-btn" title="حاسبة التسعيرة" onclick="openCalcForProject('${pr.id}')"><i class="fa-solid fa-calculator"></i></button>
+        <button class="calc-btn" title="طباعة تقرير المشروع" onclick="exportProjectPDF('${pr.id}')"><i class="fa-solid fa-file-pdf"></i></button>
         <button class="edit-btn" onclick="openEditForm('${pr.id}')">✏️ تعديل</button>
         <button class="del-btn" onclick="openDelete('${pr.id}')">🗑️</button>
       </div>
@@ -2259,7 +2354,7 @@ function render() {
             <button class="reorder-btn" onclick="moveProject('${pr.id}',1)" ${isLast?"disabled":""}>▼</button>
           </div>
           <div style="flex:1"><div class="card-name">${esc(pr.name)}</div><div class="card-client">👤 ${esc(pr.client)}</div></div>
-          <button class="status-badge" style="background:${stage.bg};color:${stage.dark}" onclick="event.stopPropagation();openStatusSheet('${pr.id}')">${stage.emoji} ${stage.label}</button>
+          <button class="status-badge" style="background:${stage.bg};color:${stage.dark}" onclick="event.stopPropagation();openStatusSheet('${pr.id}')">${stage.emoji} ${getProjectStageLabel(pr, pr.status)}</button>
         </div>
         <div class="card-row2">
           <span class="card-price">${priceStr}</span>
@@ -2397,6 +2492,8 @@ function selectFormStatus(id){formStatus=id;buildStatusSelect();}
 function openForm(){
   editId=null;formStatus="first_meeting";
   ["f-name","f-client","f-price","f-start","f-delivery"].forEach(id=>document.getElementById(id).value="");
+  const sg=document.getElementById("stage-labels-group"); if(sg) sg.style.display="none";
+  const sl=document.getElementById("f-stage-labels"); if(sl) sl.value=stageLabelsToTextarea({});
   document.getElementById("f-currency").value="SAR";
   document.getElementById("form-title").textContent="➕ مشروع جديد";
   document.getElementById("form-save-btn").textContent="إضافة المشروع";
@@ -2412,6 +2509,8 @@ function openEditForm(id){
   document.getElementById("f-currency").value=pr.currency||"SAR";
   document.getElementById("f-start").value=pr.startDate||"";
   document.getElementById("f-delivery").value=pr.deliveryDate||"";
+  const sg=document.getElementById("stage-labels-group"); if(sg) sg.style.display="block";
+  const sl=document.getElementById("f-stage-labels"); if(sl) sl.value=stageLabelsToTextarea(pr.customStageLabels||{});
   document.getElementById("form-title").textContent="✏️ تعديل المشروع";
   document.getElementById("form-save-btn").textContent="حفظ التعديلات";
   buildStatusSelect();
@@ -2423,7 +2522,7 @@ async function saveProject(){
   const client=document.getElementById("f-client").value.trim();
   if(!name||!client){alert("يرجى إدخال اسم المشروع واسم العميل");return;}
   const data={name,client,price:document.getElementById("f-price").value,currency:document.getElementById("f-currency").value,startDate:document.getElementById("f-start").value,deliveryDate:document.getElementById("f-delivery").value,status:formStatus};
-  if(editId){window._projects=window._projects.map(p=>p.id===editId?{...p,...data,activeReview:(p.activeReview&&p.activeReview.stageId===data.status)?p.activeReview:null,reviewStartDate:null,reviewStageId:null}:p);}
+  if(editId){data.customStageLabels=getStageLabelsFromTextarea();window._projects=window._projects.map(p=>p.id===editId?{...p,...data,activeReview:(p.activeReview&&p.activeReview.stageId===data.status)?p.activeReview:null,reviewStartDate:null,reviewStageId:null}:p);}
   else{const maxOrder=window._projects.length?Math.max(...window._projects.map(p=>Number(p.manualOrder??0))):0;window._projects.push({...data,id:Date.now().toString(),stageNotes:{},stageTiming:{},payments:[],stageRevisions:{},manualOrder:maxOrder+10});}
   await window._saveToDb();closeForm();showToast("✓ تم الحفظ");
 }
@@ -2815,6 +2914,115 @@ async function applyCalcToProject(){
   window._projects=window._projects.map(p=>p.id===calcTargetProjectId?{...p,price:total}:p);
   await window._saveToDb();closeCalc();showToast(`✓ تم تحديث السعر: ${fmtN(total)} ر.س`);render();
 }
+
+
+function quoteSnapshotForProject(total) {
+  const activeTypes = CALC_ORDER.filter(t => calcActive.has(t));
+  return {
+    title: calcQuoteMeta.title || "عرض سعر",
+    projectName: calcQuoteMeta.projectName || "",
+    projectActivity: calcQuoteMeta.projectActivity || "",
+    projectArea: calcQuoteMeta.projectArea || "",
+    projectLocation: calcQuoteMeta.projectLocation || "",
+    clientName: calcQuoteMeta.clientName || "",
+    clientPhone: calcQuoteMeta.clientPhone || "",
+    clientEmail: calcQuoteMeta.clientEmail || "",
+    total,
+    activeTypes,
+    budgets: {...calcBudgets},
+    sentAt: todayStr()
+  };
+}
+
+async function createProjectFromQuote(){
+  calcSyncQuoteMeta();
+  const total = calcGrandTotal();
+  const projectName = calcQuoteMeta.projectName.trim();
+  if(!projectName){ showToast("⚠️ اكتب اسم المشروع في بيانات التسعيرة أولًا"); return; }
+  const clientName = calcQuoteMeta.clientName.trim() || "عميل غير محدد";
+  const maxOrder=window._projects.length?Math.max(...window._projects.map(p=>Number(p.manualOrder??0))):0;
+  const quote = quoteSnapshotForProject(total);
+  const newProject = {
+    id: Date.now().toString(),
+    name: projectName,
+    client: clientName,
+    price: total,
+    currency: "SAR",
+    startDate: todayStr(),
+    deliveryDate: "",
+    status: "pending_approval",
+    quoteSentDate: todayStr(),
+    quote,
+    stageNotes:{},
+    stageTiming:{},
+    payments:[],
+    stageRevisions:{},
+    manualOrder:maxOrder+10
+  };
+  window._projects.push(newProject);
+  await window._saveToDb();
+  closeCalc();
+  expandedId = newProject.id;
+  setTab("pending_approval", document.querySelector(".tab:nth-child(3)") || null);
+  showToast("✓ تم تسجيل التسعيرة كمشروع بانتظار الاعتماد");
+  render();
+}
+
+function projectStageRowsForReport(pr) {
+  return STAGES.map(s => {
+    const timing = (pr.stageTiming && pr.stageTiming[s.id]) || {};
+    const revs = (pr.stageRevisions && pr.stageRevisions[s.id]) || [];
+    const note = stripHtml((pr.stageNotes && pr.stageNotes[s.id]) || "");
+    return `<tr>
+      <td>${esc(getProjectStageLabel(pr, s.id))}</td>
+      <td>${timing.plannedDays ? esc(timing.plannedDays)+" يوم" : "—"}</td>
+      <td>${timing.startDate ? formatDate(timing.startDate) : "—"}</td>
+      <td>${timing.endDate ? formatDate(timing.endDate) : "—"}</td>
+      <td>${revs.length}</td>
+      <td class="report-note">${esc(note || "—")}</td>
+    </tr>`;
+  }).join("");
+}
+
+function exportProjectPDF(pid){
+  const pr = normalizeProject(window._projects.find(p=>p.id===pid));
+  if(!pr){ showToast("⚠️ لم يتم العثور على المشروع"); return; }
+  const payments = pr.payments || [];
+  const paid = payments.filter(paymentIsReceived).reduce((s,p)=>s+(parseFloat(p.amount)||0),0);
+  const total = parseFloat(pr.price)||0;
+  const remaining = total - paid;
+  const paymentRows = payments.map(p=>`<tr><td>${esc(p.label||"دفعة")}</td><td>${p.date?formatDate(p.date):"—"}</td><td>${paymentIsReceived(p)?"مستلمة":"غير مستلمة"}</td><td>${Number(p.amount||0).toLocaleString()} ${esc(pr.currency||"SAR")}</td></tr>`).join("") || `<tr><td colspan="4">لا توجد دفعات</td></tr>`;
+  const quoteInfo = pr.quoteSentDate ? `<div class="report-box"><div class="report-label">تاريخ إرسال التسعيرة</div><div class="report-val">${formatDate(pr.quoteSentDate)}</div></div>` : "";
+  const node = document.createElement("div");
+  node.innerHTML = `<div class="project-report-page">
+    <div class="project-report-title">تقرير مشروع</div>
+    <div class="project-report-sub">تم إنشاء التقرير بتاريخ ${formatDate(todayStr())}</div>
+    <div class="report-grid">
+      <div class="report-box"><div class="report-label">اسم المشروع</div><div class="report-val">${esc(pr.name)}</div></div>
+      <div class="report-box"><div class="report-label">العميل</div><div class="report-val">${esc(pr.client)}</div></div>
+      <div class="report-box"><div class="report-label">الحالة</div><div class="report-val">${getStage(pr.status).emoji} ${esc(getProjectStageLabel(pr, pr.status))}</div></div>
+      <div class="report-box"><div class="report-label">قيمة المشروع</div><div class="report-val">${total ? total.toLocaleString()+" "+esc(pr.currency||"SAR") : "—"}</div></div>
+      <div class="report-box"><div class="report-label">المستلم</div><div class="report-val">${paid.toLocaleString()} ${esc(pr.currency||"SAR")}</div></div>
+      <div class="report-box"><div class="report-label">المتبقي</div><div class="report-val">${remaining.toLocaleString()} ${esc(pr.currency||"SAR")}</div></div>
+      <div class="report-box"><div class="report-label">تاريخ البدء</div><div class="report-val">${pr.startDate?formatDate(pr.startDate):"—"}</div></div>
+      <div class="report-box"><div class="report-label">التسليم النهائي</div><div class="report-val">${pr.deliveryDate?formatDate(pr.deliveryDate):"—"}</div></div>
+      ${quoteInfo}
+    </div>
+    <div class="report-section-title">المراحل</div>
+    <table class="report-table"><thead><tr><th>المرحلة</th><th>المخصص</th><th>البدء</th><th>الانتهاء</th><th>التعديلات</th><th>الملاحظات</th></tr></thead><tbody>${projectStageRowsForReport(pr)}</tbody></table>
+    <div class="report-section-title">الدفعات</div>
+    <table class="report-table"><thead><tr><th>الوصف</th><th>التاريخ</th><th>الحالة</th><th>المبلغ</th></tr></thead><tbody>${paymentRows}</tbody></table>
+  </div>`;
+  document.body.appendChild(node);
+  html2pdf().set({
+    filename:`تقرير_${(pr.name||"مشروع").replace(/[\\/:*?"<>|]/g,"_")}.pdf`,
+    image:{type:'jpeg',quality:0.98},
+    html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff'},
+    jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
+    pagebreak:{mode:['avoid-all','css','legacy']}
+  }).from(node).save().then(()=>node.remove()).catch(()=>{node.remove();showToast("حدث خطأ أثناء تصدير التقرير");});
+}
+
 
 function calcExp(){
   calcSyncQuoteMeta();
