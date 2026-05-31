@@ -3405,19 +3405,26 @@ async function maybeRegisterQuoteBeforePdf(){
     showToast("⚠️ اكتب اسم المشروع أولًا قبل تصدير PDF");
     return false;
   }
-  const sameQuoteProject = (window._projects || []).some(p =>
-    p.quoteSentDate &&
-    (p.quote?.projectName || p.name || "").trim() === projectName &&
-    Number(p.quote?.total || p.price || 0) === Number(calcGrandTotal())
-  );
-  if (sameQuoteProject) return true;
 
+  // يظهر السؤال كل مرة عند الضغط على PDF
   const ok = await showQuoteRegisterConfirm();
+
   if (ok) {
-    const created = await createProjectFromQuoteSilent();
-    if (!created) return false;
-    showToast("✓ تم تسجيل التسعيرة كمشروع وباقي فتح ملف PDF");
+    const sameQuoteProject = (window._projects || []).some(p =>
+      p.quoteSentDate &&
+      (p.quote?.projectName || p.name || "").trim() === projectName &&
+      Number(p.quote?.total || p.price || 0) === Number(calcGrandTotal())
+    );
+
+    if (sameQuoteProject) {
+      showToast("✓ هذه التسعيرة مسجلة كمشروع مسبقًا، سيتم فتح PDF فقط");
+    } else {
+      const created = await createProjectFromQuoteSilent();
+      if (!created) return false;
+      showToast("✓ تم تسجيل التسعيرة كمشروع وباقي فتح ملف PDF");
+    }
   }
+
   return true;
 }
 
