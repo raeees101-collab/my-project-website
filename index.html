@@ -2020,8 +2020,10 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
     <div class="sheet-handle"></div>
     <div class="sheet-title">العقد</div>
     <div class="contract-note">
-      هذا نموذج عقد مبدئي قابل للتعديل والتصدير كـ PDF. يُفضّل مراجعته قانونيًا قبل الاستخدام الرسمي.
+      بيانات العقد تُسحب تلقائيًا من الإعدادات والتسعيرة والمشروع، وتقدر تعدل عليها قبل الحفظ أو تصدير PDF.
     </div>
+
+    <div class="settings-section-title">بيانات العقد</div>
     <div class="contract-grid">
       <div class="contract-field">
         <label>عنوان العقد</label>
@@ -2032,18 +2034,6 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
         <input id="ct-date" type="date">
       </div>
       <div class="contract-field">
-        <label>اسم العميل</label>
-        <input id="ct-client">
-      </div>
-      <div class="contract-field">
-        <label>قيمة العقد</label>
-        <input id="ct-amount">
-      </div>
-      <div class="contract-field">
-        <label>مدة التنفيذ</label>
-        <input id="ct-duration" placeholder="مثال: 30 يوم عمل">
-      </div>
-      <div class="contract-field">
         <label>حالة العقد</label>
         <select id="ct-status">
           <option value="مسودة">مسودة</option>
@@ -2052,19 +2042,84 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
           <option value="ملغي">ملغي</option>
         </select>
       </div>
+      <div class="contract-field">
+        <label>مدة التنفيذ</label>
+        <input id="ct-duration" placeholder="مثال: 30 يوم عمل">
+      </div>
+    </div>
+
+    <div class="settings-section-title">بيانات المصمم / الشركة</div>
+    <div class="contract-grid">
+      <div class="contract-field">
+        <label>الاسم</label>
+        <input id="ct-designer-name">
+      </div>
+      <div class="contract-field">
+        <label>رقم الجوال</label>
+        <input id="ct-designer-phone">
+      </div>
+      <div class="contract-field contract-full">
+        <label>البريد الإلكتروني</label>
+        <input id="ct-designer-email" type="email">
+      </div>
+    </div>
+
+    <div class="settings-section-title">بيانات العميل</div>
+    <div class="contract-grid">
+      <div class="contract-field">
+        <label>اسم العميل</label>
+        <input id="ct-client">
+      </div>
+      <div class="contract-field">
+        <label>رقم العميل</label>
+        <input id="ct-client-phone">
+      </div>
+      <div class="contract-field contract-full">
+        <label>إيميل العميل</label>
+        <input id="ct-client-email" type="email">
+      </div>
+    </div>
+
+    <div class="settings-section-title">بيانات المشروع</div>
+    <div class="contract-grid">
+      <div class="contract-field">
+        <label>اسم المشروع</label>
+        <input id="ct-project-name">
+      </div>
+      <div class="contract-field">
+        <label>نوع / نشاط المشروع</label>
+        <input id="ct-project-activity">
+      </div>
+      <div class="contract-field">
+        <label>موقع المشروع</label>
+        <input id="ct-project-location">
+      </div>
+      <div class="contract-field">
+        <label>مساحة المشروع</label>
+        <input id="ct-project-area">
+      </div>
+      <div class="contract-field contract-full">
+        <label>قيمة العقد</label>
+        <input id="ct-amount">
+      </div>
+    </div>
+
+    <div class="settings-section-title">نطاق العمل والدفعات</div>
+    <div class="contract-grid">
       <div class="contract-field contract-full">
         <label>نطاق العمل</label>
         <textarea id="ct-scope"></textarea>
       </div>
       <div class="contract-field contract-full">
-        <label>آلية السداد</label>
+        <label>جدول الدفعات</label>
         <textarea id="ct-payments"></textarea>
       </div>
       <div class="contract-field contract-full">
-        <label>بنود وشروط العقد</label>
+        <label>الشروط والأحكام</label>
         <textarea id="ct-terms"></textarea>
       </div>
     </div>
+
     <div class="contract-actions">
       <button class="contract-save" onclick="saveContract()">حفظ العقد</button>
       <button class="contract-pdf" onclick="exportContractPDF()">تصدير PDF</button>
@@ -3502,6 +3557,18 @@ async function applyCalcToProject(){
 }
 
 
+function calcPaymentPlanSnapshot(total){
+  const p1 = parseInt(document.getElementById('cp1')?.value) || 0;
+  const p2 = parseInt(document.getElementById('cp2')?.value) || 0;
+  const p3 = parseInt(document.getElementById('cp3')?.value) || 0;
+  const rows = [
+    { label:"الدفعة الأولى", percent:p1, trigger:"عند توقيع العقد وبدء العمل" },
+    { label:"الدفعة الثانية", percent:p2, trigger:"عند تسليم التصاميم الأولية" },
+    { label:"الدفعة الأخيرة", percent:p3, trigger:"قبل تسليم الملفات النهائية" }
+  ].filter(r => r.percent > 0);
+  return rows.map(r => ({...r, amount: Math.round(total * r.percent / 100)}));
+}
+
 function quoteSnapshotForProject(total) {
   const activeTypes = CALC_ORDER.filter(t => calcActive.has(t));
   return {
@@ -3516,6 +3583,7 @@ function quoteSnapshotForProject(total) {
     total,
     activeTypes,
     budgets: {...calcBudgets},
+    paymentPlan: calcPaymentPlanSnapshot(total),
     sentAt: todayStr()
   };
 }
@@ -3603,53 +3671,111 @@ async function createProjectFromQuote(){
 
 let contractTargetId = null;
 
-function defaultContractForProject(pr){
-  const amount = pr.price ? `${(Number(pr.price)||0).toLocaleString()} ${pr.currency || appCurrency()}` : "";
-  const scopeLines = [];
-  if (pr.quote && pr.quote.activeTypes) {
-    const map = { interior:"تصميم داخلي", arch:"تصميم معماري", landscape:"تصميم لاند سكيب" };
-    pr.quote.activeTypes.forEach(t => { if (map[t]) scopeLines.push("- " + map[t]); });
+function projectAreaForContract(value){
+  const clean = cleanProjectAreaValue(value || "");
+  return clean ? `${clean} م²` : "";
+}
+
+function quoteWorkScopeLines(pr){
+  const lines = [];
+  const q = pr.quote || {};
+  const map = { interior:"تصميم داخلي", arch:"تصميم معماري", landscape:"تصميم لاند سكيب" };
+  (q.activeTypes || []).forEach(t => { if (map[t]) lines.push("- " + map[t]); });
+  if (q.projectActivity) lines.push(`- نشاط المشروع: ${q.projectActivity}`);
+  if (!lines.length) lines.push("- خدمات التصميم حسب نطاق العمل المتفق عليه في عرض السعر.");
+  return lines.join("\\n");
+}
+
+function contractPaymentLines(pr){
+  const currency = pr.currency || appCurrency();
+  const total = Number(pr.price || pr.quote?.total || 0);
+  const plan = pr.quote?.paymentPlan;
+  if (Array.isArray(plan) && plan.length) {
+    return plan.map(p => `- ${p.label}: ${p.percent}% — ${Number(p.amount || 0).toLocaleString()} ${currency} — ${p.trigger}`).join("\\n");
   }
-  if (!scopeLines.length) scopeLines.push("- خدمات التصميم حسب نطاق المشروع المتفق عليه");
-  const payments = (pr.payments || []).length
-    ? (pr.payments || []).map(p => `- ${p.label || "دفعة"}: ${Number(p.amount || 0).toLocaleString()} ${pr.currency || appCurrency()}${p.date ? " — " + formatDate(p.date) : ""}`).join("\n")
-    : "- الدفعة الأولى قبل بدء العمل.\n- الدفعة الأخيرة قبل تسليم الملفات النهائية.";
+  if ((pr.payments || []).length) {
+    return (pr.payments || []).map(p => `- ${p.label || "دفعة"}: ${Number(p.amount || 0).toLocaleString()} ${currency}${p.date ? " — " + formatDate(p.date) : ""}`).join("\\n");
+  }
+  return [
+    `- الدفعة الأولى: 60% — ${Math.round(total * 0.60).toLocaleString()} ${currency} — عند توقيع العقد وبدء العمل`,
+    `- الدفعة الثانية: 20% — ${Math.round(total * 0.20).toLocaleString()} ${currency} — عند تسليم التصاميم الأولية`,
+    `- الدفعة الأخيرة: 20% — ${Math.round(total * 0.20).toLocaleString()} ${currency} — قبل تسليم الملفات النهائية`
+  ].join("\\n");
+}
+
+function defaultContractTerms(){
+  return "1. يتم تنفيذ خدمات التصميم حسب نطاق العمل المتفق عليه في العقد أو عرض السعر المعتمد، وتشمل المخرجات المذكورة فقط، مثل التصاميم، المخططات، اللقطات، أو جداول الكميات إن وجدت.\\n\\n2. تبدأ مدة العمل بعد اعتماد العقد واستلام الدفعة الأولى وتوفر جميع المعلومات المطلوبة من العميل. وفي حال تأخر الاعتماد أو إرسال الملاحظات، يتم تمديد مدة العمل بما يتناسب مع ذلك.\\n\\n3. يشمل المشروع ثلاث جولات من التعديلات على التصميم المختار. وأي تعديلات إضافية بعد ذلك يتم الاتفاق على مدتها وتكلفتها قبل تنفيذها.\\n\\n4. يتم تسليم المخرجات النهائية بعد اعتماد المرحلة النهائية واستكمال الدفعات المستحقة، وذلك بصيغة رقمية عبر البريد الإلكتروني أو رابط تحميل.\\n\\n5. في حال تضمن المشروع جدول كميات أو مواصفات، فيكون الهدف منه توضيح البنود والمواد والكميات المقترحة للتصميم، ولا يشمل أسعار المواد أو أسعار التنفيذ أو عروض المقاولين، حيث تختلف الأسعار حسب المورد ووقت الشراء وطريقة التنفيذ.\\n\\n6. في حال رغبة العميل في إلغاء المشروع بعد بدء العمل، يتم احتساب ما تم إنجازه حتى تاريخ الإلغاء، ويتم الاتفاق على التسوية بشكل عادل بين الطرفين.\\n\\n7. تنتقل ملكية التصاميم النهائية للعميل بعد سداد كامل المستحقات. ويحق للمصمم عرض المشروع ضمن ملف الأعمال أو الموقع الإلكتروني أو وسائل التواصل الاجتماعي، مع الحفاظ على خصوصية بيانات العميل وعدم إظهار أي معلومات سرية.\\n\\n8. يعتمد البريد الإلكتروني كوسيلة رسمية للاعتمادات والمراسلات، ويمكن استخدام واتساب أو وسائل التواصل الأخرى للتنسيق والمتابعة السريعة.\\n\\n9. في حال وجود أي اختلاف، يتم السعي لحله وديًا بين الطرفين، وفي حال تعذر ذلك يتم الرجوع للأنظمة المعمول بها في المملكة العربية السعودية.";
+}
+
+function defaultContractForProject(pr){
+  const q = pr.quote || {};
+  const currency = pr.currency || appCurrency();
+  const total = Number(pr.price || q.total || 0);
   return {
     title: "عقد خدمات تصميم",
     date: todayStr(),
-    client: pr.client || "",
-    amount,
-    duration: pr.deliveryDate && pr.startDate ? `${diffDaysInclusive(pr.startDate, pr.deliveryDate)} يوم` : "",
     status: "مسودة",
-    scope: scopeLines.join("\n"),
-    payments,
-    terms: "1. يلتزم الطرف الأول بتقديم خدمات التصميم حسب نطاق العمل الموضح أعلاه.\n2. لا تشمل قيمة العقد أعمال التنفيذ أو شراء المواد ما لم يذكر خلاف ذلك صراحة.\n3. تبدأ مدة العمل بعد اعتماد الدفعة الأولى وتوفير جميع المتطلبات اللازمة من العميل.\n4. يتم تسليم الملفات والمخرجات النهائية بعد استكمال الدفعات المستحقة.\n5. أي أعمال إضافية خارج نطاق العقد يتم تسعيرها واعتمادها بشكل مستقل.\n6. يحق للمصمم استخدام صور المشروع في ملف الأعمال بعد انتهاء المشروع، ما لم يطلب العميل خلاف ذلك خطيًا."
+    duration: pr.deliveryDate && pr.startDate ? `${diffDaysInclusive(pr.startDate, pr.deliveryDate)} يوم` : "",
+    designerName: calcQuoteMeta.brandName || "",
+    designerPhone: calcQuoteMeta.myPhone || "",
+    designerEmail: calcQuoteMeta.myEmail || "",
+    client: q.clientName || pr.client || "",
+    clientPhone: q.clientPhone || "",
+    clientEmail: q.clientEmail || "",
+    projectName: q.projectName || pr.name || "",
+    projectActivity: q.projectActivity || "",
+    projectLocation: q.projectLocation || "",
+    projectArea: projectAreaForContract(q.projectArea || ""),
+    amount: total ? `${total.toLocaleString()} ${currency}` : "",
+    scope: quoteWorkScopeLines(pr),
+    payments: contractPaymentLines(pr),
+    terms: defaultContractTerms()
   };
 }
 
 function fillContractForm(contract){
-  document.getElementById("ct-title").value = contract.title || "عقد خدمات تصميم";
-  document.getElementById("ct-date").value = contract.date || todayStr();
-  document.getElementById("ct-client").value = contract.client || "";
-  document.getElementById("ct-amount").value = contract.amount || "";
-  document.getElementById("ct-duration").value = contract.duration || "";
-  document.getElementById("ct-status").value = contract.status || "مسودة";
-  document.getElementById("ct-scope").value = contract.scope || "";
-  document.getElementById("ct-payments").value = contract.payments || "";
-  document.getElementById("ct-terms").value = contract.terms || "";
+  const setVal = (id,val) => { const el = document.getElementById(id); if (el) el.value = val || ""; };
+  setVal("ct-title", contract.title || "عقد خدمات تصميم");
+  setVal("ct-date", contract.date || todayStr());
+  setVal("ct-status", contract.status || "مسودة");
+  setVal("ct-duration", contract.duration || "");
+  setVal("ct-designer-name", contract.designerName || "");
+  setVal("ct-designer-phone", contract.designerPhone || "");
+  setVal("ct-designer-email", contract.designerEmail || "");
+  setVal("ct-client", contract.client || "");
+  setVal("ct-client-phone", contract.clientPhone || "");
+  setVal("ct-client-email", contract.clientEmail || "");
+  setVal("ct-project-name", contract.projectName || "");
+  setVal("ct-project-activity", contract.projectActivity || "");
+  setVal("ct-project-location", contract.projectLocation || "");
+  setVal("ct-project-area", contract.projectArea || "");
+  setVal("ct-amount", contract.amount || "");
+  setVal("ct-scope", contract.scope || "");
+  setVal("ct-payments", contract.payments || "");
+  setVal("ct-terms", contract.terms || "");
 }
 
 function readContractForm(){
+  const val = id => (document.getElementById(id)?.value || "").trim();
   return {
-    title: document.getElementById("ct-title").value.trim() || "عقد خدمات تصميم",
-    date: document.getElementById("ct-date").value || todayStr(),
-    client: document.getElementById("ct-client").value.trim(),
-    amount: document.getElementById("ct-amount").value.trim(),
-    duration: document.getElementById("ct-duration").value.trim(),
-    status: document.getElementById("ct-status").value || "مسودة",
-    scope: document.getElementById("ct-scope").value.trim(),
-    payments: document.getElementById("ct-payments").value.trim(),
-    terms: document.getElementById("ct-terms").value.trim(),
+    title: val("ct-title") || "عقد خدمات تصميم",
+    date: val("ct-date") || todayStr(),
+    status: val("ct-status") || "مسودة",
+    duration: val("ct-duration"),
+    designerName: val("ct-designer-name"),
+    designerPhone: val("ct-designer-phone"),
+    designerEmail: val("ct-designer-email"),
+    client: val("ct-client"),
+    clientPhone: val("ct-client-phone"),
+    clientEmail: val("ct-client-email"),
+    projectName: val("ct-project-name"),
+    projectActivity: val("ct-project-activity"),
+    projectLocation: val("ct-project-location"),
+    projectArea: val("ct-project-area"),
+    amount: val("ct-amount"),
+    scope: val("ct-scope"),
+    payments: val("ct-payments"),
+    terms: val("ct-terms"),
     updatedAt: todayStr()
   };
 }
@@ -3698,27 +3824,35 @@ async function exportContractPDF(){
     .page{width:210mm;min-height:297mm;background:#fff;margin:0 auto;padding:15mm 16mm;box-sizing:border-box}
     .head{display:flex;justify-content:space-between;gap:12mm;border-bottom:2px solid #111;padding-bottom:7mm;margin-bottom:8mm}
     .title{font-size:26px;font-weight:900;color:#15866A;margin-bottom:3mm}
-    .sub{font-size:11px;color:#777;line-height:1.7}
-    .logo{width:28mm;height:28mm;display:flex;align-items:center;justify-content:center}.logo img{max-width:100%;max-height:100%;object-fit:contain}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:4mm;margin-bottom:7mm}
-    .box{border:1px solid #E7E5E0;border-radius:10px;padding:9px 10px;background:#FAFAF8}
-    .label{font-size:10px;color:#888;font-weight:800;margin-bottom:4px}.val{font-size:12.5px;font-weight:900;line-height:1.5;word-break:break-word}
+    .sub{font-size:11px;color:#777;line-height:1.7}.logo{width:28mm;height:28mm;display:flex;align-items:center;justify-content:center}.logo img{max-width:100%;max-height:100%;object-fit:contain}
     .section{font-size:16px;font-weight:900;border-bottom:1.7px solid #111;padding-bottom:6px;margin:8mm 0 4mm}
-    .text{font-size:12px;line-height:1.9;white-space:pre-line}
-    .signatures{display:grid;grid-template-columns:1fr 1fr;gap:10mm;margin-top:12mm}.sign{border-top:1.5px solid #111;padding-top:8px;font-size:12px;font-weight:800}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:4mm;margin-bottom:5mm}.box{border:1px solid #E7E5E0;border-radius:10px;padding:9px 10px;background:#FAFAF8}
+    .label{font-size:10px;color:#888;font-weight:800;margin-bottom:4px}.val{font-size:12.5px;font-weight:900;line-height:1.5;word-break:break-word}
+    .text{font-size:12px;line-height:1.9;white-space:pre-line}.signatures{display:grid;grid-template-columns:1fr 1fr;gap:10mm;margin-top:12mm}.sign{border-top:1.5px solid #111;padding-top:8px;font-size:12px;font-weight:800}
     @media print{body{background:#fff}.page{margin:0}}
   </style></head><body><div class="page">
-    <div class="head"><div><div class="title">${esc(contract.title)}</div><div class="sub">تاريخ العقد: ${formatDate(contract.date)}<br>المشروع: ${esc(pr.name || "—")}<br>الحالة: ${esc(contract.status || "مسودة")}</div></div><div class="logo">${logo}</div></div>
+    <div class="head"><div><div class="title">${esc(contract.title)}</div><div class="sub">تاريخ العقد: ${formatDate(contract.date)}<br>حالة العقد: ${esc(contract.status || "مسودة")}</div></div><div class="logo">${logo}</div></div>
+
+    <div class="section">بيانات الأطراف</div>
     <div class="grid">
-      <div class="box"><div class="label">الطرف الأول</div><div class="val">${esc(calcQuoteMeta.brandName || "—")}</div></div>
-      <div class="box"><div class="label">الطرف الثاني</div><div class="val">${esc(contract.client || pr.client || "—")}</div></div>
+      <div class="box"><div class="label">المصمم / الشركة</div><div class="val">${esc(contract.designerName || "—")}<br>${esc(contract.designerPhone || "—")}<br>${esc(contract.designerEmail || "—")}</div></div>
+      <div class="box"><div class="label">العميل</div><div class="val">${esc(contract.client || "—")}<br>${esc(contract.clientPhone || "—")}<br>${esc(contract.clientEmail || "—")}</div></div>
+    </div>
+
+    <div class="section">بيانات المشروع</div>
+    <div class="grid">
+      <div class="box"><div class="label">اسم المشروع</div><div class="val">${esc(contract.projectName || pr.name || "—")}</div></div>
+      <div class="box"><div class="label">نوع / نشاط المشروع</div><div class="val">${esc(contract.projectActivity || "—")}</div></div>
+      <div class="box"><div class="label">موقع المشروع</div><div class="val">${esc(contract.projectLocation || "—")}</div></div>
+      <div class="box"><div class="label">مساحة المشروع</div><div class="val">${esc(contract.projectArea || "—")}</div></div>
       <div class="box"><div class="label">قيمة العقد</div><div class="val">${esc(contract.amount || "—")}</div></div>
       <div class="box"><div class="label">مدة التنفيذ</div><div class="val">${esc(contract.duration || "—")}</div></div>
     </div>
+
     <div class="section">نطاق العمل</div><div class="text">${esc(contract.scope || "—")}</div>
-    <div class="section">آلية السداد</div><div class="text">${esc(contract.payments || "—")}</div>
+    <div class="section">جدول الدفعات</div><div class="text">${esc(contract.payments || "—")}</div>
     <div class="section">الشروط والأحكام</div><div class="text">${esc(contract.terms || "—")}</div>
-    <div class="signatures"><div class="sign">توقيع الطرف الأول</div><div class="sign">توقيع الطرف الثاني</div></div>
+    <div class="signatures"><div class="sign">توقيع المصمم / الشركة</div><div class="sign">توقيع العميل</div></div>
   </div><script>window.addEventListener('load',()=>setTimeout(()=>window.print(),400));<\/script></body></html>`;
 
   const win = window.open("", "_blank");
