@@ -162,7 +162,22 @@ button:active { transform: scale(0.96); }
 .review-toggle-btn { border:none; border-radius:10px; padding:8px 12px; font-size:12px; font-weight:800; cursor:pointer; font-family:inherit; margin-top:10px; width:100%; }
 .review-toggle-btn.on { background:#FFF7ED; color:#9A3412; border:1.5px solid #FDBA74; }
 .review-toggle-btn.off { background:#F8F7F4; color:#57534E; border:1.5px solid #E7E5E0; }
-.amounts-hidden .money-value { color: transparent !important; text-shadow: 0 0 11px rgba(28,25,23,.45); filter: blur(5px); user-select:none; }
+.amounts-hidden .money-value {
+  color: transparent !important;
+  text-shadow: none !important;
+  filter: none !important;
+  position: relative;
+  user-select: none;
+  white-space: nowrap;
+}
+.amounts-hidden .money-value::before {
+  content: "﷼ ******";
+  color: #1C1917;
+  font-weight: 900;
+  letter-spacing: 3px;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
 .amounts-hidden .money-value::selection { background: transparent; }
 
 
@@ -1372,64 +1387,180 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
   font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif;
   background: #fff;
   color: #111;
-  padding: 18mm 16mm;
   width: 210mm;
   min-height: 297mm;
+  padding: 12mm 13mm;
+}
+.project-report-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10mm;
+  border-bottom: 2px solid #111;
+  padding-bottom: 5mm;
+  margin-bottom: 7mm;
 }
 .project-report-title {
-  font-size: 25px;
+  font-size: 24px;
   font-weight: 900;
-  margin-bottom: 4mm;
   color: #15866A;
+  margin: 0 0 2mm;
 }
 .project-report-sub {
   color: #777;
-  font-size: 11px;
+  font-size: 10.5px;
   line-height: 1.7;
-  margin-bottom: 7mm;
+  margin: 0;
+}
+.project-report-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 999px;
+  background: #EAF6F1;
+  color: #126B56;
+  border: 1px solid #CBE9DF;
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 900;
+  white-space: nowrap;
 }
 .report-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4mm;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3mm;
   margin-bottom: 6mm;
 }
 .report-box {
   border: 1px solid #E7E5E0;
-  border-radius: 12px;
-  padding: 8px 11px;
+  border-radius: 10px;
+  padding: 8px 10px;
   background: #FAFAF8;
+  min-height: 16mm;
 }
-.report-label { font-size: 10px; color: #888; font-weight: 800; margin-bottom: 3px; }
-.report-val { font-size: 13px; font-weight: 900; }
+.report-label { font-size: 9.5px; color: #888; font-weight: 800; margin-bottom: 3px; }
+.report-val { font-size: 12.5px; font-weight: 900; line-height: 1.45; word-break: break-word; }
 .report-section-title {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 900;
-  border-bottom: 2px solid #111;
-  padding-bottom: 6px;
-  margin: 8mm 0 4mm;
+  border-bottom: 1.8px solid #111;
+  padding-bottom: 5px;
+  margin: 7mm 0 4mm;
+}
+.report-stage-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3mm;
+}
+.report-stage-card {
+  border: 1px solid #E8E8E8;
+  border-radius: 11px;
+  background: #FCFCFB;
+  overflow: hidden;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+.report-stage-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 10px;
+  background: #F5F5F4;
+  border-bottom: 1px solid #E8E8E8;
+}
+.report-stage-name {
+  font-size: 12px;
+  font-weight: 900;
+}
+.report-stage-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 10px;
+  border-bottom: 1px solid #F0F0F0;
+}
+.report-chip {
+  border: 1px solid #E7E5E0;
+  background: #fff;
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: 9.5px;
+  font-weight: 800;
+  color: #555;
+}
+.report-note {
+  padding: 8px 10px;
+  font-size: 10.5px;
+  line-height: 1.75;
+  color: #222;
+  white-space: pre-line;
+  word-break: break-word;
+}
+.report-note.empty {
+  color: #999;
 }
 .report-table {
   width: 100%;
-  border-collapse: collapse;
-  font-size: 11px;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 10.5px;
   margin-bottom: 5mm;
+  border: 1px solid #E5E5E5;
+  border-radius: 10px;
+  overflow: hidden;
 }
 .report-table th {
   background: #F4F4F4;
   color: #555;
   text-align: right;
   padding: 8px;
-  border: 1px solid #E5E5E5;
+  border-bottom: 1px solid #E5E5E5;
 }
 .report-table td {
   padding: 8px;
-  border: 1px solid #EDEDED;
-  vertical-align: top;
+  border-bottom: 1px solid #EFEFEF;
+  vertical-align: middle;
 }
-.report-note {
-  white-space: pre-line;
-  line-height: 1.7;
+.report-table tr:last-child td { border-bottom: none; }
+.report-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3mm;
+  margin: 4mm 0 6mm;
+}
+
+.account-btn {
+  background: rgba(255,255,255,0.1);
+  border: none;
+  border-radius: 13px;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.account-btn .user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #D4A853;
+  cursor: pointer;
+}
+.account-btn .user-avatar[src=""],
+.account-btn .user-avatar:not([src]) {
+  display: none;
+}
+.account-btn .user-avatar:not([src=""]) + #user-fallback-icon {
+  display: none;
+}
+#user-fallback-icon {
+  font-size: 17px;
 }
 
 </style>
@@ -1480,9 +1611,12 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
       <div class="header-actions">
         <button class="icon-btn" title="إخفاء/إظهار المبالغ" aria-label="إخفاء/إظهار المبالغ" id="privacy-btn" onclick="toggleAmountPrivacy()"><i class="fa-regular fa-eye"></i></button>
         <button class="icon-btn" title="حاسبة التسعيرة" aria-label="حاسبة التسعيرة" onclick="openCalc()"><i class="fa-solid fa-calculator"></i></button>
-        <button class="icon-btn" onclick="openIO()">⇅</button>
-        <img class="user-avatar" id="user-avatar" src="" onclick="openUserMenu()" onerror="this.style.display='none'">
-        <button class="add-btn" onclick="openForm()">+</button>
+        <button class="icon-btn" title="استيراد / تصدير البيانات" aria-label="استيراد / تصدير البيانات" onclick="openIO()">⇅</button>
+        <button class="account-btn" id="account-btn" title="الحساب / تسجيل الخروج" aria-label="الحساب / تسجيل الخروج" onclick="openUserMenu()">
+          <img class="user-avatar" id="user-avatar" src="" onerror="this.style.display='none'">
+          <i class="fa-regular fa-user" id="user-fallback-icon"></i>
+        </button>
+        <button class="add-btn" title="إضافة مشروع جديد" aria-label="إضافة مشروع جديد" onclick="openForm()">+</button>
       </div>
     </div>
     <div class="stats">
@@ -1542,7 +1676,7 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
       <img id="menu-avatar" src="" style="width:48px;height:48px;border-radius:50%;object-fit:cover" onerror="this.style.display='none'">
       <div><div class="user-menu-name" id="menu-name"></div><div class="user-menu-email" id="menu-email"></div></div>
     </div>
-    <button class="signout-btn" onclick="doSignOut()">🚪 تسجيل الخروج</button>
+    <button class="signout-btn" onclick="doSignOut()"><i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج والدخول بحساب آخر</button>
   </div>
 </div>
 
@@ -1842,7 +1976,15 @@ window.resetEmailPassword = async () => {
   }
 };
 
-window.doSignOut = async () => { await fbSignOut(auth); closeUserMenu(); };
+window.doSignOut = async () => {
+  closeUserMenu();
+  try { await fbSignOut(auth); } catch(e) {}
+  window._projects = [];
+  currentUser = null;
+  document.getElementById("app-screen").classList.remove("show");
+  document.getElementById("login-screen").style.display = "flex";
+  showToast("تم تسجيل الخروج");
+};
 window._saveToDb = async () => {
   if (!window._dbRef) return;
   const obj = {};
@@ -2339,8 +2481,7 @@ function render() {
       </div>
       <div class="stages-section"><div class="stages-title">ملاحظات المراحل</div>${stagesHtml}</div>
       <div class="card-actions">
-        <button class="calc-btn" title="حاسبة التسعيرة" onclick="openCalcForProject('${pr.id}')"><i class="fa-solid fa-calculator"></i></button>
-        <button class="calc-btn" title="طباعة تقرير المشروع" onclick="exportProjectPDF('${pr.id}')"><i class="fa-solid fa-file-pdf"></i></button>
+        <button class="calc-btn" title="طباعة تقرير المشروع" aria-label="طباعة تقرير المشروع" onclick="exportProjectPDF('${pr.id}')"><i class="fa-solid fa-file-pdf"></i></button>
         <button class="edit-btn" onclick="openEditForm('${pr.id}')">✏️ تعديل</button>
         <button class="del-btn" onclick="openDelete('${pr.id}')">🗑️</button>
       </div>
@@ -2968,61 +3109,100 @@ async function createProjectFromQuote(){
   render();
 }
 
-function projectStageRowsForReport(pr) {
+function cleanReportText(value) {
+  return stripHtml(value || "")
+    .replace(/\u00a0/g, " ")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+function projectStageCardsForReport(pr) {
   return STAGES.map(s => {
     const timing = (pr.stageTiming && pr.stageTiming[s.id]) || {};
     const revs = (pr.stageRevisions && pr.stageRevisions[s.id]) || [];
-    const note = stripHtml((pr.stageNotes && pr.stageNotes[s.id]) || "");
-    return `<tr>
-      <td>${esc(getProjectStageLabel(pr, s.id))}</td>
-      <td>${timing.plannedDays ? esc(timing.plannedDays)+" يوم" : "—"}</td>
-      <td>${timing.startDate ? formatDate(timing.startDate) : "—"}</td>
-      <td>${timing.endDate ? formatDate(timing.endDate) : "—"}</td>
-      <td>${revs.length}</td>
-      <td class="report-note">${esc(note || "—")}</td>
-    </tr>`;
+    const note = cleanReportText((pr.stageNotes && pr.stageNotes[s.id]) || "");
+    const noteClass = note ? "report-note" : "report-note empty";
+    return `<div class="report-stage-card">
+      <div class="report-stage-top">
+        <div class="report-stage-name">${s.emoji} ${esc(getProjectStageLabel(pr, s.id))}</div>
+        <div class="report-chip">التعديلات: ${revs.length}</div>
+      </div>
+      <div class="report-stage-meta">
+        <span class="report-chip">المدة: ${timing.plannedDays ? esc(timing.plannedDays) + " يوم" : "—"}</span>
+        <span class="report-chip">البداية: ${timing.startDate ? formatDate(timing.startDate) : "—"}</span>
+        <span class="report-chip">النهاية: ${timing.endDate ? formatDate(timing.endDate) : "—"}</span>
+      </div>
+      <div class="${noteClass}">${esc(note || "لا توجد ملاحظات")}</div>
+    </div>`;
   }).join("");
 }
 
 function exportProjectPDF(pid){
   const pr = normalizeProject(window._projects.find(p=>p.id===pid));
   if(!pr){ showToast("⚠️ لم يتم العثور على المشروع"); return; }
+
   const payments = pr.payments || [];
   const paid = payments.filter(paymentIsReceived).reduce((s,p)=>s+(parseFloat(p.amount)||0),0);
   const total = parseFloat(pr.price)||0;
   const remaining = total - paid;
-  const paymentRows = payments.map(p=>`<tr><td>${esc(p.label||"دفعة")}</td><td>${p.date?formatDate(p.date):"—"}</td><td>${paymentIsReceived(p)?"مستلمة":"غير مستلمة"}</td><td>${Number(p.amount||0).toLocaleString()} ${esc(pr.currency||"SAR")}</td></tr>`).join("") || `<tr><td colspan="4">لا توجد دفعات</td></tr>`;
-  const quoteInfo = pr.quoteSentDate ? `<div class="report-box"><div class="report-label">تاريخ إرسال التسعيرة</div><div class="report-val">${formatDate(pr.quoteSentDate)}</div></div>` : "";
+  const currency = pr.currency || "SAR";
+
+  const paymentRows = payments.map(p=>`<tr>
+    <td>${esc(p.label||"دفعة")}</td>
+    <td>${p.date?formatDate(p.date):"—"}</td>
+    <td>${paymentIsReceived(p)?"مستلمة":"غير مستلمة"}</td>
+    <td>${Number(p.amount||0).toLocaleString()} ${esc(currency)}</td>
+  </tr>`).join("") || `<tr><td colspan="4" style="text-align:center;color:#999">لا توجد دفعات مسجلة</td></tr>`;
+
+  const quoteInfo = pr.quoteSentDate
+    ? `<div class="report-box"><div class="report-label">تاريخ إرسال التسعيرة</div><div class="report-val">${formatDate(pr.quoteSentDate)}</div></div>`
+    : "";
+
   const node = document.createElement("div");
   node.innerHTML = `<div class="project-report-page">
-    <div class="project-report-title">تقرير مشروع</div>
-    <div class="project-report-sub">تم إنشاء التقرير بتاريخ ${formatDate(todayStr())}</div>
+    <div class="project-report-head">
+      <div>
+        <div class="project-report-title">تقرير مشروع</div>
+        <div class="project-report-sub">تم إنشاء التقرير بتاريخ ${formatDate(todayStr())}</div>
+      </div>
+      <div class="project-report-status">${getStage(pr.status).emoji} ${esc(getProjectStageLabel(pr, pr.status))}</div>
+    </div>
+
     <div class="report-grid">
-      <div class="report-box"><div class="report-label">اسم المشروع</div><div class="report-val">${esc(pr.name)}</div></div>
-      <div class="report-box"><div class="report-label">العميل</div><div class="report-val">${esc(pr.client)}</div></div>
-      <div class="report-box"><div class="report-label">الحالة</div><div class="report-val">${getStage(pr.status).emoji} ${esc(getProjectStageLabel(pr, pr.status))}</div></div>
-      <div class="report-box"><div class="report-label">قيمة المشروع</div><div class="report-val">${total ? total.toLocaleString()+" "+esc(pr.currency||"SAR") : "—"}</div></div>
-      <div class="report-box"><div class="report-label">المستلم</div><div class="report-val">${paid.toLocaleString()} ${esc(pr.currency||"SAR")}</div></div>
-      <div class="report-box"><div class="report-label">المتبقي</div><div class="report-val">${remaining.toLocaleString()} ${esc(pr.currency||"SAR")}</div></div>
+      <div class="report-box"><div class="report-label">اسم المشروع</div><div class="report-val">${esc(pr.name || "—")}</div></div>
+      <div class="report-box"><div class="report-label">العميل</div><div class="report-val">${esc(pr.client || "—")}</div></div>
+      <div class="report-box"><div class="report-label">قيمة المشروع</div><div class="report-val">${total ? total.toLocaleString()+" "+esc(currency) : "—"}</div></div>
       <div class="report-box"><div class="report-label">تاريخ البدء</div><div class="report-val">${pr.startDate?formatDate(pr.startDate):"—"}</div></div>
       <div class="report-box"><div class="report-label">التسليم النهائي</div><div class="report-val">${pr.deliveryDate?formatDate(pr.deliveryDate):"—"}</div></div>
       ${quoteInfo}
     </div>
-    <div class="report-section-title">المراحل</div>
-    <table class="report-table"><thead><tr><th>المرحلة</th><th>المخصص</th><th>البدء</th><th>الانتهاء</th><th>التعديلات</th><th>الملاحظات</th></tr></thead><tbody>${projectStageRowsForReport(pr)}</tbody></table>
+
+    <div class="report-summary">
+      <div class="report-box"><div class="report-label">الإجمالي</div><div class="report-val">${total.toLocaleString()} ${esc(currency)}</div></div>
+      <div class="report-box"><div class="report-label">المستلم</div><div class="report-val">${paid.toLocaleString()} ${esc(currency)}</div></div>
+      <div class="report-box"><div class="report-label">المتبقي</div><div class="report-val">${remaining.toLocaleString()} ${esc(currency)}</div></div>
+    </div>
+
+    <div class="report-section-title">المراحل والملاحظات</div>
+    <div class="report-stage-list">${projectStageCardsForReport(pr)}</div>
+
     <div class="report-section-title">الدفعات</div>
-    <table class="report-table"><thead><tr><th>الوصف</th><th>التاريخ</th><th>الحالة</th><th>المبلغ</th></tr></thead><tbody>${paymentRows}</tbody></table>
+    <table class="report-table">
+      <thead><tr><th>الوصف</th><th>التاريخ</th><th>الحالة</th><th>المبلغ</th></tr></thead>
+      <tbody>${paymentRows}</tbody>
+    </table>
   </div>`;
+
   document.body.appendChild(node);
   html2pdf().set({
     filename:`تقرير_${(pr.name||"مشروع").replace(/[\\/:*?"<>|]/g,"_")}.pdf`,
     image:{type:'jpeg',quality:0.98},
-    html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff'},
+    html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff',scrollY:0},
     jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
-    pagebreak:{mode:['avoid-all','css','legacy']}
+    pagebreak:{mode:['css','legacy'], avoid:['.report-stage-card','.report-box','tr']}
   }).from(node).save().then(()=>node.remove()).catch(()=>{node.remove();showToast("حدث خطأ أثناء تصدير التقرير");});
 }
-
 
 function calcExp(){
   calcSyncQuoteMeta();
