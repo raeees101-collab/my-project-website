@@ -171,11 +171,11 @@ button:active { transform: scale(0.96); }
   white-space: nowrap;
 }
 .amounts-hidden .money-value::before {
-  content: "﷼ ******";
-  color: #1C1917;
+  content: "ريال ******";
+  color: #D4A853;
   font-weight: 900;
   letter-spacing: 3px;
-  direction: ltr;
+  direction: rtl;
   unicode-bidi: isolate;
 }
 .amounts-hidden .money-value::selection { background: transparent; }
@@ -1563,6 +1563,26 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
   font-size: 17px;
 }
 
+
+.logout-corner-btn {
+  background: #FEF2F2;
+  color: #EF4444;
+  border: 1px solid rgba(239,68,68,0.20);
+  border-radius: 13px;
+  width: 40px;
+  height: 40px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(239,68,68,0.12);
+}
+.logout-corner-btn:hover {
+  background: #FEE2E2;
+  transform: translateY(-1px);
+}
+
 </style>
 </head>
 <body>
@@ -1617,6 +1637,9 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
           <i class="fa-regular fa-user" id="user-fallback-icon"></i>
         </button>
         <button class="add-btn" title="إضافة مشروع جديد" aria-label="إضافة مشروع جديد" onclick="openForm()">+</button>
+        <button class="logout-corner-btn" title="تسجيل الخروج" aria-label="تسجيل الخروج" onclick="confirmHeaderSignOut()">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
       </div>
     </div>
     <div class="stats">
@@ -1974,6 +1997,12 @@ window.resetEmailPassword = async () => {
   } catch(e) {
     showLoginError(friendlyAuthError(e));
   }
+};
+
+
+window.confirmHeaderSignOut = async () => {
+  if (!confirm("تسجيل الخروج من الحساب الحالي؟")) return;
+  await doSignOut();
 };
 
 window.doSignOut = async () => {
