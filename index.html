@@ -1900,8 +1900,8 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
       هل تريد تسجيل هذه التسعيرة كمشروع بحالة <b>بانتظار الاعتماد</b> قبل فتح ملف PDF؟
     </div>
     <div class="dialog-btns">
-      <button class="cancel-btn" onclick="resolveQuoteRegisterConfirm(false)">لا، افتح PDF فقط</button>
-      <button class="confirm-quote-btn" onclick="resolveQuoteRegisterConfirm(true)">نعم، سجلها كمشروع</button>
+      <button class="cancel-btn" onclick="continueQuotePdf(false)">لا، افتح PDF فقط</button>
+      <button class="confirm-quote-btn" onclick="continueQuotePdf(true)">نعم، سجلها كمشروع</button>
     </div>
   </div>
 </div>
@@ -3354,20 +3354,14 @@ function quoteSnapshotForProject(total) {
 }
 
 
-let quoteRegisterConfirmResolver = null;
-window.showQuoteRegisterConfirm = function(){
-  return new Promise(resolve => {
-    quoteRegisterConfirmResolver = resolve;
-    const overlay = document.getElementById("quote-register-overlay");
-    if (overlay) overlay.classList.add("show");
-  });
-};
-window.resolveQuoteRegisterConfirm = function(value){
+function showQuoteRegisterConfirm(){
+  const overlay = document.getElementById("quote-register-overlay");
+  if (overlay) overlay.classList.add("show");
+}
+function resolveQuoteRegisterConfirm(value, silent){
   const overlay = document.getElementById("quote-register-overlay");
   if (overlay) overlay.classList.remove("show");
-  if (quoteRegisterConfirmResolver) quoteRegisterConfirmResolver(!!value);
-  quoteRegisterConfirmResolver = null;
-};
+}
 
 async function createProjectFromQuoteSilent(){
   const total = calcGrandTotal();
@@ -3680,14 +3674,43 @@ function pdfWorkRows(text){
 async function calcExportPDF(){
   calcSyncQuoteMeta();
   if (!requireQuoteProfileReady()) return;
+  const projectName = calcQuoteMeta.projectName.trim();
+  if(!projectName){
+    showToast("⚠️ اكتب اسم المشروع أولًا قبل تصدير PDF");
+    return;
+  }
+  showQuoteRegisterConfirm();
+}
 
-  // نفتح نافذة PDF فور ضغط الزر حتى لا يمنعها المتصفح بعد انتظار نافذة التأكيد
-  const quoteWin = window.open('', '_blank');
-  if (!quoteWin) { showToast('⚠️ السماح بالنوافذ المنبثقة في المتصفح'); return; }
-  quoteWin.document.write('<!DOCTYPE html><html dir="rtl"><head><title>جاري تجهيز PDF...</title></head><body style="font-family:Arial;padding:30px;text-align:center">جاري تجهيز ملف PDF...</body></html>');
-  quoteWin.document.close();
+async function continueQuotePdf(registerProject){
+  resolveQuoteRegisterConfirm(false, true);
+  if (registerProject) {
+    const projectName = calcQuoteMeta.projectName.trim();
+    const sameQuoteProject = (window._projects || []).some(p =>
+      p.quoteSentDate &&
+      (p.quote?.projectName || p.name || "").trim() === projectName &&
+      Number(p.quote?.total || p.price || 0) === Number(calcGrandTotal())
+    );
+    if (sameQuoteProject) {
+      showToast("✓ هذه التسعيرة مسجلة كمشروع مسبقًا، سيتم فتح PDF فقط");
+    } else {
+      const created = await createProjectFromQuoteSilent();
+      if (!created) return;
+      showToast("✓ تم تسجيل التسعيرة كمشروع");
+    }
+  }
+  await calcExportPDFFinal();
+}
 
-  if (!(await maybeRegisterQuoteBeforePdf())) { try { quoteWin.close(); } catch(e) {} return; }
+
+
+window.showQuoteRegisterConfirm = showQuoteRegisterConfirm;
+window.resolveQuoteRegisterConfirm = resolveQuoteRegisterConfirm;
+window.continueQuotePdf = continueQuotePdf;
+
+async function calcExportPDFFinal(){
+  calcSyncQuoteMeta();
+  if (!requireQuoteProfileReady()) return;
   const activeTypes = CALC_ORDER.filter(t => calcActive.has(t));
   const scope = calcAutoScope();
   const multi = activeTypes.length > 1, total = calcGrandTotal();
@@ -4483,8 +4506,8 @@ ${calcQuoteMeta.includeDesignScope !== false ? `<!-- ════ DESIGN SCOPE P
 </body>
 </html>`;
 
-  const win = quoteWin;
-  win.document.open();
+  const win = window.open('', '_blank');
+  if (!win) { showToast('⚠️ السماح بالنوافذ المنبثقة في المتصفح'); return; }
   win.document.write(html);
   win.document.close();
   showToast('✓ فُتح عرض السعر — اضغط "طباعة / حفظ PDF"');
