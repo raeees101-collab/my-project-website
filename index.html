@@ -1773,6 +1773,19 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
   color: #92400E;
 }
 
+
+/* Quote confirm must appear above calculator sheet */
+#quote-register-overlay {
+  z-index: 9999 !important;
+}
+#quote-register-overlay.show {
+  display: flex !important;
+}
+#quote-register-overlay .quote-register-dialog {
+  position: relative;
+  z-index: 10000;
+}
+
 </style>
 </head>
 <body>
@@ -3356,7 +3369,10 @@ function quoteSnapshotForProject(total) {
 
 function showQuoteRegisterConfirm(){
   const overlay = document.getElementById("quote-register-overlay");
-  if (overlay) overlay.classList.add("show");
+  if (overlay) {
+    overlay.style.zIndex = "9999";
+    overlay.classList.add("show");
+  }
 }
 function resolveQuoteRegisterConfirm(value, silent){
   const overlay = document.getElementById("quote-register-overlay");
