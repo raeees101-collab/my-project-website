@@ -1753,6 +1753,26 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
   .settings-logo-row { align-items: flex-start; flex-direction: column; }
 }
 
+
+.quote-register-dialog {
+  max-width: 420px;
+}
+.confirm-quote-btn {
+  flex: 1;
+  background: linear-gradient(135deg, #D4A853, #E8C070);
+  color: #1C1917;
+  border: none;
+  border-radius: 14px;
+  padding: 14px;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+  font-family: inherit;
+}
+.quote-register-dialog .dialog-sub b {
+  color: #92400E;
+}
+
 </style>
 </head>
 <body>
@@ -1867,6 +1887,22 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
       <div><div class="user-menu-name" id="menu-name"></div><div class="user-menu-email" id="menu-email"></div></div>
     </div>
     
+  </div>
+</div>
+
+
+<!-- Quote Register Confirm -->
+<div class="overlay-center" id="quote-register-overlay">
+  <div class="dialog quote-register-dialog" onclick="event.stopPropagation()">
+    <div class="dialog-icon">📄</div>
+    <div class="dialog-title">تسجيل التسعيرة كمشروع؟</div>
+    <div class="dialog-sub">
+      هل تريد تسجيل هذه التسعيرة كمشروع بحالة <b>بانتظار الاعتماد</b> قبل فتح ملف PDF؟
+    </div>
+    <div class="dialog-btns">
+      <button class="cancel-btn" onclick="resolveQuoteRegisterConfirm(false)">لا، افتح PDF فقط</button>
+      <button class="confirm-quote-btn" onclick="resolveQuoteRegisterConfirm(true)">نعم، سجلها كمشروع</button>
+    </div>
   </div>
 </div>
 
@@ -3317,6 +3353,20 @@ function quoteSnapshotForProject(total) {
   };
 }
 
+
+let quoteRegisterConfirmResolver = null;
+function showQuoteRegisterConfirm(){
+  return new Promise(resolve => {
+    quoteRegisterConfirmResolver = resolve;
+    document.getElementById("quote-register-overlay").classList.add("show");
+  });
+}
+function resolveQuoteRegisterConfirm(value){
+  document.getElementById("quote-register-overlay").classList.remove("show");
+  if (quoteRegisterConfirmResolver) quoteRegisterConfirmResolver(!!value);
+  quoteRegisterConfirmResolver = null;
+}
+
 async function createProjectFromQuoteSilent(){
   const total = calcGrandTotal();
   const projectName = calcQuoteMeta.projectName.trim();
@@ -3360,7 +3410,7 @@ async function maybeRegisterQuoteBeforePdf(){
   );
   if (sameQuoteProject) return true;
 
-  const ok = confirm("هل تريد تسجيل هذه التسعيرة كمشروع بانتظار الاعتماد قبل فتح ملف PDF؟");
+  const ok = await showQuoteRegisterConfirm();
   if (ok) {
     const created = await createProjectFromQuoteSilent();
     if (!created) return false;
