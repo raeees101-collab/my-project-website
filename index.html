@@ -2087,7 +2087,6 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
     <div class="calc-btn-row" style="margin-top:10px">
       <button class="calc-export-btn" onclick="calcExp()"><i class="fa-solid fa-paper-plane"></i> نص للعميل</button>
       <button class="calc-export-btn primary" onclick="calcExportPDF()"><i class="fa-solid fa-file-pdf"></i> PDF</button>
-      <button class="calc-export-btn quote-to-project" onclick="createProjectFromQuote()"><i class="fa-solid fa-folder-plus"></i> تسجيل كمشروع</button>
     </div>
     <button class="calc-apply-btn" id="calcApplyBtn" onclick="applyCalcToProject()" style="display:none">✓ تطبيق السعر على المشروع</button>
   </div>
@@ -3318,14 +3317,12 @@ function quoteSnapshotForProject(total) {
   };
 }
 
-async function createProjectFromQuote(){
-  calcSyncQuoteMeta();
-  if (!requireQuoteProfileReady()) return;
+async function createProjectFromQuoteSilent(){
   const total = calcGrandTotal();
   const projectName = calcQuoteMeta.projectName.trim();
-  if(!projectName){ showToast("⚠️ اكتب اسم المشروع في بيانات التسعيرة أولًا"); return; }
+  if(!projectName){ showToast("⚠️ اكتب اسم المشروع في بيانات التسعيرة أولًا"); return null; }
   const clientName = calcQuoteMeta.clientName.trim() || "عميل غير محدد";
-  const maxOrder=window._projects.length?Math.max(...window._projects.map(p=>Number(p.manualOrder??0))):0;
+  const maxOrder = window._projects.length ? Math.max(...window._projects.map(p=>Number(p.manualOrder??0))) : 0;
   const quote = quoteSnapshotForProject(total);
   const newProject = {
     id: Date.now().toString(),
@@ -3346,11 +3343,41 @@ async function createProjectFromQuote(){
   };
   window._projects.push(newProject);
   await window._saveToDb();
+  render();
+  return newProject;
+}
+
+async function maybeRegisterQuoteBeforePdf(){
+  const projectName = calcQuoteMeta.projectName.trim();
+  if(!projectName){
+    showToast("⚠️ اكتب اسم المشروع أولًا قبل تصدير PDF");
+    return false;
+  }
+  const sameQuoteProject = (window._projects || []).some(p =>
+    p.quoteSentDate &&
+    (p.quote?.projectName || p.name || "").trim() === projectName &&
+    Number(p.quote?.total || p.price || 0) === Number(calcGrandTotal())
+  );
+  if (sameQuoteProject) return true;
+
+  const ok = confirm("هل تريد تسجيل هذه التسعيرة كمشروع بانتظار الاعتماد قبل فتح ملف PDF؟");
+  if (ok) {
+    const created = await createProjectFromQuoteSilent();
+    if (!created) return false;
+    showToast("✓ تم تسجيل التسعيرة كمشروع وباقي فتح ملف PDF");
+  }
+  return true;
+}
+
+async function createProjectFromQuote(){
+  calcSyncQuoteMeta();
+  if (!requireQuoteProfileReady()) return;
+  const created = await createProjectFromQuoteSilent();
+  if (!created) return;
   closeCalc();
-  expandedId = newProject.id;
+  expandedId = created.id;
   setTab("pending_approval", document.querySelector(".tab:nth-child(3)") || null);
   showToast("✓ تم تسجيل التسعيرة كمشروع بانتظار الاعتماد");
-  render();
 }
 
 function cleanReportText(value) {
@@ -3591,9 +3618,10 @@ function pdfWorkRows(text){
   const chunks = source.split(/\n\s*\n/).map(s=>s.trim()).filter(Boolean);
   return chunks.map(chunk => `<div class="pdf-work-row">${pdfRichLines(chunk)}</div>`).join('');
 }
-function calcExportPDF(){
+async function calcExportPDF(){
   calcSyncQuoteMeta();
   if (!requireQuoteProfileReady()) return;
+  if (!(await maybeRegisterQuoteBeforePdf())) return;
   const activeTypes = CALC_ORDER.filter(t => calcActive.has(t));
   const scope = calcAutoScope();
   const multi = activeTypes.length > 1, total = calcGrandTotal();
