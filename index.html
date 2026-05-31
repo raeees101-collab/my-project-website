@@ -1880,6 +1880,15 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
   .contract-actions { flex-direction:column; }
 }
 
+
+#quote-register-overlay {
+  z-index: 500 !important;
+}
+#quote-register-overlay .quote-register-dialog {
+  position: relative;
+  z-index: 501;
+}
+
 </style>
 </head>
 <body>
@@ -2007,10 +2016,9 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
       هل تريد تسجيل هذه التسعيرة كمشروع بحالة <b>بانتظار الاعتماد</b> قبل فتح ملف PDF؟
     </div>
     <div class="dialog-btns" id="quote-register-actions">
-      <button class="cancel-btn" onclick="continueQuotePdf(false)">لا، افتح PDF فقط</button>
-      <button class="confirm-quote-btn" onclick="registerQuoteThenShowPdfButton()">نعم، سجلها كمشروع</button>
+      <button class="cancel-btn" onclick="prepareQuotePdfAfterChoice(false)">لا، افتح PDF فقط</button>
+      <button class="confirm-quote-btn" onclick="prepareQuotePdfAfterChoice(true)">نعم، سجلها كمشروع</button>
     </div>
-    <button class="confirm-quote-btn quote-open-pdf-btn" id="quote-open-pdf-btn" style="display:none;width:100%;margin-top:10px" onclick="openQuotePdfNow()">فتح PDF الآن</button>
   </div>
 </div>
 
@@ -2344,7 +2352,7 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
 
     <div class="calc-btn-row" style="margin-top:10px">
       <button class="calc-export-btn" onclick="calcExp()"><i class="fa-solid fa-paper-plane"></i> نص للعميل</button>
-      <button class="calc-export-btn primary" onclick="calcExportPDF()"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+      <button class="calc-export-btn primary" id="quotePdfBtn" onclick="calcExportPDF()"><i class="fa-solid fa-file-pdf"></i> PDF</button>
     </div>
     <button class="calc-apply-btn" id="calcApplyBtn" onclick="applyCalcToProject()" style="display:none">✓ تطبيق السعر على المشروع</button>
   </div>
@@ -3413,6 +3421,7 @@ function calcFillQuoteMetaForm(){
   renderCalcPlanPreview();
   const scopeToggle = document.getElementById('cq-scope-toggle');
   if (scopeToggle) scopeToggle.checked = calcQuoteMeta.includeDesignScope !== false;
+  setQuotePdfReadyState(false);
   updateCalcProfileWarning();
 }
 function calcSyncQuoteMeta(){
@@ -4111,76 +4120,98 @@ function pdfWorkRows(text){
   const chunks = source.split(/\n\s*\n/).map(s=>s.trim()).filter(Boolean);
   return chunks.map(chunk => `<div class="pdf-work-row">${pdfRichLines(chunk)}</div>`).join('');
 }
+let quotePdfReady = false;
+let quotePdfFingerprint = "";
+
+function currentQuoteFingerprint(){
+  const total = calcGrandTotal();
+  return [
+    calcQuoteMeta.projectName || "",
+    calcQuoteMeta.clientName || "",
+    calcQuoteMeta.projectArea || "",
+    calcQuoteMeta.projectLocation || "",
+    appCurrency(),
+    total,
+    document.getElementById('cp1')?.value || "",
+    document.getElementById('cp2')?.value || "",
+    document.getElementById('cp3')?.value || ""
+  ].join("|");
+}
+
+function setQuotePdfReadyState(ready){
+  quotePdfReady = !!ready;
+  quotePdfFingerprint = ready ? currentQuoteFingerprint() : "";
+  const btn = document.getElementById("quotePdfBtn");
+  if (btn) {
+    btn.innerHTML = ready
+      ? '<i class="fa-solid fa-file-pdf"></i> فتح PDF'
+      : '<i class="fa-solid fa-file-pdf"></i> PDF';
+  }
+}
+
 async function calcExportPDF(){
   calcSyncQuoteMeta();
   if (!requireQuoteProfileReady()) return;
+
   const projectName = calcQuoteMeta.projectName.trim();
   if(!projectName){
     showToast("⚠️ اكتب اسم المشروع أولًا قبل تصدير PDF");
     return;
   }
+
+  // إذا تم اختيار طريقة التسجيل مسبقًا، الضغطة الثانية تفتح PDF مباشرة.
+  if (quotePdfReady && quotePdfFingerprint === currentQuoteFingerprint()) {
+    await calcExportPDFFinal();
+    setQuotePdfReadyState(false);
+    return;
+  }
+
+  // أول ضغطة: يظهر السؤال فقط ولا يفتح PDF تلقائيًا، وهذا أفضل للجوال.
   showQuoteRegisterConfirm();
 }
 
-async function continueQuotePdf(registerProject){
-  if (registerProject) return registerQuoteThenShowPdfButton();
-  resolveQuoteRegisterConfirm(false, true);
-  await calcExportPDFFinal();
-}
-
-async function registerQuoteThenShowPdfButton(){
+async function prepareQuotePdfAfterChoice(registerProject){
   const title = document.getElementById("quote-register-title");
   const sub = document.getElementById("quote-register-sub");
   const actions = document.getElementById("quote-register-actions");
-  const openBtn = document.getElementById("quote-open-pdf-btn");
 
   if (actions) actions.style.pointerEvents = "none";
-  if (sub) sub.innerHTML = "جاري تسجيل التسعيرة كمشروع...";
 
   try {
-    const projectName = calcQuoteMeta.projectName.trim();
-    const sameQuoteProject = (window._projects || []).some(p =>
-      p.quoteSentDate &&
-      (p.quote?.projectName || p.name || "").trim() === projectName &&
-      Number(p.quote?.total || p.price || 0) === Number(calcGrandTotal())
-    );
+    if (registerProject) {
+      if (sub) sub.innerHTML = "جاري تسجيل التسعيرة كمشروع...";
+      const projectName = calcQuoteMeta.projectName.trim();
+      const sameQuoteProject = (window._projects || []).some(p =>
+        p.quoteSentDate &&
+        (p.quote?.projectName || p.name || "").trim() === projectName &&
+        Number(p.quote?.total || p.price || 0) === Number(calcGrandTotal())
+      );
 
-    if (sameQuoteProject) {
-      if (title) title.textContent = "التسعيرة مسجلة مسبقًا";
-      if (sub) sub.innerHTML = "هذه التسعيرة مسجلة كمشروع مسبقًا. اضغط الزر بالأسفل لفتح ملف PDF.";
-      showToast("✓ هذه التسعيرة مسجلة كمشروع مسبقًا");
-    } else {
-      const created = await createProjectFromQuoteSilent();
-      if (!created) {
-        if (actions) actions.style.pointerEvents = "auto";
-        if (sub) sub.innerHTML = "تعذر تسجيل التسعيرة. تأكد من اسم المشروع وحاول مرة أخرى.";
-        return;
+      if (!sameQuoteProject) {
+        const created = await createProjectFromQuoteSilent();
+        if (!created) {
+          if (actions) actions.style.pointerEvents = "auto";
+          if (sub) sub.innerHTML = "تعذر تسجيل التسعيرة. تأكد من اسم المشروع وحاول مرة أخرى.";
+          return;
+        }
+        showToast("✓ تم تسجيل التسعيرة كمشروع");
+      } else {
+        showToast("✓ هذه التسعيرة مسجلة كمشروع مسبقًا");
       }
-      if (title) title.textContent = "تم تسجيل التسعيرة";
-      if (sub) sub.innerHTML = "تم تسجيل التسعيرة كمشروع بحالة <b>بانتظار الاعتماد</b>. الآن اضغط فتح PDF.";
-      showToast("✓ تم تسجيل التسعيرة كمشروع");
     }
 
-    if (actions) actions.style.display = "none";
-    if (openBtn) openBtn.style.display = "block";
+    resolveQuoteRegisterConfirm(false, true);
+    setQuotePdfReadyState(true);
+    showToast("جاهز، اضغط فتح PDF");
   } catch(e) {
     if (actions) actions.style.pointerEvents = "auto";
-    if (sub) sub.innerHTML = "حدث خطأ أثناء تسجيل التسعيرة، حاول مرة أخرى.";
-    showToast("حدث خطأ أثناء التسجيل");
+    if (title) title.textContent = "حدث خطأ";
+    if (sub) sub.innerHTML = "حدث خطأ أثناء التجهيز، حاول مرة أخرى.";
+    showToast("حدث خطأ أثناء التجهيز");
   }
 }
 
-async function openQuotePdfNow(){
-  resolveQuoteRegisterConfirm(false, true);
-  await calcExportPDFFinal();
-}
-
-window.showQuoteRegisterConfirm = showQuoteRegisterConfirm;
-window.resolveQuoteRegisterConfirm = resolveQuoteRegisterConfirm;
-window.continueQuotePdf = continueQuotePdf;
-window.registerQuoteThenShowPdfButton = registerQuoteThenShowPdfButton;
-window.openQuotePdfNow = openQuotePdfNow;
-
+window.prepareQuotePdfAfterChoice = prepareQuotePdfAfterChoice;
 async function calcExportPDFFinal(existingWin = null){
   calcSyncQuoteMeta();
   if (!requireQuoteProfileReady()) return;
@@ -4978,6 +5009,24 @@ ${calcQuoteMeta.includeDesignScope !== false ? `<!-- ════ DESIGN SCOPE P
 <\/script>
 </body>
 </html>`;
+
+  const isMobilePdf = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+  if (isMobilePdf) {
+    const backUrl = location.href;
+    const mobileHtml = html
+      .replace("</head>", `<style>
+        .mobile-pdf-actions{position:fixed;left:12px;right:12px;bottom:14px;z-index:9999;display:flex;gap:8px;direction:rtl;font-family:Arial,sans-serif}
+        .mobile-pdf-actions button{flex:1;border:none;border-radius:14px;padding:13px 10px;font-size:14px;font-weight:800;box-shadow:0 8px 22px rgba(0,0,0,.18)}
+        .mobile-pdf-print{background:#1C1917;color:#fff}
+        .mobile-pdf-back{background:#F3F2EF;color:#1C1917}
+        @media print{.mobile-pdf-actions{display:none!important}}
+      </style></head>`)
+      .replace("<body>", `<body><div class="mobile-pdf-actions"><button class="mobile-pdf-print" onclick="window.print()">طباعة / حفظ PDF</button><button class="mobile-pdf-back" onclick="location.href='${backUrl}'">رجوع للتطبيق</button></div>`);
+    document.open();
+    document.write(mobileHtml);
+    document.close();
+    return;
+  }
 
   const win = existingWin || window.open('', '_blank');
   if (!win) { showToast('⚠️ السماح بالنوافذ المنبثقة في المتصفح'); return; }
