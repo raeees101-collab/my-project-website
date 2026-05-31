@@ -1889,6 +1889,19 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
   z-index: 501;
 }
 
+
+#contract-approve-overlay {
+  z-index: 520 !important;
+}
+#contract-approve-overlay .dialog {
+  position: relative;
+  z-index: 521;
+}
+.contract-approve-btn {
+  background: linear-gradient(135deg, #D4A853, #E8C070);
+  color: #1C1917;
+}
+
 </style>
 </head>
 <body>
@@ -2023,6 +2036,22 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
 </div>
 
 
+
+<!-- Contract Approval Confirm -->
+<div class="overlay-center" id="contract-approve-overlay">
+  <div class="dialog quote-register-dialog" onclick="event.stopPropagation()">
+    <div class="dialog-icon">✅</div>
+    <div class="dialog-title">اعتماد المشروع؟</div>
+    <div class="dialog-sub">
+      هل تريد نقل المشروع من <b>بانتظار الاعتماد</b> إلى مرحلة العمل؟
+    </div>
+    <div class="dialog-btns">
+      <button class="cancel-btn" onclick="resolveContractApproval(false)">لا، خله بانتظار الاعتماد</button>
+      <button class="confirm-quote-btn" onclick="resolveContractApproval(true)">نعم، اعتمد المشروع</button>
+    </div>
+  </div>
+</div>
+
 <!-- Contract -->
 <div class="overlay" id="contract-overlay" onclick="closeContract()">
   <div class="sheet" onclick="event.stopPropagation()">
@@ -2132,6 +2161,7 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
     <div class="contract-actions">
       <button class="contract-save" onclick="saveContract()">حفظ العقد</button>
       <button class="contract-pdf" onclick="exportContractPDF()">تصدير PDF</button>
+      <button class="contract-save contract-approve-btn" id="contractApproveBtn" onclick="askApproveProjectFromContract()" style="display:none">اعتماد المشروع</button>
     </div>
   </div>
 </div>
@@ -3022,7 +3052,7 @@ function render() {
       <div class="stages-section"><div class="stages-title">ملاحظات المراحل</div>${stagesHtml}</div>
       <div class="card-actions">
         <button class="calc-btn" title="طباعة تقرير المشروع" aria-label="طباعة تقرير المشروع" onclick="exportProjectPDF('${pr.id}')"><i class="fa-solid fa-file-pdf"></i></button>
-        <button class="contract-btn" title="العقد" aria-label="العقد" onclick="openContract('${pr.id}', ${pr.status==='pending_approval'?'true':'false'})">${pr.status==='pending_approval'?'اعتماد + عقد':'العقد'}</button>
+        <button class="contract-btn" title="العقد" aria-label="العقد" onclick="openContract('${pr.id}')">العقد</button>
         <button class="edit-btn" onclick="openEditForm('${pr.id}')">✏️ تعديل</button>
         <button class="del-btn" onclick="openDelete('${pr.id}')">🗑️</button>
       </div>
@@ -3798,21 +3828,41 @@ function readContractForm(){
   };
 }
 
-async function openContract(pid, approve=false){
+async function openContract(pid){
   contractTargetId = pid;
-  let pr = window._projects.find(p => p.id === pid);
+  const pr = window._projects.find(p => p.id === pid);
   if (!pr) return;
-  if (approve && pr.status === "pending_approval") {
-    window._projects = window._projects.map(p => p.id === pid ? {...p, status:"first_meeting", contractApprovedAt: todayStr()} : p);
-    await window._saveToDb();
-    pr = window._projects.find(p => p.id === pid);
-    showToast("✓ تم اعتماد المشروع، ويمكنك تجهيز العقد");
-  }
   fillContractForm(pr.contract || defaultContractForProject(pr));
+  const approveBtn = document.getElementById("contractApproveBtn");
+  if (approveBtn) approveBtn.style.display = pr.status === "pending_approval" ? "block" : "none";
   document.getElementById("contract-overlay").classList.add("show");
   render();
 }
 
+function askApproveProjectFromContract(){
+  if (!contractTargetId) return;
+  document.getElementById("contract-approve-overlay").classList.add("show");
+}
+
+async function resolveContractApproval(approve){
+  document.getElementById("contract-approve-overlay").classList.remove("show");
+  if (!approve || !contractTargetId) return;
+  const contract = readContractForm();
+  window._projects = window._projects.map(p => p.id === contractTargetId ? {
+    ...p,
+    status:"first_meeting",
+    contractApprovedAt: todayStr(),
+    contract
+  } : p);
+  await window._saveToDb();
+  const approveBtn = document.getElementById("contractApproveBtn");
+  if (approveBtn) approveBtn.style.display = "none";
+  showToast("✓ تم اعتماد المشروع");
+  render();
+}
+
+window.resolveContractApproval = resolveContractApproval;
+window.askApproveProjectFromContract = askApproveProjectFromContract;
 function closeContract(){
   contractTargetId = null;
   document.getElementById("contract-overlay").classList.remove("show");
