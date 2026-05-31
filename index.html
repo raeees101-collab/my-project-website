@@ -1953,11 +1953,15 @@ onAuthStateChanged(auth, user => {
     document.getElementById("login-screen").style.display = "none";
     document.getElementById("app-screen").classList.add("show");
     if (user.photoURL) {
-      document.getElementById("user-avatar").src = user.photoURL;
-      document.getElementById("menu-avatar").src = user.photoURL;
+      const userAvatar = document.getElementById("user-avatar");
+      const menuAvatar = document.getElementById("menu-avatar");
+      if (userAvatar) userAvatar.src = user.photoURL;
+      if (menuAvatar) menuAvatar.src = user.photoURL;
     }
-    document.getElementById("menu-name").textContent = user.displayName || "";
-    document.getElementById("menu-email").textContent = user.email || "";
+    const menuName = document.getElementById("menu-name");
+    const menuEmail = document.getElementById("menu-email");
+    if (menuName) menuName.textContent = user.displayName || "";
+    if (menuEmail) menuEmail.textContent = user.email || "";
     const dbRef = ref(db, `users/${user.uid}/projects`);
     onValue(dbRef, snap => {
       const data = snap.val();
