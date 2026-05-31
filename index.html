@@ -1689,6 +1689,70 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
   .settings-full { grid-column:auto; }
 }
 
+
+.calc-profile-warning {
+  border: 1.5px solid #E8C070;
+  background: #FFF8E8;
+  color: #6B4E16;
+  border-radius: 14px;
+  padding: 12px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.calc-profile-warning b {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 3px;
+}
+.calc-profile-warning span {
+  display: block;
+  font-size: 11px;
+  line-height: 1.6;
+  color: #7C672C;
+}
+.calc-profile-warning button {
+  border: none;
+  border-radius: 11px;
+  background: #1C1917;
+  color: #fff;
+  padding: 10px 12px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+}
+.calc-export-btn.disabled-soft,
+.calc-export-btn:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+.settings-logo-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.settings-logo-actions {
+  flex: 1;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.settings-note.compact {
+  width: 100%;
+  margin-top: 2px;
+  padding: 8px 10px;
+}
+@media (max-width: 520px) {
+  .calc-profile-warning { align-items: stretch; flex-direction: column; }
+  .calc-profile-warning button { width: 100%; }
+  .settings-logo-row { align-items: flex-start; flex-direction: column; }
+}
+
 </style>
 </head>
 <body>
@@ -1852,10 +1916,6 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
           <option value="QAR">QAR — ريال قطري</option>
         </select>
       </div>
-      <div class="settings-field">
-        <label>صلاحية التسعيرة بالأيام</label>
-        <input id="set-validity" type="number" min="1" step="1" placeholder="7">
-      </div>
     </div>
 
     <div class="settings-section-title">بياناتك في التسعيرة</div>
@@ -1872,6 +1932,17 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
         <label>الإيميل</label>
         <input id="set-my-email" type="email" placeholder="name@example.com">
       </div>
+    </div>
+
+    <div class="settings-section-title">الشعار</div>
+    <div class="settings-logo-row">
+      <div class="calc-logo-preview" id="settingsLogoPreview"><span class="calc-logo-note">بدون شعار</span></div>
+      <div class="settings-logo-actions">
+        <button class="calc-logo-btn primary" type="button" onclick="document.getElementById('settingsLogoInput').click()">رفع الشعار</button>
+        <button class="calc-logo-btn" type="button" onclick="clearSettingsLogo()">حذف الشعار</button>
+        <div class="settings-note compact">يفضّل PNG بخلفية شفافة. الشعار يُستخدم تلقائيًا في كل تسعيرة.</div>
+      </div>
+      <input id="settingsLogoInput" type="file" accept="image/*" style="display:none" onchange="settingsHandleLogoUpload(event)">
     </div>
 
     <div class="settings-section-title">بيانات الحساب البنكي</div>
@@ -1944,6 +2015,14 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
     <div class="calc-budgets-card" id="calcBudgetsCard"></div>
 
     <div class="calc-sec-label">بيانات عرض السعر</div>
+    <div class="calc-profile-warning" id="calcProfileWarning" style="display:none">
+      <div>
+        <b>أكمل إعدادات التسعيرة أولًا</b>
+        <span>أضف الشعار وبياناتك وبيانات الحساب البنكي من الإعدادات قبل إنشاء عرض سعر.</span>
+      </div>
+      <button type="button" onclick="openSettings()">فتح الإعدادات</button>
+    </div>
+
     <div class="calc-quote-card">
       <div class="calc-quote-grid">
         <div class="calc-quote-field"><label>عنوان عرض السعر</label><input id="cq-title" type="text" placeholder="عرض سعر" oninput="calcSyncQuoteMeta()"></div>
@@ -1956,16 +2035,9 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
           </select></div>
         <div class="calc-quote-field"><label>مساحة المشروع</label><input id="cq-area" type="number" min="0" step="1" placeholder="اكتب الرقم فقط" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>موقع المشروع</label><input id="cq-location" type="text" placeholder="المدينة / الحي" oninput="calcSyncQuoteMeta()"></div>
-        <div class="calc-quote-field"><label>الاسم تحت الشعار</label><input id="cq-brand-name" type="text" placeholder="مثال: اسم الشركة أو اسم الشخص" oninput="calcSyncQuoteMeta()"></div>
-        <div class="calc-quote-field"><label>رقم الجوال</label><input id="cq-my-phone" type="text" placeholder="مثال: 05xxxxxxxx" oninput="calcSyncQuoteMeta()"></div>
-        <div class="calc-quote-field"><label>البريد الإلكتروني</label><input id="cq-my-email" type="email" placeholder="مثال: name@email.com" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>اسم العميل</label><input id="cq-client-name" type="text" placeholder="اختياري" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>رقم العميل</label><input id="cq-client-phone" type="text" placeholder="اختياري" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field"><label>إيميل العميل</label><input id="cq-client-email" type="email" placeholder="اختياري" oninput="calcSyncQuoteMeta()"></div>
-        <div class="calc-quote-field"><label>مدة الصلاحية (أيام)</label><input id="cq-validity" type="number" min="1" value="7" oninput="calcSyncQuoteMeta()"></div>
-        <div class="calc-quote-field"><label>اسم البنك</label><input id="cq-bank-name" type="text" placeholder="مثال: الراجحي" oninput="calcSyncQuoteMeta()"></div>
-        <div class="calc-quote-field"><label>رقم الحساب / الآيبان</label><input id="cq-account-number" type="text" placeholder="اكتب رقم الحساب أو IBAN" oninput="calcSyncQuoteMeta()"></div>
-        <div class="calc-quote-field"><label>اسم الحساب</label><input id="cq-account-name" type="text" placeholder="مثال: اسم صاحب الحساب" oninput="calcSyncQuoteMeta()"></div>
         <div class="calc-quote-field calc-quote-full">
           <div class="calc-auto-scope">
             <div>
@@ -1978,13 +2050,6 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
         <div class="calc-quote-field calc-quote-full"><label>مكونات المشروع</label><textarea id="cq-components" rows="4" placeholder="- الواجهة المعمارية&#10;- التصميم الداخلي" oninput="calcSyncQuoteMeta()"></textarea></div>
         <div class="calc-quote-field calc-quote-full"><label>وصف ما سيتم القيام به</label><textarea id="cq-work-desc" rows="10" placeholder="اكتب وصف العمل والخدمات هنا..." oninput="calcSyncQuoteMeta()" style="min-height:180px"></textarea></div>
         <div class="calc-quote-field calc-quote-full"><label>ملاحظات إضافية</label><textarea id="cq-notes" rows="3" placeholder="مثال: الأسعار لا تشمل التنفيذ أو تعتمد بعد اعتماد العرض النهائي" oninput="calcSyncQuoteMeta()"></textarea></div>
-      </div>
-      <div class="calc-logo-tools">
-        <div class="calc-logo-preview" id="calcLogoPreview"><span class="calc-logo-note">بدون شعار</span></div>
-        <button class="calc-logo-btn primary" type="button" onclick="document.getElementById('calcLogoInput').click()">رفع الشعار</button>
-        <button class="calc-logo-btn" type="button" onclick="clearCalcLogo()">حذف الشعار</button>
-        <span class="calc-logo-note">يفضّل PNG بخلفية شفافة</span>
-        <input id="calcLogoInput" type="file" accept="image/*" style="display:none" onchange="calcHandleLogoUpload(event)">
       </div>
 
       <div class="calc-logo-tools calc-plan-tools">
@@ -3080,72 +3145,36 @@ function calcFillQuoteMetaForm(){
   setVal('cq-activity', calcQuoteMeta.projectActivity || '');
   setVal('cq-area', cleanProjectAreaValue(calcQuoteMeta.projectArea) || '');
   setVal('cq-location', calcQuoteMeta.projectLocation || '');
-  setVal('cq-validity', calcQuoteMeta.validityDays || 7);
-  setVal('cq-brand-name', calcQuoteMeta.brandName || '');
-  setVal('cq-my-phone', calcQuoteMeta.myPhone || '');
-  setVal('cq-my-email', calcQuoteMeta.myEmail || '');
   setVal('cq-client-name', '');
   setVal('cq-client-phone', '');
   setVal('cq-client-email', '');
-  setVal('cq-bank-name', calcQuoteMeta.bankName || '');
   setVal('cq-components', calcQuoteMeta.components || '');
   setVal('cq-work-desc', calcQuoteMeta.workDescription || '');
   renderCalcAutoScopePreview();
-  setVal('cq-account-name', calcQuoteMeta.accountName || '');
-  setVal('cq-account-number', calcQuoteMeta.accountNumber || '');
   setVal('cq-notes', calcQuoteMeta.notes || '');
-  renderCalcLogoPreview();
   renderCalcPlanPreview();
   const scopeToggle = document.getElementById('cq-scope-toggle');
   if (scopeToggle) scopeToggle.checked = calcQuoteMeta.includeDesignScope !== false;
+  updateCalcProfileWarning();
 }
 function calcSyncQuoteMeta(){
-  calcQuoteMeta.title = document.getElementById('cq-title').value.trim() || 'عرض سعر';
-  calcQuoteMeta.projectName = document.getElementById('cq-project').value.trim();
-  calcQuoteMeta.projectActivity = document.getElementById('cq-activity').value.trim();
-  calcQuoteMeta.projectArea = cleanProjectAreaValue(document.getElementById('cq-area').value);
-  calcQuoteMeta.projectLocation = document.getElementById('cq-location').value.trim();
-  calcQuoteMeta.validityDays = Math.max(1, parseInt(document.getElementById('cq-validity').value) || 7);
-  calcQuoteMeta.brandName = document.getElementById('cq-brand-name').value.trim();
-  calcQuoteMeta.myPhone = document.getElementById('cq-my-phone').value.trim();
-  calcQuoteMeta.myEmail = document.getElementById('cq-my-email').value.trim();
-  calcQuoteMeta.clientName = document.getElementById('cq-client-name').value.trim();
-  calcQuoteMeta.clientPhone = document.getElementById('cq-client-phone').value.trim();
-  calcQuoteMeta.clientEmail = document.getElementById('cq-client-email').value.trim();
-  calcQuoteMeta.bankName = document.getElementById('cq-bank-name').value.trim();
-  calcQuoteMeta.components = document.getElementById('cq-components').value.trim();
-  calcQuoteMeta.workDescription = document.getElementById('cq-work-desc').value.trim();
+  const val = id => (document.getElementById(id)?.value || "").trim();
+  calcQuoteMeta.title = val('cq-title') || 'عرض سعر';
+  calcQuoteMeta.projectName = val('cq-project');
+  calcQuoteMeta.projectActivity = val('cq-activity');
+  calcQuoteMeta.projectArea = cleanProjectAreaValue(val('cq-area'));
+  calcQuoteMeta.projectLocation = val('cq-location');
+  calcQuoteMeta.clientName = val('cq-client-name');
+  calcQuoteMeta.clientPhone = val('cq-client-phone');
+  calcQuoteMeta.clientEmail = val('cq-client-email');
+  calcQuoteMeta.components = val('cq-components');
+  calcQuoteMeta.workDescription = val('cq-work-desc');
   renderCalcAutoScopePreview();
-  calcQuoteMeta.accountName = document.getElementById('cq-account-name').value.trim();
-  calcQuoteMeta.accountNumber = document.getElementById('cq-account-number').value.trim();
-  calcQuoteMeta.notes = document.getElementById('cq-notes').value.trim();
+  calcQuoteMeta.notes = val('cq-notes');
   const scopeToggle = document.getElementById('cq-scope-toggle');
   calcQuoteMeta.includeDesignScope = scopeToggle ? scopeToggle.checked : true;
   saveCalcQuoteMeta();
-}
-function renderCalcLogoPreview(){
-  const box = document.getElementById('calcLogoPreview');
-  if(!box) return;
-  box.innerHTML = calcQuoteMeta.logoData ? `<img src="${calcQuoteMeta.logoData}" alt="logo">` : '<span class="calc-logo-note">بدون شعار</span>';
-}
-function calcHandleLogoUpload(evt){
-  const file = evt.target.files && evt.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = () => {
-    calcQuoteMeta.logoData = reader.result;
-    saveCalcQuoteMeta();
-    renderCalcLogoPreview();
-    showToast('✓ تم حفظ الشعار');
-  };
-  reader.readAsDataURL(file);
-  evt.target.value = '';
-}
-function clearCalcLogo(){
-  calcQuoteMeta.logoData = '';
-  saveCalcQuoteMeta();
-  renderCalcLogoPreview();
-  showToast('✓ تم حذف الشعار');
+  updateCalcProfileWarning();
 }
 function renderCalcPlanPreview(){
   const box = document.getElementById('calcPlanPreview');
@@ -3238,6 +3267,8 @@ function openCalc(){
   document.getElementById('calcApplyBtn').style.display='none';
   document.getElementById('calc-overlay').classList.add('show');
   calcFillQuoteMetaForm();
+  updateCalcProfileWarning();
+  if (!isQuoteProfileReady()) showToast('⚠️ أكمل إعدادات التسعيرة أولًا');
   calcRenderBudgets();calcRender();
 }
 function openCalcForProject(pid){
@@ -3289,6 +3320,7 @@ function quoteSnapshotForProject(total) {
 
 async function createProjectFromQuote(){
   calcSyncQuoteMeta();
+  if (!requireQuoteProfileReady()) return;
   const total = calcGrandTotal();
   const projectName = calcQuoteMeta.projectName.trim();
   if(!projectName){ showToast("⚠️ اكتب اسم المشروع في بيانات التسعيرة أولًا"); return; }
@@ -3417,16 +3449,81 @@ function exportProjectPDF(pid){
 }
 
 
+
+function renderSettingsLogoPreview(){
+  const box = document.getElementById("settingsLogoPreview");
+  if (!box) return;
+  box.innerHTML = calcQuoteMeta.logoData ? `<img src="${calcQuoteMeta.logoData}" alt="logo">` : '<span class="calc-logo-note">بدون شعار</span>';
+}
+function settingsHandleLogoUpload(evt){
+  const file = evt.target.files && evt.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    calcQuoteMeta.logoData = reader.result;
+    saveCalcQuoteMeta();
+    renderSettingsLogoPreview();
+    showToast("✓ تم حفظ الشعار");
+  };
+  reader.readAsDataURL(file);
+  evt.target.value = "";
+}
+function clearSettingsLogo(){
+  calcQuoteMeta.logoData = "";
+  saveCalcQuoteMeta();
+  renderSettingsLogoPreview();
+  showToast("✓ تم حذف الشعار");
+}
+function missingQuoteSettings(){
+  const required = [
+    ["logoData", "الشعار"],
+    ["brandName", "اسم الشركة / الشخص"],
+    ["myPhone", "رقم الجوال"],
+    ["myEmail", "الإيميل"],
+    ["bankName", "اسم البنك"],
+    ["accountName", "اسم الحساب"],
+    ["accountNumber", "رقم الحساب / الآيبان"]
+  ];
+  return required.filter(([key]) => !String(calcQuoteMeta[key] || "").trim()).map(([,label]) => label);
+}
+function isQuoteProfileReady(){
+  return missingQuoteSettings().length === 0;
+}
+function updateCalcProfileWarning(){
+  const warn = document.getElementById("calcProfileWarning");
+  if (!warn) return;
+  const missing = missingQuoteSettings();
+  warn.style.display = missing.length ? "flex" : "none";
+  warn.querySelector("span").textContent = missing.length
+    ? "الناقص: " + missing.join("، ") + ". أضفها من الإعدادات قبل إنشاء عرض سعر."
+    : "";
+  document.querySelectorAll(".calc-export-btn").forEach(btn => {
+    const isAction = btn.textContent.includes("نص") || btn.textContent.includes("PDF") || btn.textContent.includes("تسجيل كمشروع");
+    if (isAction) {
+      btn.disabled = !!missing.length;
+      btn.classList.toggle("disabled-soft", !!missing.length);
+    }
+  });
+}
+function requireQuoteProfileReady(){
+  const missing = missingQuoteSettings();
+  if (!missing.length) return true;
+  updateCalcProfileWarning();
+  showToast("⚠️ أكمل إعدادات التسعيرة أولًا");
+  openSettings();
+  return false;
+}
+
 function openSettings(){
   const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val ?? ""; };
   setVal("set-default-currency", appCurrency());
-  setVal("set-validity", calcQuoteMeta.validityDays || 7);
   setVal("set-brand-name", calcQuoteMeta.brandName || "");
   setVal("set-my-phone", calcQuoteMeta.myPhone || "");
   setVal("set-my-email", calcQuoteMeta.myEmail || "");
   setVal("set-bank-name", calcQuoteMeta.bankName || "");
   setVal("set-account-name", calcQuoteMeta.accountName || "");
   setVal("set-account-number", calcQuoteMeta.accountNumber || "");
+  renderSettingsLogoPreview();
   document.getElementById("settings-overlay").classList.add("show");
 }
 function closeSettings(){
@@ -3435,7 +3532,6 @@ function closeSettings(){
 function saveSettings(){
   const getVal = id => (document.getElementById(id)?.value || "").trim();
   calcQuoteMeta.defaultCurrency = getVal("set-default-currency") || "SAR";
-  calcQuoteMeta.validityDays = Math.max(1, parseInt(getVal("set-validity")) || 7);
   calcQuoteMeta.brandName = getVal("set-brand-name");
   calcQuoteMeta.myPhone = getVal("set-my-phone");
   calcQuoteMeta.myEmail = getVal("set-my-email");
@@ -3450,6 +3546,7 @@ function saveSettings(){
 
 function calcExp(){
   calcSyncQuoteMeta();
+  if (!requireQuoteProfileReady()) return;
   const activeTypes=CALC_ORDER.filter(t=>calcActive.has(t));
   const total=calcGrandTotal();
   const p1=parseInt(document.getElementById('cp1').value)||0,p2=parseInt(document.getElementById('cp2').value)||0,p3=parseInt(document.getElementById('cp3').value)||0;
@@ -3496,6 +3593,7 @@ function pdfWorkRows(text){
 }
 function calcExportPDF(){
   calcSyncQuoteMeta();
+  if (!requireQuoteProfileReady()) return;
   const activeTypes = CALC_ORDER.filter(t => calcActive.has(t));
   const scope = calcAutoScope();
   const multi = activeTypes.length > 1, total = calcGrandTotal();
