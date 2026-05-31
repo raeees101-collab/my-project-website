@@ -4115,22 +4115,38 @@ async function calcExportPDF(){
 
 async function continueQuotePdf(registerProject){
   resolveQuoteRegisterConfirm(false, true);
-  if (registerProject) {
-    const projectName = calcQuoteMeta.projectName.trim();
-    const sameQuoteProject = (window._projects || []).some(p =>
-      p.quoteSentDate &&
-      (p.quote?.projectName || p.name || "").trim() === projectName &&
-      Number(p.quote?.total || p.price || 0) === Number(calcGrandTotal())
-    );
-    if (sameQuoteProject) {
-      showToast("✓ هذه التسعيرة مسجلة كمشروع مسبقًا، سيتم فتح PDF فقط");
-    } else {
-      const created = await createProjectFromQuoteSilent();
-      if (!created) return;
-      showToast("✓ تم تسجيل التسعيرة كمشروع");
+
+  // مهم للجوال: نفتح نافذة PDF فور ضغط زر الاختيار، قبل أي عملية حفظ أو انتظار.
+  const pdfWin = window.open('', '_blank');
+  if (!pdfWin) { showToast('⚠️ السماح بالنوافذ المنبثقة في المتصفح'); return; }
+  pdfWin.document.write('<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>جاري تجهيز PDF</title></head><body style="font-family:Arial;padding:32px;text-align:center;color:#1C1917">جاري تجهيز ملف PDF...</body></html>');
+  pdfWin.document.close();
+
+  try {
+    if (registerProject) {
+      const projectName = calcQuoteMeta.projectName.trim();
+      const sameQuoteProject = (window._projects || []).some(p =>
+        p.quoteSentDate &&
+        (p.quote?.projectName || p.name || "").trim() === projectName &&
+        Number(p.quote?.total || p.price || 0) === Number(calcGrandTotal())
+      );
+      if (sameQuoteProject) {
+        showToast("✓ هذه التسعيرة مسجلة كمشروع مسبقًا، سيتم فتح PDF فقط");
+      } else {
+        const created = await createProjectFromQuoteSilent();
+        if (!created) { try { pdfWin.close(); } catch(e) {} return; }
+        showToast("✓ تم تسجيل التسعيرة كمشروع");
+      }
     }
+    await calcExportPDFFinal(pdfWin);
+  } catch(e) {
+    try {
+      pdfWin.document.open();
+      pdfWin.document.write('<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>خطأ</title></head><body style="font-family:Arial;padding:32px;text-align:center;color:#B91C1C">حدث خطأ أثناء تجهيز ملف PDF. ارجع للتطبيق وحاول مرة ثانية.</body></html>');
+      pdfWin.document.close();
+    } catch(err) {}
+    showToast("حدث خطأ أثناء تجهيز PDF");
   }
-  await calcExportPDFFinal();
 }
 
 
@@ -4139,7 +4155,7 @@ window.showQuoteRegisterConfirm = showQuoteRegisterConfirm;
 window.resolveQuoteRegisterConfirm = resolveQuoteRegisterConfirm;
 window.continueQuotePdf = continueQuotePdf;
 
-async function calcExportPDFFinal(){
+async function calcExportPDFFinal(existingWin = null){
   calcSyncQuoteMeta();
   if (!requireQuoteProfileReady()) return;
   const activeTypes = CALC_ORDER.filter(t => calcActive.has(t));
@@ -4937,8 +4953,9 @@ ${calcQuoteMeta.includeDesignScope !== false ? `<!-- ════ DESIGN SCOPE P
 </body>
 </html>`;
 
-  const win = window.open('', '_blank');
+  const win = existingWin || window.open('', '_blank');
   if (!win) { showToast('⚠️ السماح بالنوافذ المنبثقة في المتصفح'); return; }
+  try { win.document.open(); } catch(e) {}
   win.document.write(html);
   win.document.close();
   showToast('✓ فُتح عرض السعر — اضغط "طباعة / حفظ PDF"');
