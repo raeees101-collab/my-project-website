@@ -143,8 +143,8 @@ button:active { transform: scale(0.96); }
 .card-name { font-weight: 900; font-size: 17px; margin-bottom: 4px; line-height: 1.3; }
 .card-client { font-size: 13px; color: #78716C; display: flex; align-items: center; gap: 4px; }
 .status-badge { border: none; border-radius: 13px; padding: 7px 12px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 4px; flex-shrink: 0; margin-right: 8px; }
-.card-row2 { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; }
-.card-price { font-size: 19px; font-weight: 900; color: #D4A853; }
+.card-row2 { display: flex; align-items: center; justify-content: flex-start; flex-wrap: wrap; gap: 6px; }
+.card-price { font-size: 19px; font-weight: 900; color: #D4A853; display:inline-flex; align-items:center; max-width:100%; margin-inline-start:10px; }
 .card-days { font-size: 12px; font-weight: 700; }
 .card-arrow { font-size: 16px; color: #C7C3BC; display: inline-block; transition: transform 0.25s ease; }
 
@@ -166,11 +166,13 @@ button:active { transform: scale(0.96); }
 .money-value{
   display:inline-flex;
   align-items:center;
+  justify-content:flex-start;
   gap:8px;
   white-space:nowrap;
   direction:ltr;
   unicode-bidi:isolate;
   vertical-align:middle;
+  max-width:100%;
 }
 .money-currency{
   display:inline-flex;
@@ -197,14 +199,20 @@ button:active { transform: scale(0.96); }
 }
 .amounts-hidden .money-amount{
   color:transparent !important;
+  width:74px;
+  min-width:74px;
+  overflow:hidden;
 }
 .amounts-hidden .money-amount::after{
-  content:"******";
+  content:"*****";
   position:absolute;
-  inset:0;
+  left:0;
+  top:50%;
+  transform:translateY(-50%);
   color:#D4A853;
   font-weight:900;
-  letter-spacing:2px;
+  letter-spacing:1px;
+  white-space:nowrap;
 }
 .amounts-hidden .money-value::selection,
 .amounts-hidden .money-amount::selection{
@@ -1906,6 +1914,50 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
 .contract-actions {
   flex-wrap: wrap;
 }
+
+@media (max-width: 520px) {
+  .header-top {
+    gap: 16px;
+  }
+  .header-left {
+    flex: 1;
+    min-width: 0;
+    text-align: right;
+  }
+  .header-actions {
+    gap: 7px;
+    flex-shrink: 0;
+  }
+  .add-btn,
+  .logout-corner-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 13px;
+    font-size: 23px;
+  }
+  .icon-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    font-size: 16px;
+  }
+}
+
+
+@media (max-width: 520px) {
+  .card-row2 {
+    gap: 7px;
+  }
+  .card-price {
+    font-size: 18px;
+    margin-inline-start: 8px;
+  }
+  .amounts-hidden .money-amount {
+    width: 68px;
+    min-width: 68px;
+  }
+}
+
 </style>
 </head>
 <body>
