@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
-<title>PROJECT TRACKER</title>
+<title>Project Tracker</title>
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="apple-touch-icon" href="/favicon.png">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -114,7 +114,7 @@ button:active { transform: scale(0.96); }
 .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
 .header-left { display: flex; flex-direction: column; }
 .header-sub { font-size: 10px; color: #D4A853; letter-spacing: 3px; margin-bottom: 3px; font-weight: 700; }
-.header-title { font-size: 26px; font-weight: 900; letter-spacing: -0.5px; }
+.header-title { font-size: 26px; font-weight: 900; letter-spacing: -0.3px; text-transform:none; }
 .header-actions { display: flex; gap: 8px; align-items: center; }
 .add-btn { background: linear-gradient(135deg, #D4A853, #E8C070); border: none; border-radius: 14px; width: 46px; height: 46px; font-size: 26px; cursor: pointer; color: #1C1917; font-weight: 900; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 18px rgba(212,168,83,0.5); }
 .icon-btn { background: rgba(255,255,255,0.1); border: none; border-radius: 13px; width: 40px; height: 40px; font-size: 18px; cursor: pointer; color: #fff; display: flex; align-items: center; justify-content: center; }
@@ -1958,6 +1958,91 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
   }
 }
 
+
+/* ─── MOBILE HEADER FIX ─── */
+@media (max-width: 640px) {
+  .header {
+    padding: 46px 16px 18px;
+  }
+  .header-top {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    gap: 18px !important;
+    margin-bottom: 18px !important;
+  }
+  .header-left {
+    order: 1 !important;
+    width: 100% !important;
+    text-align: right !important;
+    align-items: flex-end !important;
+  }
+  .header-sub {
+    font-size: 9px !important;
+    letter-spacing: 4px !important;
+    margin-bottom: 4px !important;
+  }
+  .header-title {
+    font-size: 30px !important;
+    line-height: 1.02 !important;
+    letter-spacing: -0.5px !important;
+    max-width: 230px !important;
+  }
+  .header-actions {
+    order: 2 !important;
+    width: 100% !important;
+    display: flex !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    gap: 8px !important;
+    flex-wrap: nowrap !important;
+    overflow: visible !important;
+  }
+  .add-btn,
+  .logout-corner-btn {
+    width: 39px !important;
+    height: 39px !important;
+    min-width: 39px !important;
+    border-radius: 12px !important;
+    font-size: 21px !important;
+  }
+  .icon-btn {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    border-radius: 11px !important;
+    font-size: 15px !important;
+  }
+}
+
+
+/* ─── MOBILE MONEY ALIGN FIX ─── */
+@media (max-width: 640px) {
+  .card-row2 {
+    justify-content: flex-start !important;
+    gap: 7px !important;
+  }
+  .card-price {
+    margin-inline-start: 8px !important;
+    margin-inline-end: 0 !important;
+    max-width: calc(100% - 16px) !important;
+  }
+  .money-value {
+    gap: 7px !important;
+  }
+  .amounts-hidden .money-amount {
+    width: 64px !important;
+    min-width: 64px !important;
+  }
+  .amounts-hidden .money-amount::after {
+    content: "*****" !important;
+    letter-spacing: 1px !important;
+    left: 0 !important;
+    right: auto !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1969,7 +2054,7 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
 
 <div class="login-screen" id="login-screen" style="display:none">
   <div class="login-logo">🗂️</div>
-  <div class="login-title">PROJECT TRACKER</div>
+  <div class="login-title">Project Tracker</div>
   <div class="login-sub">سجّل دخولك لإدارة مشاريعك<br>بشكل احترافي</div>
 
   <div class="email-login-card">
@@ -2001,7 +2086,7 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
     <div class="header-top">
       <div class="header-left">
         <div class="header-sub">INTERIOR DESIGN</div>
-        <div class="header-title">PROJECT TRACKER</div>
+        <div class="header-title">Project Tracker</div>
       </div>
       <div class="header-actions">
         <button class="icon-btn" title="إخفاء/إظهار المبالغ" aria-label="إخفاء/إظهار المبالغ" id="privacy-btn" onclick="toggleAmountPrivacy()"><i class="fa-regular fa-eye"></i></button>
