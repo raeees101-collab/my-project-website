@@ -1906,53 +1906,6 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
 .contract-actions {
   flex-wrap: wrap;
 }
-.contract-approve-question {
-  width: 100%;
-  background: #FFF8E8;
-  border: 1.5px solid #E8C070;
-  border-radius: 16px;
-  padding: 12px;
-  margin-top: 4px;
-}
-.contract-approve-text b {
-  display: block;
-  font-size: 13px;
-  color: #1C1917;
-  margin-bottom: 4px;
-}
-.contract-approve-text span {
-  display: block;
-  font-size: 11px;
-  color: #7C672C;
-  line-height: 1.7;
-  margin-bottom: 10px;
-}
-.contract-approve-actions {
-  display: flex;
-  gap: 8px;
-}
-.contract-approve-actions button {
-  flex: 1;
-  border: none;
-  border-radius: 12px;
-  padding: 12px;
-  font-size: 12px;
-  font-weight: 900;
-  cursor: pointer;
-  font-family: inherit;
-}
-.contract-approve-no {
-  background: #F3F2EF;
-  color: #1C1917;
-}
-.contract-approve-yes {
-  background: linear-gradient(135deg, #D4A853, #E8C070);
-  color: #1C1917;
-}
-@media (max-width: 520px) {
-  .contract-approve-actions { flex-direction: column; }
-}
-
 </style>
 </head>
 <body>
@@ -2092,15 +2045,16 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
 <div class="overlay-center" id="contract-approve-overlay">
   <div class="dialog quote-register-dialog" onclick="event.stopPropagation()">
     <div class="dialog-icon">✅</div>
-    <div class="dialog-title">اعتماد المشروع؟</div>
+    <div class="dialog-title">اعتماد المشروع قبل تصدير العقد؟</div>
     <div class="dialog-sub">
-      هل تريد نقل المشروع من <b>بانتظار الاعتماد</b> إلى مرحلة العمل؟
+      المشروع لا يزال بحالة <b>بانتظار الاعتماد</b>. هل تريد اعتماده قبل فتح عقد PDF؟
     </div>
     <div class="dialog-btns">
-      <button class="cancel-btn" onclick="resolveContractApproval(false)">لا، خله بانتظار الاعتماد</button>
-      <button class="confirm-quote-btn" onclick="resolveContractApproval(true)">نعم، اعتمد المشروع</button>
+      <button class="cancel-btn" onclick="resolveContractApprovalForPdf(false)">لا، صدّر PDF فقط</button>
+      <button class="confirm-quote-btn" onclick="resolveContractApprovalForPdf(true)">نعم، اعتمد وصدّر</button>
     </div>
   </div>
+</div>
 </div>
 
 <!-- Contract -->
@@ -2212,16 +2166,7 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
     <div class="contract-actions">
       <button class="contract-save" onclick="saveContract()">حفظ العقد</button>
       <button class="contract-pdf" onclick="exportContractPDF()">تصدير PDF</button>
-      <div class="contract-approve-question" id="contractApproveQuestion" style="display:none">
-        <div class="contract-approve-text">
-          <b>هل تريد اعتماد المشروع؟</b>
-          <span>سيتم نقل المشروع من بانتظار الاعتماد إلى مرحلة العمل.</span>
-        </div>
-        <div class="contract-approve-actions">
-          <button type="button" class="contract-approve-no" onclick="resolveContractApproval(false)">لا، خله بانتظار الاعتماد</button>
-          <button type="button" class="contract-approve-yes" onclick="resolveContractApproval(true)">نعم، اعتمد المشروع</button>
-        </div>
-      </div>
+
     </div>
   </div>
 </div>
@@ -3896,8 +3841,6 @@ async function openContract(pid){
   const pr = window._projects.find(p => p.id === pid);
   if (!pr) return;
   fillContractForm(pr.contract || defaultContractForProject(pr));
-  const approveQuestion = document.getElementById("contractApproveQuestion");
-  if (approveQuestion) approveQuestion.style.display = pr.status === "pending_approval" ? "block" : "none";
   document.getElementById("contract-overlay").classList.add("show");
   render();
 }
@@ -3927,6 +3870,7 @@ async function resolveContractApproval(approve){
 
 window.resolveContractApproval = resolveContractApproval;
 window.askApproveProjectFromContract = askApproveProjectFromContract;
+window.resolveContractApprovalForPdf = resolveContractApprovalForPdf;
 function closeContract(){
   contractTargetId = null;
   document.getElementById("contract-overlay").classList.remove("show");
@@ -3941,7 +3885,41 @@ async function saveContract(){
   render();
 }
 
-async function exportContractPDF(){
+
+function exportContractPDF(){
+  if (!contractTargetId) return;
+  const pr = window._projects.find(p => p.id === contractTargetId);
+  if (!pr) return;
+  if (pr.status === "pending_approval") {
+    const overlay = document.getElementById("contract-approve-overlay");
+    if (overlay) overlay.classList.add("show");
+    return;
+  }
+  exportContractPDFNow();
+}
+
+async function resolveContractApprovalForPdf(approve){
+  const overlay = document.getElementById("contract-approve-overlay");
+  if (overlay) overlay.classList.remove("show");
+  if (!contractTargetId) return;
+
+  if (approve) {
+    const contract = readContractForm();
+    window._projects = window._projects.map(p => p.id === contractTargetId ? {
+      ...p,
+      status:"first_meeting",
+      contractApprovedAt: todayStr(),
+      contract
+    } : p);
+    await window._saveToDb();
+    showToast("✓ تم اعتماد المشروع");
+    render();
+  }
+
+  await exportContractPDFNow();
+}
+
+async function exportContractPDFNow(){
   if (!contractTargetId) return;
   const pr = window._projects.find(p => p.id === contractTargetId);
   if (!pr) return;
