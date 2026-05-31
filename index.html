@@ -1663,10 +1663,7 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
         <button class="icon-btn" title="إخفاء/إظهار المبالغ" aria-label="إخفاء/إظهار المبالغ" id="privacy-btn" onclick="toggleAmountPrivacy()"><i class="fa-regular fa-eye"></i></button>
         <button class="icon-btn" title="حاسبة التسعيرة" aria-label="حاسبة التسعيرة" onclick="openCalc()"><i class="fa-solid fa-calculator"></i></button>
         <button class="icon-btn" title="استيراد / تصدير البيانات" aria-label="استيراد / تصدير البيانات" onclick="openIO()">⇅</button>
-        <button class="account-btn" id="account-btn" title="الحساب / تسجيل الخروج" aria-label="الحساب / تسجيل الخروج" onclick="openUserMenu()">
-          <img class="user-avatar" id="user-avatar" src="" onerror="this.style.display='none'">
-          <i class="fa-regular fa-user" id="user-fallback-icon"></i>
-        </button>
+        <button class="logout-toolbar-btn" title="تسجيل الخروج" aria-label="تسجيل الخروج" onclick="doSignOut()"><i class="fa-solid fa-right-from-bracket"></i></button>
         <button class="add-btn" title="إضافة مشروع جديد" aria-label="إضافة مشروع جديد" onclick="openForm()">+</button>
         </div>
     </div>
@@ -1727,9 +1724,7 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
       <img id="menu-avatar" src="" style="width:48px;height:48px;border-radius:50%;object-fit:cover" onerror="this.style.display='none'">
       <div><div class="user-menu-name" id="menu-name"></div><div class="user-menu-email" id="menu-email"></div></div>
     </div>
-    <button class="signout-btn" onclick="doSignOut()"><i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج والدخول بحساب آخر</button>
-    
-  </div>
+</div>
 </div>
 
 <!-- Delete -->
