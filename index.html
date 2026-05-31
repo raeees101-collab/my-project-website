@@ -3930,22 +3930,22 @@ async function exportContractPDFNow(){
   const logo = calcQuoteMeta.logoData ? `<img src="${calcQuoteMeta.logoData}" alt="logo">` : "";
   const htmlDoc = `<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${esc(contract.title)}</title>
   <style>
-    body{margin:0;background:#eee;font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;color:#111}
+    body{margin:0;background:#eee;font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;color:#111;display:flex;justify-content:center}
     .page{width:210mm;min-height:297mm;background:#fff;margin:0 auto;padding:15mm 16mm;box-sizing:border-box}
     .head{display:flex;justify-content:space-between;gap:12mm;border-bottom:2px solid #111;padding-bottom:7mm;margin-bottom:8mm}
     .title{font-size:26px;font-weight:900;color:#15866A;margin-bottom:3mm}
     .sub{font-size:11px;color:#777;line-height:1.7}.logo{width:28mm;height:28mm;display:flex;align-items:center;justify-content:center}.logo img{max-width:100%;max-height:100%;object-fit:contain}
     .section{font-size:16px;font-weight:900;border-bottom:1.7px solid #111;padding-bottom:6px;margin:8mm 0 4mm}
     .grid{display:grid;grid-template-columns:1fr 1fr;gap:4mm;margin-bottom:5mm}.box{border:1px solid #E7E5E0;border-radius:10px;padding:9px 10px;background:#FAFAF8}
-    .label{font-size:10px;color:#888;font-weight:800;margin-bottom:4px}.val{font-size:12.5px;font-weight:900;line-height:1.5;word-break:break-word}
+    .label{font-size:10px;color:#888;font-weight:800;margin-bottom:4px}.val{font-size:12.5px;font-weight:900;line-height:1.5;word-break:break-word}.val-normal{font-weight:500}
     .text{font-size:12px;line-height:1.9;white-space:pre-line}.signatures{display:grid;grid-template-columns:1fr 1fr;gap:10mm;margin-top:12mm}.sign{border-top:1.5px solid #111;padding-top:8px;font-size:12px;font-weight:800}
-    @media print{body{background:#fff}.page{margin:0}}
+    @page{size:A4;margin:0}@media print{body{background:#fff;display:block}.page{margin:0 auto}}
   </style></head><body><div class="page">
     <div class="head"><div><div class="title">${esc(contract.title)}</div><div class="sub">تاريخ العقد: ${formatDate(contract.date)}<br>حالة العقد: ${esc(contract.status || "مسودة")}</div></div><div class="logo">${logo}</div></div>
 
     <div class="section">بيانات الأطراف</div>
     <div class="grid">
-      <div class="box"><div class="label">المصمم / الشركة</div><div class="val">${esc(contract.designerName || "—")}<br>${esc(contract.designerPhone || "—")}<br>${esc(contract.designerEmail || "—")}</div></div>
+      <div class="box"><div class="label">المصمم / الشركة</div><div class="val val-normal">${esc(contract.designerName || "—")}<br>${esc(contract.designerPhone || "—")}<br>${esc(contract.designerEmail || "—")}</div></div>
       <div class="box"><div class="label">العميل</div><div class="val">${esc(contract.client || "—")}<br>${esc(contract.clientPhone || "—")}<br>${esc(contract.clientEmail || "—")}</div></div>
     </div>
 
