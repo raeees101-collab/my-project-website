@@ -2002,14 +2002,15 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
 <div class="overlay-center" id="quote-register-overlay">
   <div class="dialog quote-register-dialog" onclick="event.stopPropagation()">
     <div class="dialog-icon">📄</div>
-    <div class="dialog-title">تسجيل التسعيرة كمشروع؟</div>
-    <div class="dialog-sub">
+    <div class="dialog-title" id="quote-register-title">تسجيل التسعيرة كمشروع؟</div>
+    <div class="dialog-sub" id="quote-register-sub">
       هل تريد تسجيل هذه التسعيرة كمشروع بحالة <b>بانتظار الاعتماد</b> قبل فتح ملف PDF؟
     </div>
-    <div class="dialog-btns">
+    <div class="dialog-btns" id="quote-register-actions">
       <button class="cancel-btn" onclick="continueQuotePdf(false)">لا، افتح PDF فقط</button>
-      <button class="confirm-quote-btn" onclick="continueQuotePdf(true)">نعم، سجلها كمشروع</button>
+      <button class="confirm-quote-btn" onclick="registerQuoteThenShowPdfButton()">نعم، سجلها كمشروع</button>
     </div>
+    <button class="confirm-quote-btn quote-open-pdf-btn" id="quote-open-pdf-btn" style="display:none;width:100%;margin-top:10px" onclick="openQuotePdfNow()">فتح PDF الآن</button>
   </div>
 </div>
 
@@ -3591,6 +3592,14 @@ function quoteSnapshotForProject(total) {
 
 function showQuoteRegisterConfirm(){
   const overlay = document.getElementById("quote-register-overlay");
+  const title = document.getElementById("quote-register-title");
+  const sub = document.getElementById("quote-register-sub");
+  const actions = document.getElementById("quote-register-actions");
+  const openBtn = document.getElementById("quote-open-pdf-btn");
+  if (title) title.textContent = "تسجيل التسعيرة كمشروع؟";
+  if (sub) sub.innerHTML = "هل تريد تسجيل هذه التسعيرة كمشروع بحالة <b>بانتظار الاعتماد</b> قبل فتح ملف PDF؟";
+  if (actions) actions.style.display = "flex";
+  if (openBtn) openBtn.style.display = "none";
   if (overlay) overlay.classList.add("show");
 }
 function resolveQuoteRegisterConfirm(value, silent){
@@ -4114,46 +4123,63 @@ async function calcExportPDF(){
 }
 
 async function continueQuotePdf(registerProject){
+  if (registerProject) return registerQuoteThenShowPdfButton();
   resolveQuoteRegisterConfirm(false, true);
+  await calcExportPDFFinal();
+}
 
-  // مهم للجوال: نفتح نافذة PDF فور ضغط زر الاختيار، قبل أي عملية حفظ أو انتظار.
-  const pdfWin = window.open('', '_blank');
-  if (!pdfWin) { showToast('⚠️ السماح بالنوافذ المنبثقة في المتصفح'); return; }
-  pdfWin.document.write('<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>جاري تجهيز PDF</title></head><body style="font-family:Arial;padding:32px;text-align:center;color:#1C1917">جاري تجهيز ملف PDF...</body></html>');
-  pdfWin.document.close();
+async function registerQuoteThenShowPdfButton(){
+  const title = document.getElementById("quote-register-title");
+  const sub = document.getElementById("quote-register-sub");
+  const actions = document.getElementById("quote-register-actions");
+  const openBtn = document.getElementById("quote-open-pdf-btn");
+
+  if (actions) actions.style.pointerEvents = "none";
+  if (sub) sub.innerHTML = "جاري تسجيل التسعيرة كمشروع...";
 
   try {
-    if (registerProject) {
-      const projectName = calcQuoteMeta.projectName.trim();
-      const sameQuoteProject = (window._projects || []).some(p =>
-        p.quoteSentDate &&
-        (p.quote?.projectName || p.name || "").trim() === projectName &&
-        Number(p.quote?.total || p.price || 0) === Number(calcGrandTotal())
-      );
-      if (sameQuoteProject) {
-        showToast("✓ هذه التسعيرة مسجلة كمشروع مسبقًا، سيتم فتح PDF فقط");
-      } else {
-        const created = await createProjectFromQuoteSilent();
-        if (!created) { try { pdfWin.close(); } catch(e) {} return; }
-        showToast("✓ تم تسجيل التسعيرة كمشروع");
+    const projectName = calcQuoteMeta.projectName.trim();
+    const sameQuoteProject = (window._projects || []).some(p =>
+      p.quoteSentDate &&
+      (p.quote?.projectName || p.name || "").trim() === projectName &&
+      Number(p.quote?.total || p.price || 0) === Number(calcGrandTotal())
+    );
+
+    if (sameQuoteProject) {
+      if (title) title.textContent = "التسعيرة مسجلة مسبقًا";
+      if (sub) sub.innerHTML = "هذه التسعيرة مسجلة كمشروع مسبقًا. اضغط الزر بالأسفل لفتح ملف PDF.";
+      showToast("✓ هذه التسعيرة مسجلة كمشروع مسبقًا");
+    } else {
+      const created = await createProjectFromQuoteSilent();
+      if (!created) {
+        if (actions) actions.style.pointerEvents = "auto";
+        if (sub) sub.innerHTML = "تعذر تسجيل التسعيرة. تأكد من اسم المشروع وحاول مرة أخرى.";
+        return;
       }
+      if (title) title.textContent = "تم تسجيل التسعيرة";
+      if (sub) sub.innerHTML = "تم تسجيل التسعيرة كمشروع بحالة <b>بانتظار الاعتماد</b>. الآن اضغط فتح PDF.";
+      showToast("✓ تم تسجيل التسعيرة كمشروع");
     }
-    await calcExportPDFFinal(pdfWin);
+
+    if (actions) actions.style.display = "none";
+    if (openBtn) openBtn.style.display = "block";
   } catch(e) {
-    try {
-      pdfWin.document.open();
-      pdfWin.document.write('<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>خطأ</title></head><body style="font-family:Arial;padding:32px;text-align:center;color:#B91C1C">حدث خطأ أثناء تجهيز ملف PDF. ارجع للتطبيق وحاول مرة ثانية.</body></html>');
-      pdfWin.document.close();
-    } catch(err) {}
-    showToast("حدث خطأ أثناء تجهيز PDF");
+    if (actions) actions.style.pointerEvents = "auto";
+    if (sub) sub.innerHTML = "حدث خطأ أثناء تسجيل التسعيرة، حاول مرة أخرى.";
+    showToast("حدث خطأ أثناء التسجيل");
   }
 }
 
-
+async function openQuotePdfNow(){
+  resolveQuoteRegisterConfirm(false, true);
+  await calcExportPDFFinal();
+}
 
 window.showQuoteRegisterConfirm = showQuoteRegisterConfirm;
 window.resolveQuoteRegisterConfirm = resolveQuoteRegisterConfirm;
 window.continueQuotePdf = continueQuotePdf;
+window.registerQuoteThenShowPdfButton = registerQuoteThenShowPdfButton;
+window.openQuotePdfNow = openQuotePdfNow;
 
 async function calcExportPDFFinal(existingWin = null){
   calcSyncQuoteMeta();
