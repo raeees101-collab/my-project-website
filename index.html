@@ -3355,17 +3355,19 @@ function quoteSnapshotForProject(total) {
 
 
 let quoteRegisterConfirmResolver = null;
-function showQuoteRegisterConfirm(){
+window.showQuoteRegisterConfirm = function(){
   return new Promise(resolve => {
     quoteRegisterConfirmResolver = resolve;
-    document.getElementById("quote-register-overlay").classList.add("show");
+    const overlay = document.getElementById("quote-register-overlay");
+    if (overlay) overlay.classList.add("show");
   });
-}
-function resolveQuoteRegisterConfirm(value){
-  document.getElementById("quote-register-overlay").classList.remove("show");
+};
+window.resolveQuoteRegisterConfirm = function(value){
+  const overlay = document.getElementById("quote-register-overlay");
+  if (overlay) overlay.classList.remove("show");
   if (quoteRegisterConfirmResolver) quoteRegisterConfirmResolver(!!value);
   quoteRegisterConfirmResolver = null;
-}
+};
 
 async function createProjectFromQuoteSilent(){
   const total = calcGrandTotal();
@@ -3577,7 +3579,7 @@ function updateCalcProfileWarning(){
   document.querySelectorAll(".calc-export-btn").forEach(btn => {
     const isAction = btn.textContent.includes("نص") || btn.textContent.includes("PDF") || btn.textContent.includes("تسجيل كمشروع");
     if (isAction) {
-      btn.disabled = !!missing.length;
+      btn.disabled = false;
       btn.classList.toggle("disabled-soft", !!missing.length);
     }
   });
@@ -3671,7 +3673,14 @@ function pdfWorkRows(text){
 async function calcExportPDF(){
   calcSyncQuoteMeta();
   if (!requireQuoteProfileReady()) return;
-  if (!(await maybeRegisterQuoteBeforePdf())) return;
+
+  // نفتح نافذة PDF فور ضغط الزر حتى لا يمنعها المتصفح بعد انتظار نافذة التأكيد
+  const quoteWin = window.open('', '_blank');
+  if (!quoteWin) { showToast('⚠️ السماح بالنوافذ المنبثقة في المتصفح'); return; }
+  quoteWin.document.write('<!DOCTYPE html><html dir="rtl"><head><title>جاري تجهيز PDF...</title></head><body style="font-family:Arial;padding:30px;text-align:center">جاري تجهيز ملف PDF...</body></html>');
+  quoteWin.document.close();
+
+  if (!(await maybeRegisterQuoteBeforePdf())) { try { quoteWin.close(); } catch(e) {} return; }
   const activeTypes = CALC_ORDER.filter(t => calcActive.has(t));
   const scope = calcAutoScope();
   const multi = activeTypes.length > 1, total = calcGrandTotal();
@@ -4467,8 +4476,8 @@ ${calcQuoteMeta.includeDesignScope !== false ? `<!-- ════ DESIGN SCOPE P
 </body>
 </html>`;
 
-  const win = window.open('', '_blank');
-  if (!win) { showToast('⚠️ السماح بالنوافذ المنبثقة في المتصفح'); return; }
+  const win = quoteWin;
+  win.document.open();
   win.document.write(html);
   win.document.close();
   showToast('✓ فُتح عرض السعر — اضغط "طباعة / حفظ PDF"');
