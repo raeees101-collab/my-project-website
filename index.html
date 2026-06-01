@@ -3171,14 +3171,47 @@ const STAGES = [
 let currentTab = "active", expandedId = null, openStageNotes = {}, openPayments = {}, projectSearch = "";
 let statusTargetId = null, deleteTargetId = null, editId = null, formStatus = "first_meeting";
 let calcTargetProjectId = null;
-let hideAmounts = false;
-function toggleAmountPrivacy() {
-  hideAmounts = !hideAmounts;
+
+// Mini Update v1.0.1 — حفظ حالة إخفاء المبالغ
+// يحفظ آخر اختيار للمستخدم على نفس الجهاز والمتصفح حتى بعد تحديث الصفحة أو إغلاق التطبيق.
+const AMOUNT_PRIVACY_KEY = "projectTracker.hideAmounts";
+
+function getStoredAmountPrivacy() {
+  try {
+    return localStorage.getItem(AMOUNT_PRIVACY_KEY) === "true";
+  } catch (e) {
+    return false;
+  }
+}
+
+function saveStoredAmountPrivacy(value) {
+  try {
+    localStorage.setItem(AMOUNT_PRIVACY_KEY, value ? "true" : "false");
+  } catch (e) {}
+}
+
+let hideAmounts = getStoredAmountPrivacy();
+
+function applyAmountPrivacyState() {
   document.body.classList.toggle("amounts-hidden", hideAmounts);
   const btn = document.getElementById("privacy-btn");
-  if (btn) btn.innerHTML = hideAmounts ? '<i class="fa-regular fa-eye-slash"></i>' : '<i class="fa-regular fa-eye"></i>';
+  if (btn) {
+    btn.innerHTML = hideAmounts
+      ? '<i class="fa-regular fa-eye-slash"></i>'
+      : '<i class="fa-regular fa-eye"></i>';
+    btn.title = hideAmounts ? "إظهار المبالغ" : "إخفاء المبالغ";
+    btn.setAttribute("aria-label", hideAmounts ? "إظهار المبالغ" : "إخفاء المبالغ");
+  }
+}
+
+function toggleAmountPrivacy() {
+  hideAmounts = !hideAmounts;
+  saveStoredAmountPrivacy(hideAmounts);
+  applyAmountPrivacyState();
   showToast(hideAmounts ? "تم إخفاء المبالغ" : "تم إظهار المبالغ");
 }
+
+applyAmountPrivacyState();
 function moneySpan(amount, currency = "SAR") {
   const cur = String(currency || "SAR").trim().toUpperCase();
   if (cur === "SAR") {
@@ -3565,6 +3598,7 @@ function updateTargetPanel(){
 
 // ─── RENDER ───
 function render() {
+  applyAmountPrivacyState();
   const projects = window._projects || [];
   document.getElementById("stat-total").textContent = projects.length;
   document.getElementById("stat-pending").textContent = projects.filter(p=>p.status==="pending_approval").length;
