@@ -2067,6 +2067,81 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
 }
 .payment-toggle-btn .arr { display:inline-block; transition: transform .2s ease; }
 
+
+.stage-custom-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.stage-custom-row {
+  display: grid;
+  grid-template-columns: 54px 1fr;
+  gap: 8px;
+  align-items: center;
+  background: #F8F7F4;
+  border: 1.5px solid #E7E5E0;
+  border-radius: 14px;
+  padding: 8px;
+}
+.stage-icon-input {
+  width: 100%;
+  height: 42px;
+  border: 1.5px solid #E7E5E0;
+  border-radius: 12px;
+  background: #fff;
+  font-size: 21px;
+  text-align: center;
+  outline: none;
+  font-family: inherit;
+}
+.stage-label-input {
+  width: 100%;
+  height: 42px;
+  border: 1.5px solid #E7E5E0;
+  border-radius: 12px;
+  background: #fff;
+  padding: 0 12px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #1C1917;
+  outline: none;
+  font-family: inherit;
+  text-align: right;
+}
+.stage-icon-input:focus,
+.stage-label-input:focus {
+  border-color: #D4A853;
+}
+
+
+.stage-custom-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #F8F7F4;
+  border: 1.5px solid #E7E5E0;
+  border-radius: 14px;
+  padding: 11px 12px;
+  margin-bottom: 10px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #1C1917;
+}
+.stage-custom-toggle input {
+  width: 18px;
+  height: 18px;
+  accent-color: #D4A853;
+}
+.stage-custom-list.disabled {
+  opacity: .45;
+  pointer-events: none;
+}
+.settings-note.compact {
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px 10px;
+}
+
 </style>
 </head>
 <body>
@@ -2380,6 +2455,13 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
       </div>
     </div>
 
+    <div class="settings-section-title">المراحل الافتراضية</div>
+    <div class="stage-custom-list" id="set-stage-custom"></div>
+    <div class="settings-note compact">
+      هذه المسميات والأيقونات تُستخدم افتراضيًا في كل المشاريع. يمكن تخصيص مراحل مشروع معيّن من نافذة تعديل المشروع.
+    </div>
+    <button class="settings-save-btn" type="button" onclick="applyDefaultStagesToCurrentProjects()" style="margin-top:10px;background:#F8F7F4;color:#1C1917;border:1.5px solid #E7E5E0">تطبيق على المشاريع الحالية</button>
+
     <div class="settings-section-title">بياناتك في التسعيرة</div>
     <div class="settings-grid">
       <div class="settings-field">
@@ -2450,9 +2532,13 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
     </div>
     <div class="form-group"><label class="form-label">حالة المشروع</label><div id="status-select"></div></div>
     <div class="form-group" id="stage-labels-group" style="display:none">
-      <label class="form-label">مسميات المراحل</label>
-      <textarea class="form-input" id="f-stage-labels" rows="6" style="resize:vertical;min-height:120px;line-height:1.8" placeholder="كل مرحلة في سطر"></textarea>
-      <div style="font-size:11px;color:#78716C;font-weight:700;margin-top:6px;line-height:1.7">تظهر هذه المسميات داخل هذا المشروع فقط، وبنفس ترتيب المراحل.</div>
+      <label class="form-label">تخصيص مراحل هذا المشروع</label>
+      <label class="stage-custom-toggle">
+        <input type="checkbox" id="f-stage-custom-enabled" onchange="toggleProjectStageCustomization()">
+        <span>تخصيص أسماء وأيقونات هذا المشروع فقط</span>
+      </label>
+      <div class="stage-custom-list" id="f-stage-custom"></div>
+      <div style="font-size:11px;color:#78716C;font-weight:700;margin-top:6px;line-height:1.7">إذا لم تفعّل التخصيص، سيستخدم المشروع مراحل الإعدادات الافتراضية.</div>
     </div>
     <div class="form-btns">
       <button class="form-cancel" onclick="closeForm()">إلغاء</button>
@@ -2764,21 +2850,63 @@ function currencyText(amount, currency = appCurrency()) {
 
 
 function getStage(id) { return STAGES.find(s => s.id === id) || STAGES[0]; }
-function getProjectStageLabel(pr, sid) {
+function getDefaultStageLabel(sid) {
   const st = getStage(sid);
-  const custom = pr && pr.customStageLabels && pr.customStageLabels[sid];
-  return (custom && String(custom).trim()) || st.label;
+  const val = calcQuoteMeta.defaultStageLabels && calcQuoteMeta.defaultStageLabels[sid];
+  return (val && String(val).trim()) || st.label;
 }
-function getStageLabelsFromTextarea() {
-  const raw = document.getElementById("f-stage-labels")?.value || "";
-  const lines = raw.split(/\n+/).map(s => s.trim());
+function getDefaultStageEmoji(sid) {
+  const st = getStage(sid);
+  const val = calcQuoteMeta.defaultStageEmojis && calcQuoteMeta.defaultStageEmojis[sid];
+  return (val && String(val).trim()) || st.emoji;
+}
+function getProjectStageLabel(pr, sid) {
+  const custom = pr && pr.customStageLabels && pr.customStageLabels[sid];
+  return (custom && String(custom).trim()) || getDefaultStageLabel(sid);
+}
+function getProjectStageEmoji(pr, sid) {
+  const custom = pr && pr.customStageEmojis && pr.customStageEmojis[sid];
+  return (custom && String(custom).trim()) || getDefaultStageEmoji(sid);
+}
+function renderStageCustomization(labels = {}, emojis = {}, target = "f", enabled = true) {
+  const box = document.getElementById(target === "settings" ? "set-stage-custom" : "f-stage-custom");
+  if (!box) return;
+  box.classList.toggle("disabled", !enabled);
+  box.innerHTML = STAGES.map(s => `
+    <div class="stage-custom-row">
+      <input class="stage-icon-input" id="${target}-stage-emoji-${s.id}" maxlength="3" value="${esc(emojis[s.id] || getDefaultStageEmoji(s.id))}" ${enabled ? "" : "disabled"}>
+      <input class="stage-label-input" id="${target}-stage-label-${s.id}" value="${esc(labels[s.id] || getDefaultStageLabel(s.id))}" ${enabled ? "" : "disabled"}>
+    </div>
+  `).join("");
+}
+function getStageLabelsFromFields(target = "f") {
   const obj = {};
-  STAGES.forEach((s, i) => {
-    const val = lines[i] || "";
-    if (val && val !== s.label) obj[s.id] = val;
+  STAGES.forEach(s => {
+    const val = (document.getElementById(`${target}-stage-label-${s.id}`)?.value || "").trim();
+    const base = target === "settings" ? s.label : getDefaultStageLabel(s.id);
+    if (val && val !== base) obj[s.id] = val;
   });
   return obj;
 }
+function getStageEmojisFromFields(target = "f") {
+  const obj = {};
+  STAGES.forEach(s => {
+    const val = (document.getElementById(`${target}-stage-emoji-${s.id}`)?.value || "").trim();
+    const base = target === "settings" ? s.emoji : getDefaultStageEmoji(s.id);
+    if (val && val !== base) obj[s.id] = val;
+  });
+  return obj;
+}
+function projectHasStageCustom(pr) {
+  return !!(pr && ((pr.customStageLabels && Object.keys(pr.customStageLabels).length) || (pr.customStageEmojis && Object.keys(pr.customStageEmojis).length)));
+}
+function toggleProjectStageCustomization() {
+  const enabled = !!document.getElementById("f-stage-custom-enabled")?.checked;
+  const labels = enabled ? getStageLabelsFromFields("f") : {};
+  const emojis = enabled ? getStageEmojisFromFields("f") : {};
+  renderStageCustomization(labels, emojis, "f", enabled);
+}
+function getStageLabelsFromTextarea() { return getStageLabelsFromFields("f"); }
 function stageLabelsToTextarea(labels = {}) {
   return STAGES.map(s => labels[s.id] || s.label).join("\n");
 }
@@ -3015,7 +3143,7 @@ function render() {
       ? `<span class="overdue-revisions-badge">⚠ ${totalOverdueRevisions} متأخر</span>`
       : totalOpenRevisions > 0 ? `<span class="open-revisions-badge">✏️ ${totalOpenRevisions} تعديل</span>` : "";
     const activeReview = getActiveReview(pr);
-    const reviewBadge = activeReview ? `<span class="review-stage-pill">👁 ${getProjectStageLabel(pr, activeReview.stageId)} — ${reviewDaysText(daysSince(activeReview.startDate || todayStr()))}</span>` : "";
+    const reviewBadge = activeReview ? `<span class="review-stage-pill">👁 ${getProjectStageEmoji(pr, activeReview.stageId)} ${getProjectStageLabel(pr, activeReview.stageId)} — ${reviewDaysText(daysSince(activeReview.startDate || todayStr()))}</span>` : "";
 
     const stagesHtml = STAGES.map(s => {
       const sLabel = getProjectStageLabel(pr, s.id);
@@ -3085,7 +3213,7 @@ function render() {
         <div class="stage-row-header" onclick="toggleStageNote('${pr.id}','${s.id}')">
           <div class="stage-row-left">
             <div class="stage-row-title">
-              <span class="stage-row-emoji">${s.emoji}</span>
+              <span class="stage-row-emoji">${getProjectStageEmoji(pr, s.id)}</span>
               <span class="stage-row-label" style="color:${s.dark}">${sLabel}</span>
               ${hasNote ? `<span class="stage-row-has-note"></span>` : ""}
               ${revisionsBadge}
@@ -3240,7 +3368,7 @@ function render() {
             <button class="reorder-btn" onclick="moveProject('${pr.id}',1)" ${isLast?"disabled":""}>▼</button>
           </div>
           <div style="flex:1"><div class="card-name">${esc(pr.name)}</div><div class="card-client">👤 ${esc(pr.client)}</div></div>
-          <button class="status-badge" style="background:${stage.bg};color:${stage.dark}" onclick="event.stopPropagation();openStatusSheet('${pr.id}')">${stage.emoji} ${getProjectStageLabel(pr, pr.status)}</button>
+          <button class="status-badge" style="background:${stage.bg};color:${stage.dark}" onclick="event.stopPropagation();openStatusSheet('${pr.id}')">${getProjectStageEmoji(pr, pr.status)} ${getProjectStageLabel(pr, pr.status)}</button>
         </div>
         <div class="card-row2">
           <span class="card-price">${priceStr}</span>
@@ -3324,8 +3452,9 @@ async function moveProject(id,dir) {
 // ─── STATUS ───
 function openStatusSheet(id) {
   statusTargetId=id;
+  const pr = window._projects.find(p => p.id === id);
   document.getElementById("status-buttons").innerHTML=STAGES.map(s=>
-    `<button class="stage-btn" style="background:${s.bg};color:${s.dark};border-color:${s.color}30" onclick="changeStatus('${s.id}')"><span style="font-size:20px">${s.emoji}</span>${s.label}</button>`).join("");
+    `<button class="stage-btn" style="background:${s.bg};color:${s.dark};border-color:${s.color}30" onclick="changeStatus('${s.id}')"><span style="font-size:20px">${getProjectStageEmoji(pr, s.id)}</span>${getProjectStageLabel(pr, s.id)}</button>`).join("");
   document.getElementById("status-overlay").classList.add("show");
 }
 function closeStatusSheet(){document.getElementById("status-overlay").classList.remove("show");}
@@ -3378,15 +3507,16 @@ async function doImport(){
 
 // ─── FORM ───
 function buildStatusSelect(){
+  const current = editId ? window._projects.find(p => p.id === editId) : null;
   document.getElementById("status-select").innerHTML=STAGES.map(s=>
-    `<button class="status-option" style="background:${formStatus===s.id?s.bg:"#F8F7F4"};color:${formStatus===s.id?s.dark:"#78716C"};border-color:${formStatus===s.id?s.color:"transparent"}" onclick="selectFormStatus('${s.id}')">${s.emoji} ${s.label}</button>`).join("");
+    `<button class="status-option" style="background:${formStatus===s.id?s.bg:"#F8F7F4"};color:${formStatus===s.id?s.dark:"#78716C"};border-color:${formStatus===s.id?s.color:"transparent"}" onclick="selectFormStatus('${s.id}')">${getProjectStageEmoji(current, s.id)} ${getProjectStageLabel(current, s.id)}</button>`).join("");
 }
 function selectFormStatus(id){formStatus=id;buildStatusSelect();}
 function openForm(){
   editId=null;formStatus="first_meeting";
   ["f-name","f-client","f-price","f-start","f-delivery"].forEach(id=>document.getElementById(id).value="");
   const sg=document.getElementById("stage-labels-group"); if(sg) sg.style.display="none";
-  const sl=document.getElementById("f-stage-labels"); if(sl) sl.value=stageLabelsToTextarea({});
+  renderStageCustomization({}, {}, "f", false); const ce=document.getElementById("f-stage-custom-enabled"); if(ce) ce.checked=false;
   document.getElementById("f-currency").value=appCurrency();
   document.getElementById("form-title").textContent="➕ مشروع جديد";
   document.getElementById("form-save-btn").textContent="إضافة المشروع";
@@ -3403,7 +3533,7 @@ function openEditForm(id){
   document.getElementById("f-start").value=pr.startDate||"";
   document.getElementById("f-delivery").value=pr.deliveryDate||"";
   const sg=document.getElementById("stage-labels-group"); if(sg) sg.style.display="block";
-  const sl=document.getElementById("f-stage-labels"); if(sl) sl.value=stageLabelsToTextarea(pr.customStageLabels||{});
+  const customEnabled=projectHasStageCustom(pr); const ce=document.getElementById("f-stage-custom-enabled"); if(ce) ce.checked=customEnabled; renderStageCustomization(pr.customStageLabels||{}, pr.customStageEmojis||{}, "f", customEnabled);
   document.getElementById("form-title").textContent="✏️ تعديل المشروع";
   document.getElementById("form-save-btn").textContent="حفظ التعديلات";
   buildStatusSelect();
@@ -3415,7 +3545,7 @@ async function saveProject(){
   const client=document.getElementById("f-client").value.trim();
   if(!name||!client){alert("يرجى إدخال اسم المشروع واسم العميل");return;}
   const data={name,client,price:document.getElementById("f-price").value,currency:document.getElementById("f-currency").value,startDate:document.getElementById("f-start").value,deliveryDate:document.getElementById("f-delivery").value,status:formStatus};
-  if(editId){data.customStageLabels=getStageLabelsFromTextarea();window._projects=window._projects.map(p=>p.id===editId?{...p,...data,activeReview:(p.activeReview&&p.activeReview.stageId===data.status)?p.activeReview:null,reviewStartDate:null,reviewStageId:null}:p);}
+  if(editId){const customEnabled=!!document.getElementById("f-stage-custom-enabled")?.checked;data.customStageLabels=customEnabled?getStageLabelsFromFields("f"):{};data.customStageEmojis=customEnabled?getStageEmojisFromFields("f"):{};window._projects=window._projects.map(p=>p.id===editId?{...p,...data,activeReview:(p.activeReview&&p.activeReview.stageId===data.status)?p.activeReview:null,reviewStartDate:null,reviewStageId:null}:p);}
   else{const maxOrder=window._projects.length?Math.max(...window._projects.map(p=>Number(p.manualOrder??0))):0;window._projects.push({...data,id:Date.now().toString(),stageNotes:{},stageTiming:{},payments:[],stageRevisions:{},manualOrder:maxOrder+10});}
   await window._saveToDb();closeForm();showToast("✓ تم الحفظ");
 }
@@ -3496,7 +3626,9 @@ let calcQuoteMeta = {
   notes: '',
   logoData: '',
   scopePlanData: '',
-  includeDesignScope: true
+  includeDesignScope: true,
+  defaultStageLabels: {},
+  defaultStageEmojis: {}
 };
 
 function calcInitPcts(){CALC_ORDER.forEach(t=>{CALC_BASE[t].forEach(d=>{calcItemPct[d.id]=d.pct;});});calcItemPct[CALC_SURVEY.id]=2;}
@@ -3565,7 +3697,8 @@ const CALC_PROFILE_FIELDS = [
   'bankName','accountName','accountNumber',
   'logoData',
   'components','workDescription',
-  'validityDays','includeDesignScope'
+  'validityDays','includeDesignScope',
+  'defaultStageLabels','defaultStageEmojis'
 ];
 
 function applyCalcProfile(profile = {}) {
@@ -4257,6 +4390,23 @@ function exportProjectPDF(pid){
 
 
 
+
+function renderSettingsStageCustomization(){
+  renderStageCustomization(calcQuoteMeta.defaultStageLabels || {}, calcQuoteMeta.defaultStageEmojis || {}, "settings", true);
+}
+async function applyDefaultStagesToCurrentProjects(){
+  if(!confirm("هل تريد تطبيق مراحل الإعدادات على المشاريع الحالية؟ سيتم إزالة تخصيص المراحل داخل المشاريع.")) return;
+  window._projects = (window._projects || []).map(p => {
+    const copy = {...p};
+    delete copy.customStageLabels;
+    delete copy.customStageEmojis;
+    return copy;
+  });
+  if (window._saveToDb) await window._saveToDb();
+  render();
+  showToast("✓ تم تطبيق المراحل الافتراضية");
+}
+
 function renderSettingsLogoPreview(){
   const box = document.getElementById("settingsLogoPreview");
   if (!box) return;
@@ -4330,6 +4480,7 @@ function openSettings(){
   setVal("set-bank-name", calcQuoteMeta.bankName || "");
   setVal("set-account-name", calcQuoteMeta.accountName || "");
   setVal("set-account-number", calcQuoteMeta.accountNumber || "");
+  renderSettingsStageCustomization();
   renderSettingsLogoPreview();
   document.getElementById("settings-overlay").classList.add("show");
 }
@@ -4347,6 +4498,8 @@ async function saveSettings(){
   calcQuoteMeta.bankName = getVal("set-bank-name");
   calcQuoteMeta.accountName = getVal("set-account-name");
   calcQuoteMeta.accountNumber = getVal("set-account-number");
+  calcQuoteMeta.defaultStageLabels = getStageLabelsFromFields("settings");
+  calcQuoteMeta.defaultStageEmojis = getStageEmojisFromFields("settings");
   saveCalcQuoteMeta();
 
   // تحديث عملة المشاريع الموجودة حتى ينعكس تغيير العملة مباشرة في الكروت والتقارير.
