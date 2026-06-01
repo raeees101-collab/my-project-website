@@ -184,6 +184,14 @@ button:active { transform: scale(0.96); }
   flex:0 0 auto;
   letter-spacing:.3px;
 }
+.sar-symbol{
+  width:1.05em;
+  height:1.16em;
+  display:inline-block;
+  background:currentColor;
+  -webkit-mask:url("https://upload.wikimedia.org/wikipedia/commons/9/98/Saudi_Riyal_Symbol.svg") center / contain no-repeat;
+  mask:url("https://upload.wikimedia.org/wikipedia/commons/9/98/Saudi_Riyal_Symbol.svg") center / contain no-repeat;
+}
 .money-amount{
   display:inline-block;
   position:relative;
@@ -199,8 +207,8 @@ button:active { transform: scale(0.96); }
 }
 .amounts-hidden .money-amount{
   color:transparent !important;
-  width:74px;
-  min-width:74px;
+  width:64px;
+  min-width:64px;
   overflow:hidden;
 }
 .amounts-hidden .money-amount::after{
@@ -2725,6 +2733,9 @@ function toggleAmountPrivacy() {
 }
 function moneySpan(amount, currency = "SAR") {
   const cur = String(currency || "SAR").trim().toUpperCase();
+  if (cur === "SAR") {
+    return `<span class="money-value" data-currency="SAR"><span class="money-currency sar-currency"><span class="sar-symbol" aria-label="ريال سعودي"></span></span><span class="money-amount">${amount}</span></span>`;
+  }
   return `<span class="money-value" data-currency="${cur}"><span class="money-currency currency-code">${cur}</span><span class="money-amount">${amount}</span></span>`;
 }
 function appCurrency() {
