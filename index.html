@@ -2381,6 +2381,30 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
   .target-value { font-size: 13px; }
 }
 
+
+.target-setting-toggle {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: #F8F7F4;
+  border: 1.5px solid #E7E5E0;
+  border-radius: 12px;
+  padding: 9px 10px;
+  margin-bottom: 7px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #57534E;
+}
+.target-setting-toggle input {
+  width: 16px;
+  height: 16px;
+  accent-color: #D4A853;
+}
+.target-panel.single-target .target-row.year,
+.target-panel.single-target .target-row.year + .target-progress {
+  margin-top: 0;
+}
+
 </style>
 </head>
 <body>
@@ -2447,16 +2471,16 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
     <div class="target-panel" id="target-panel">
       <div class="target-row">
         <div>
-          <div class="target-title">تارقت الشهر</div>
-          <div class="target-sub" id="target-month-sub">حدد التارقت من الإعدادات</div>
+          <div class="target-title">هدف الشهر</div>
+          <div class="target-sub" id="target-month-sub">حدد الهدف من الإعدادات</div>
         </div>
         <div class="target-value" id="target-month-value">—</div>
       </div>
       <div class="target-progress"><div class="target-progress-fill" id="target-month-fill" style="width:0%"></div></div>
       <div class="target-row year">
         <div>
-          <div class="target-title">تارقت السنة</div>
-          <div class="target-sub" id="target-year-sub">حدد التارقت من الإعدادات</div>
+          <div class="target-title">هدف السنة</div>
+          <div class="target-sub" id="target-year-sub">حدد الهدف من الإعدادات</div>
         </div>
         <div class="target-value" id="target-year-value">—</div>
       </div>
@@ -2759,11 +2783,19 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
         </select>
       </div>
       <div class="settings-field">
-        <label>تارقت الشهر</label>
+        <label>هدف الشهر</label>
+        <label class="target-setting-toggle">
+          <input type="checkbox" id="set-monthly-target-enabled" onchange="toggleTargetSettingInput('monthly')">
+          <span>تفعيل هدف الشهر</span>
+        </label>
         <input id="set-monthly-target" type="number" min="0" step="100" placeholder="مثال: 50000">
       </div>
       <div class="settings-field">
-        <label>تارقت السنة</label>
+        <label>هدف السنة</label>
+        <label class="target-setting-toggle">
+          <input type="checkbox" id="set-yearly-target-enabled" onchange="toggleTargetSettingInput('yearly')">
+          <span>تفعيل هدف السنة</span>
+        </label>
         <input id="set-yearly-target" type="number" min="0" step="100" placeholder="مثال: 600000">
       </div>
     </div>
@@ -3485,12 +3517,26 @@ function updateTargetPanel(){
   const panel = document.getElementById("target-panel");
   if(!panel) return;
 
+  const monthEnabled = !!calcQuoteMeta.monthlyTargetEnabled;
+  const yearEnabled = !!calcQuoteMeta.yearlyTargetEnabled;
+  panel.style.display = (monthEnabled || yearEnabled) ? "block" : "none";
+  panel.classList.toggle("single-target", monthEnabled !== yearEnabled);
+  const monthRow = panel.querySelector(".target-row:not(.year)");
+  const monthProgress = document.getElementById("target-month-fill")?.parentElement;
+  const yearRow = panel.querySelector(".target-row.year");
+  const yearProgress = document.getElementById("target-year-fill")?.parentElement;
+  if (monthRow) monthRow.style.display = monthEnabled ? "flex" : "none";
+  if (monthProgress) monthProgress.style.display = monthEnabled ? "block" : "none";
+  if (yearRow) yearRow.style.display = yearEnabled ? "flex" : "none";
+  if (yearProgress) yearProgress.style.display = yearEnabled ? "block" : "none";
+  if (!monthEnabled && !yearEnabled) return;
+
   const today = new Date(); today.setHours(0,0,0,0);
   const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
   const yearStart = new Date(today.getFullYear(), 0, 1);
 
-  const monthTarget = Number(calcQuoteMeta.monthlyTarget || 0);
-  const yearTarget = Number(calcQuoteMeta.yearlyTarget || 0);
+  const monthTarget = monthEnabled ? Number(calcQuoteMeta.monthlyTarget || 0) : 0;
+  const yearTarget = yearEnabled ? Number(calcQuoteMeta.yearlyTarget || 0) : 0;
   const monthReceived = receivedAmountInRange(monthStart, today);
   const yearReceived = receivedAmountInRange(yearStart, today);
 
@@ -3507,13 +3553,13 @@ function updateTargetPanel(){
   if(mv) mv.innerHTML = monthTarget ? `${monthPct}%` : "—";
   if(ms) ms.innerHTML = monthTarget
     ? `${moneySpan(Math.round(monthReceived).toLocaleString(), appCurrency())} من ${moneySpan(Math.round(monthTarget).toLocaleString(), appCurrency())}`
-    : "حدد التارقت من الإعدادات";
+    : "حدد الهدف من الإعدادات";
   if(mf) mf.style.width = monthPct + "%";
 
   if(yv) yv.innerHTML = yearTarget ? `${yearPct}%` : "—";
   if(ys) ys.innerHTML = yearTarget
     ? `${moneySpan(Math.round(yearReceived).toLocaleString(), appCurrency())} من ${moneySpan(Math.round(yearTarget).toLocaleString(), appCurrency())}`
-    : "حدد التارقت من الإعدادات";
+    : "حدد الهدف من الإعدادات";
   if(yf) yf.style.width = yearPct + "%";
 }
 
@@ -4038,7 +4084,7 @@ function renderAnalytics(){
       <div class="analytics-card"><div class="analytics-label">المشاريع المعتمدة</div><div class="analytics-value">${a.approved}</div><div class="analytics-sub">بانتظار الاعتماد: ${a.pending} — مكتمل: ${a.completed}</div></div>
       <div class="analytics-card"><div class="analytics-label">معدل اعتماد التسعيرات</div><div class="analytics-value">${a.conversionRate}%</div><div class="analytics-sub">${a.converted} من ${a.quoted} تسعيرة</div></div>
       <div class="analytics-card"><div class="analytics-label">متوسط مدة المشروع</div><div class="analytics-value">${a.avgProjectDays ? a.avgProjectDays + " يوم" : "—"}</div><div class="analytics-sub">للمشاريع المكتملة فقط</div></div>
-      <div class="analytics-card"><div class="analytics-label">تارقت الشهر</div><div class="analytics-value">${calcQuoteMeta.monthlyTarget ? Math.min(100, Math.round(receivedAmountInRange(new Date(new Date().getFullYear(), new Date().getMonth(), 1), new Date()) / calcQuoteMeta.monthlyTarget * 100)) + "%" : "—"}</div><div class="analytics-sub">حسب المبالغ المستلمة</div></div>
+      <div class="analytics-card"><div class="analytics-label">هدف الشهر</div><div class="analytics-value">${calcQuoteMeta.monthlyTargetEnabled && calcQuoteMeta.monthlyTarget ? Math.min(100, Math.round(receivedAmountInRange(new Date(new Date().getFullYear(), new Date().getMonth(), 1), new Date()) / calcQuoteMeta.monthlyTarget * 100)) + "%" : "غير مفعّل"}</div><div class="analytics-sub">حسب المبالغ المستلمة</div></div>
     </div>
 
     <div class="analytics-section">
@@ -4248,7 +4294,9 @@ let calcQuoteMeta = {
   defaultStageLabels: {},
   defaultStageEmojis: {},
   monthlyTarget: 0,
-  yearlyTarget: 0
+  yearlyTarget: 0,
+  monthlyTargetEnabled: false,
+  yearlyTargetEnabled: false
 };
 
 function calcInitPcts(){CALC_ORDER.forEach(t=>{CALC_BASE[t].forEach(d=>{calcItemPct[d.id]=d.pct;});});calcItemPct[CALC_SURVEY.id]=2;}
@@ -4319,7 +4367,7 @@ const CALC_PROFILE_FIELDS = [
   'components','workDescription',
   'validityDays','includeDesignScope',
   'defaultStageLabels','defaultStageEmojis',
-  'monthlyTarget','yearlyTarget'
+  'monthlyTarget','yearlyTarget','monthlyTargetEnabled','yearlyTargetEnabled'
 ];
 
 function applyCalcProfile(profile = {}) {
@@ -5092,11 +5140,30 @@ function requireQuoteProfileReady(){
   return false;
 }
 
+
+function toggleTargetSettingInput(type){
+  const enabled = document.getElementById(type === "monthly" ? "set-monthly-target-enabled" : "set-yearly-target-enabled")?.checked;
+  const input = document.getElementById(type === "monthly" ? "set-monthly-target" : "set-yearly-target");
+  if (input) {
+    input.disabled = !enabled;
+    input.style.opacity = enabled ? "1" : ".45";
+    if (!enabled) input.value = "";
+  }
+}
+
 function openSettings(){
   const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val ?? ""; };
   setVal("set-default-currency", appCurrency());
-  setVal("set-monthly-target", calcQuoteMeta.monthlyTarget || "");
-  setVal("set-yearly-target", calcQuoteMeta.yearlyTarget || "");
+  const mtEnabled = !!calcQuoteMeta.monthlyTargetEnabled;
+  const ytEnabled = !!calcQuoteMeta.yearlyTargetEnabled;
+  const mtCheck = document.getElementById("set-monthly-target-enabled");
+  const ytCheck = document.getElementById("set-yearly-target-enabled");
+  if (mtCheck) mtCheck.checked = mtEnabled;
+  if (ytCheck) ytCheck.checked = ytEnabled;
+  setVal("set-monthly-target", mtEnabled ? (calcQuoteMeta.monthlyTarget || "") : "");
+  setVal("set-yearly-target", ytEnabled ? (calcQuoteMeta.yearlyTarget || "") : "");
+  toggleTargetSettingInput("monthly");
+  toggleTargetSettingInput("yearly");
   setVal("set-brand-name", calcQuoteMeta.brandName || "");
   setVal("set-my-phone", calcQuoteMeta.myPhone || "");
   setVal("set-my-email", calcQuoteMeta.myEmail || "");
@@ -5115,8 +5182,10 @@ async function saveSettings(){
   const oldCurrency = appCurrency();
   const newCurrency = getVal("set-default-currency") || "SAR";
   calcQuoteMeta.defaultCurrency = newCurrency;
-  calcQuoteMeta.monthlyTarget = Number(getVal("set-monthly-target")) || 0;
-  calcQuoteMeta.yearlyTarget = Number(getVal("set-yearly-target")) || 0;
+  calcQuoteMeta.monthlyTargetEnabled = !!document.getElementById("set-monthly-target-enabled")?.checked;
+  calcQuoteMeta.yearlyTargetEnabled = !!document.getElementById("set-yearly-target-enabled")?.checked;
+  calcQuoteMeta.monthlyTarget = calcQuoteMeta.monthlyTargetEnabled ? (Number(getVal("set-monthly-target")) || 0) : 0;
+  calcQuoteMeta.yearlyTarget = calcQuoteMeta.yearlyTargetEnabled ? (Number(getVal("set-yearly-target")) || 0) : 0;
   calcQuoteMeta.brandName = getVal("set-brand-name");
   calcQuoteMeta.myPhone = getVal("set-my-phone");
   calcQuoteMeta.myEmail = getVal("set-my-email");
