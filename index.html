@@ -2209,6 +2209,123 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
   color: #78716C;
 }
 
+
+/* ─── ANALYTICS ─── */
+.analytics-controls {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 9px;
+  margin-bottom: 14px;
+}
+.analytics-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+}
+.analytics-field label {
+  display:block;
+  font-size:11px;
+  color:#78716C;
+  margin-bottom:5px;
+  font-weight:800;
+}
+.analytics-field select,
+.analytics-field input {
+  width:100%;
+  border:1.5px solid #E7E5E0;
+  border-radius:12px;
+  padding:11px 12px;
+  font-size:13px;
+  background:#fff;
+  color:#111;
+  font-family:inherit;
+  outline:none;
+}
+.analytics-grid {
+  display:grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap:9px;
+  margin-bottom:14px;
+}
+.analytics-card {
+  background:#F8F7F4;
+  border:1px solid #E7E5E0;
+  border-radius:16px;
+  padding:13px 12px;
+}
+.analytics-label {
+  font-size:10px;
+  color:#78716C;
+  font-weight:800;
+  margin-bottom:5px;
+}
+.analytics-value {
+  font-size:18px;
+  font-weight:900;
+  color:#1C1917;
+  line-height:1.35;
+}
+.analytics-sub {
+  font-size:10px;
+  color:#A8A29E;
+  font-weight:700;
+  margin-top:4px;
+}
+.analytics-section {
+  margin-top:16px;
+}
+.analytics-section-title {
+  font-size:12px;
+  font-weight:900;
+  color:#78716C;
+  margin-bottom:8px;
+}
+.analytics-table {
+  width:100%;
+  border-collapse:collapse;
+  overflow:hidden;
+  border-radius:14px;
+  font-size:12px;
+}
+.analytics-table th,
+.analytics-table td {
+  padding:10px 9px;
+  border-bottom:1px solid #F0EEE9;
+  text-align:right;
+}
+.analytics-table th {
+  background:#F8F7F4;
+  color:#78716C;
+  font-size:11px;
+}
+.analytics-table td {
+  background:#fff;
+  color:#1C1917;
+  font-weight:700;
+}
+.analytics-actions {
+  display:flex;
+  gap:10px;
+  margin-top:16px;
+}
+.analytics-actions button {
+  flex:1;
+  border:none;
+  border-radius:14px;
+  padding:14px;
+  font-size:14px;
+  font-weight:900;
+  cursor:pointer;
+  font-family:inherit;
+}
+.analytics-pdf { background:linear-gradient(135deg,#D4A853,#E8C070); color:#1C1917; }
+.analytics-close { background:#F3F2EF; color:#1C1917; }
+@media (max-width:520px){
+  .analytics-grid { grid-template-columns:1fr; }
+  .analytics-row { grid-template-columns:1fr; }
+  .analytics-actions { flex-direction:column; }
+}
+
 </style>
 </head>
 <body>
@@ -2259,6 +2376,7 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
         <button class="icon-btn" title="حاسبة التسعيرة" aria-label="حاسبة التسعيرة" onclick="openCalc()"><i class="fa-solid fa-calculator"></i></button>
         <button class="icon-btn" title="استيراد / تصدير البيانات" aria-label="استيراد / تصدير البيانات" onclick="openIO()">⇅</button>
         <button class="icon-btn" title="الإعدادات" aria-label="الإعدادات" onclick="openSettings()"><i class="fa-solid fa-gear"></i></button>
+        <button class="icon-btn" title="التقارير والتحليلات" aria-label="التقارير والتحليلات" onclick="openAnalytics()"><i class="fa-solid fa-chart-line"></i></button>
         <button class="add-btn" title="إضافة مشروع جديد" aria-label="إضافة مشروع جديد" onclick="openForm()">+</button>
         <button class="logout-corner-btn" title="تسجيل الخروج" aria-label="تسجيل الخروج" onclick="confirmHeaderSignOut()">
           <i class="fa-solid fa-right-from-bracket"></i>
@@ -2478,6 +2596,45 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
       <button class="contract-save" onclick="saveContract()">حفظ العقد</button>
       <button class="contract-pdf" onclick="exportContractPDF()">تصدير PDF</button>
 
+    </div>
+  </div>
+</div>
+
+
+<!-- Analytics -->
+<div class="overlay" id="analytics-overlay" onclick="closeAnalytics()">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">التقارير والتحليلات</div>
+
+    <div class="analytics-controls">
+      <div class="analytics-field">
+        <label>الفترة</label>
+        <select id="analytics-period" onchange="renderAnalytics()">
+          <option value="this_month">هذا الشهر</option>
+          <option value="last_3_months">آخر 3 أشهر</option>
+          <option value="this_year">هذه السنة</option>
+          <option value="all">كل الفترات</option>
+          <option value="custom">فترة مخصصة</option>
+        </select>
+      </div>
+      <div class="analytics-row" id="analytics-custom-row" style="display:none">
+        <div class="analytics-field">
+          <label>من تاريخ</label>
+          <input id="analytics-from" type="date" onchange="renderAnalytics()">
+        </div>
+        <div class="analytics-field">
+          <label>إلى تاريخ</label>
+          <input id="analytics-to" type="date" onchange="renderAnalytics()">
+        </div>
+      </div>
+    </div>
+
+    <div id="analytics-content"></div>
+
+    <div class="analytics-actions">
+      <button class="analytics-close" onclick="closeAnalytics()">إغلاق</button>
+      <button class="analytics-pdf" onclick="exportAnalyticsPDF()">تصدير تقرير PDF</button>
     </div>
   </div>
 </div>
@@ -3618,6 +3775,187 @@ async function toggleClientReview(pid, sid) {
   await window._saveToDb();
   showToast("✓ تم تحديث مراجعة العميل");
   render();
+}
+
+
+// ─── ANALYTICS ───
+function projectDateForAnalytics(p){
+  return p.quoteSentDate || p.startDate || p.createdAt || "";
+}
+function parseLocalDate(value){
+  if(!value) return null;
+  const d = new Date(value + "T00:00:00");
+  return isNaN(d.getTime()) ? null : d;
+}
+function analyticsPeriodRange(){
+  const today = new Date(); today.setHours(0,0,0,0);
+  const period = document.getElementById("analytics-period")?.value || "this_month";
+  let from = null, to = new Date(today);
+  if(period === "this_month"){
+    from = new Date(today.getFullYear(), today.getMonth(), 1);
+  } else if(period === "last_3_months"){
+    from = new Date(today.getFullYear(), today.getMonth() - 2, 1);
+  } else if(period === "this_year"){
+    from = new Date(today.getFullYear(), 0, 1);
+  } else if(period === "custom"){
+    from = parseLocalDate(document.getElementById("analytics-from")?.value);
+    to = parseLocalDate(document.getElementById("analytics-to")?.value) || today;
+  } else {
+    from = null; to = null;
+  }
+  return {period, from, to};
+}
+function inAnalyticsRange(project){
+  const {from, to} = analyticsPeriodRange();
+  if(!from && !to) return true;
+  const d = parseLocalDate(projectDateForAnalytics(project));
+  if(!d) return false;
+  if(from && d < from) return false;
+  if(to && d > to) return false;
+  return true;
+}
+function moneyNumber(value){
+  return Number(value || 0) || 0;
+}
+function analyticsMoney(amount){
+  return moneySpan(Number(Math.round(amount || 0)).toLocaleString(), appCurrency());
+}
+function projectStageDuration(pr, sid){
+  const timing = pr.stageTiming && pr.stageTiming[sid];
+  if(!timing) return null;
+  if(timing.startDate && timing.endDate) return diffDaysInclusive(timing.startDate, timing.endDate);
+  return null;
+}
+function calculateAnalytics(){
+  const projects = (window._projects || []).map(normalizeProject).filter(inAnalyticsRange);
+  const totalValue = projects.reduce((s,p)=>s+moneyNumber(p.price),0);
+  const received = projects.reduce((s,p)=>s+(p.payments||[]).filter(paymentIsReceived).reduce((a,x)=>a+moneyNumber(x.amount),0),0);
+  const remaining = Math.max(0,totalValue-received);
+  const approved = projects.filter(p=>p.status !== "pending_approval").length;
+  const pending = projects.filter(p=>p.status === "pending_approval").length;
+  const completed = projects.filter(p=>p.status === "completed").length;
+  const avgProject = projects.length ? totalValue / projects.length : 0;
+  const quoted = projects.filter(p=>p.quoteSentDate || p.quote).length;
+  const converted = projects.filter(p=>(p.quoteSentDate || p.quote) && p.status !== "pending_approval").length;
+  const conversionRate = quoted ? Math.round(converted / quoted * 100) : 0;
+
+  const finishedDurations = projects
+    .filter(p=>p.startDate && p.deliveryDate && p.status === "completed")
+    .map(p=>diffDaysInclusive(p.startDate,p.deliveryDate))
+    .filter(x=>Number.isFinite(x) && x>0);
+  const avgProjectDays = finishedDurations.length ? Math.round(finishedDurations.reduce((a,b)=>a+b,0)/finishedDurations.length) : 0;
+
+  const stageRows = STAGES.filter(s=>s.id!=="pending_approval" && s.id!=="completed").map(s=>{
+    const values = projects.map(p=>projectStageDuration(p,s.id)).filter(x=>Number.isFinite(x) && x>0);
+    const avg = values.length ? Math.round(values.reduce((a,b)=>a+b,0)/values.length) : 0;
+    return {id:s.id, label:getDefaultStageLabel(s.id), emoji:getDefaultStageEmoji(s.id), avg, count:values.length};
+  });
+
+  const projectRows = projects.map(p=>{
+    const paid = (p.payments||[]).filter(paymentIsReceived).reduce((a,x)=>a+moneyNumber(x.amount),0);
+    return {name:p.name, client:p.client, status:getProjectStageLabel(p,p.status), value:moneyNumber(p.price), paid, remaining:Math.max(0,moneyNumber(p.price)-paid)};
+  });
+
+  return {projects,totalValue,received,remaining,approved,pending,completed,avgProject,quoted,converted,conversionRate,avgProjectDays,stageRows,projectRows};
+}
+function openAnalytics(){
+  const period = document.getElementById("analytics-period");
+  if(period && !period.value) period.value = "this_month";
+  document.getElementById("analytics-overlay").classList.add("show");
+  renderAnalytics();
+}
+function closeAnalytics(){
+  document.getElementById("analytics-overlay").classList.remove("show");
+}
+function renderAnalytics(){
+  const customRow = document.getElementById("analytics-custom-row");
+  const period = document.getElementById("analytics-period")?.value || "this_month";
+  if(customRow) customRow.style.display = period === "custom" ? "grid" : "none";
+
+  const a = calculateAnalytics();
+  const box = document.getElementById("analytics-content");
+  if(!box) return;
+
+  const stageHtml = a.stageRows.map(r=>`
+    <tr>
+      <td>${r.emoji} ${esc(r.label)}</td>
+      <td>${r.count ? r.avg + " يوم" : "—"}</td>
+      <td>${r.count}</td>
+    </tr>`).join("");
+
+  const rows = a.projectRows.slice(0,8).map(p=>`
+    <tr>
+      <td>${esc(p.name || "—")}<div style="font-size:10px;color:#A8A29E;margin-top:3px">${esc(p.client || "—")}</div></td>
+      <td>${esc(p.status || "—")}</td>
+      <td>${analyticsMoney(p.value)}</td>
+      <td>${analyticsMoney(p.paid)}</td>
+    </tr>`).join("");
+
+  box.innerHTML = `
+    <div class="analytics-grid">
+      <div class="analytics-card"><div class="analytics-label">عدد المشاريع</div><div class="analytics-value">${a.projects.length}</div><div class="analytics-sub">ضمن الفترة المختارة</div></div>
+      <div class="analytics-card"><div class="analytics-label">إجمالي قيمة المشاريع</div><div class="analytics-value">${analyticsMoney(a.totalValue)}</div><div class="analytics-sub">حسب عملة الإعدادات</div></div>
+      <div class="analytics-card"><div class="analytics-label">المبالغ المستلمة</div><div class="analytics-value">${analyticsMoney(a.received)}</div><div class="analytics-sub">المتبقي: ${analyticsMoney(a.remaining)}</div></div>
+      <div class="analytics-card"><div class="analytics-label">متوسط قيمة المشروع</div><div class="analytics-value">${analyticsMoney(a.avgProject)}</div><div class="analytics-sub">على عدد مشاريع الفترة</div></div>
+      <div class="analytics-card"><div class="analytics-label">المشاريع المعتمدة</div><div class="analytics-value">${a.approved}</div><div class="analytics-sub">بانتظار الاعتماد: ${a.pending} — مكتمل: ${a.completed}</div></div>
+      <div class="analytics-card"><div class="analytics-label">معدل اعتماد التسعيرات</div><div class="analytics-value">${a.conversionRate}%</div><div class="analytics-sub">${a.converted} من ${a.quoted} تسعيرة</div></div>
+      <div class="analytics-card"><div class="analytics-label">متوسط مدة المشروع</div><div class="analytics-value">${a.avgProjectDays ? a.avgProjectDays + " يوم" : "—"}</div><div class="analytics-sub">للمشاريع المكتملة فقط</div></div>
+      <div class="analytics-card"><div class="analytics-label">صافي التدفق الحالي</div><div class="analytics-value">${analyticsMoney(a.received)}</div><div class="analytics-sub">لإظهار الربح لاحقًا أضف خانة المصاريف</div></div>
+    </div>
+
+    <div class="analytics-section">
+      <div class="analytics-section-title">متوسط مدة المراحل</div>
+      <table class="analytics-table">
+        <thead><tr><th>المرحلة</th><th>المتوسط</th><th>عدد المشاريع</th></tr></thead>
+        <tbody>${stageHtml || '<tr><td colspan="3">لا توجد بيانات مراحل مكتملة</td></tr>'}</tbody>
+      </table>
+    </div>
+
+    <div class="analytics-section">
+      <div class="analytics-section-title">مشاريع الفترة</div>
+      <table class="analytics-table">
+        <thead><tr><th>المشروع</th><th>الحالة</th><th>القيمة</th><th>المستلم</th></tr></thead>
+        <tbody>${rows || '<tr><td colspan="4">لا توجد مشاريع في هذه الفترة</td></tr>'}</tbody>
+      </table>
+      ${a.projectRows.length > 8 ? `<div class="analytics-sub" style="margin-top:8px">يعرض أول 8 مشاريع فقط، وPDF يحتوي ملخص الفترة.</div>` : ""}
+    </div>
+  `;
+}
+function exportAnalyticsPDF(){
+  const a = calculateAnalytics();
+  const periodText = document.getElementById("analytics-period")?.selectedOptions?.[0]?.textContent || "الفترة";
+  const stageRows = a.stageRows.map(r=>`<tr><td>${r.emoji} ${esc(r.label)}</td><td>${r.count ? r.avg + " يوم" : "—"}</td><td>${r.count}</td></tr>`).join("");
+  const projectRows = a.projectRows.map(p=>`<tr><td>${esc(p.name||"—")}</td><td>${esc(p.client||"—")}</td><td>${esc(p.status||"—")}</td><td>${Number(p.value||0).toLocaleString()} ${appCurrency()}</td><td>${Number(p.paid||0).toLocaleString()} ${appCurrency()}</td></tr>`).join("");
+  const doc = `<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>تقرير الأداء</title>
+  <style>
+    body{margin:0;background:#eee;font-family:Arial,sans-serif;color:#111}
+    .page{width:210mm;min-height:297mm;margin:0 auto;background:#fff;padding:15mm;box-sizing:border-box}
+    .head{border-bottom:2px solid #111;padding-bottom:7mm;margin-bottom:7mm}
+    h1{margin:0;color:#15866A;font-size:25px} .sub{color:#777;font-size:12px;margin-top:6px}
+    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4mm;margin:6mm 0}
+    .card{background:#FAFAF8;border:1px solid #E7E5E0;border-radius:10px;padding:8px}
+    .label{font-size:10px;color:#777;margin-bottom:4px;font-weight:700}.val{font-size:15px;font-weight:900}
+    h2{font-size:16px;border-bottom:1.5px solid #111;padding-bottom:5px;margin:8mm 0 4mm}
+    table{width:100%;border-collapse:collapse;font-size:11px}th,td{border-bottom:1px solid #eee;padding:8px;text-align:right}th{background:#F8F7F4;color:#777}
+    @page{size:A4;margin:0}@media print{body{background:#fff}.page{margin:0}}
+  </style></head><body><div class="page">
+    <div class="head"><h1>تقرير الأداء</h1><div class="sub">${esc(periodText)} — ${new Date().toLocaleDateString('ar-SA')}</div></div>
+    <div class="grid">
+      <div class="card"><div class="label">عدد المشاريع</div><div class="val">${a.projects.length}</div></div>
+      <div class="card"><div class="label">إجمالي القيمة</div><div class="val">${Math.round(a.totalValue).toLocaleString()} ${appCurrency()}</div></div>
+      <div class="card"><div class="label">المستلم</div><div class="val">${Math.round(a.received).toLocaleString()} ${appCurrency()}</div></div>
+      <div class="card"><div class="label">المتبقي</div><div class="val">${Math.round(a.remaining).toLocaleString()} ${appCurrency()}</div></div>
+      <div class="card"><div class="label">متوسط المشروع</div><div class="val">${Math.round(a.avgProject).toLocaleString()} ${appCurrency()}</div></div>
+      <div class="card"><div class="label">المعتمد</div><div class="val">${a.approved}</div></div>
+      <div class="card"><div class="label">معدل الاعتماد</div><div class="val">${a.conversionRate}%</div></div>
+      <div class="card"><div class="label">متوسط مدة المشروع</div><div class="val">${a.avgProjectDays ? a.avgProjectDays + " يوم" : "—"}</div></div>
+    </div>
+    <h2>متوسط مدة المراحل</h2><table><thead><tr><th>المرحلة</th><th>المتوسط</th><th>عدد المشاريع</th></tr></thead><tbody>${stageRows || '<tr><td colspan="3">لا توجد بيانات</td></tr>'}</tbody></table>
+    <h2>مشاريع الفترة</h2><table><thead><tr><th>المشروع</th><th>العميل</th><th>الحالة</th><th>القيمة</th><th>المستلم</th></tr></thead><tbody>${projectRows || '<tr><td colspan="5">لا توجد مشاريع</td></tr>'}</tbody></table>
+  </div><script>window.addEventListener('load',()=>setTimeout(()=>window.print(),400));<\/script></body></html>`;
+  const win = window.open("", "_blank");
+  if(!win){ showToast("⚠️ السماح بالنوافذ المنبثقة"); return; }
+  win.document.write(doc); win.document.close();
 }
 
 // ─── DELETE ───
