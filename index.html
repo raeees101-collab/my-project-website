@@ -2051,6 +2051,22 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
   }
 }
 
+
+.payment-body { display: none; }
+.payment-body.open { display: block; animation: slideDown 0.2s ease; }
+.payment-toggle-btn {
+  border: none;
+  background: #F8F7F4;
+  color: #78716C;
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: inherit;
+}
+.payment-toggle-btn .arr { display:inline-block; transition: transform .2s ease; }
+
 </style>
 </head>
 <body>
@@ -2432,6 +2448,7 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
       <div><label class="form-label">تاريخ البدء</label><input class="form-input" id="f-start" type="date"></div>
       <div><label class="form-label">التسليم النهائي</label><input class="form-input" id="f-delivery" type="date"></div>
     </div>
+    <div class="form-group"><label class="form-label">حالة المشروع</label><div id="status-select"></div></div>
     <div class="form-group" id="stage-labels-group" style="display:none">
       <label class="form-label">مسميات المراحل</label>
       <textarea class="form-input" id="f-stage-labels" rows="6" style="resize:vertical;min-height:120px;line-height:1.8" placeholder="كل مرحلة في سطر"></textarea>
@@ -2720,7 +2737,7 @@ const STAGES = [
   { id:"completed",        label:"مكتمل",                emoji:"✅", color:"#10B981", bg:"#ECFDF5", dark:"#065F46" },
 ];
 
-let currentTab = "active", expandedId = null, openStageNotes = {};
+let currentTab = "active", expandedId = null, openStageNotes = {}, openPayments = {};
 let statusTargetId = null, deleteTargetId = null, editId = null, formStatus = "first_meeting";
 let calcTargetProjectId = null;
 let hideAmounts = false;
@@ -3170,6 +3187,7 @@ function render() {
 
     const remaining = totalPrice - totalPaid;
     const paidPctBar = totalPrice > 0 ? Math.min(100, Math.round((totalPaid/totalPrice)*100)) : 0;
+    const payOpen = openPayments[pr.id] !== false;
     const paymentSummaryHtml = totalPrice > 0 ? `
       <div class="payment-summary">
         <div class="payment-sum-box" style="background:#ECFDF5"><div class="payment-sum-label" style="color:#065F46">✅ المُستلم</div><div class="payment-sum-val" style="color:#10B981">${moneySpan(totalPaid.toLocaleString(), currency)}</div></div>
@@ -3185,27 +3203,30 @@ function render() {
       </div>
       <div class="payments-section">
         <div class="payments-header">
-          <div class="payments-title">💰 الدفعات</div>
+          <button class="payment-toggle-btn" onclick="event.stopPropagation();togglePaymentSection('${pr.id}')"><span class="arr" style="transform:${payOpen?'rotate(180deg)':'rotate(0deg)'}">▾</span></button>
+          <div class="payments-title" style="flex:1">💰 الدفعات</div>
           <button class="add-payment-btn" onclick="event.stopPropagation();togglePaymentForm('${pr.id}')">+ إضافة دفعة</button>
         </div>
-        ${paymentSummaryHtml}
-        <div class="payment-list">${payments.length===0?'<div style="text-align:center;color:#A8A29E;font-size:12px;padding:8px 0">لا توجد دفعات مسجّلة</div>':paymentsList}</div>
-        <div class="payment-form" id="pf-${pr.id}">
-          <div class="payment-form-row">
-            <div><div class="stage-time-label" style="margin-bottom:4px">المبلغ</div><input class="payment-input" type="number" id="pi-amount-${pr.id}" placeholder="0"></div>
-            <div><div class="stage-time-label" style="margin-bottom:4px">التاريخ</div><input class="payment-input" type="date" id="pi-date-${pr.id}"></div>
+        <div class="payment-body ${payOpen?'open':''}" id="pay-body-${pr.id}">
+          ${paymentSummaryHtml}
+          <div class="payment-list">${payments.length===0?'<div style="text-align:center;color:#A8A29E;font-size:12px;padding:8px 0">لا توجد دفعات مسجّلة</div>':paymentsList}</div>
+          <div class="payment-form" id="pf-${pr.id}">
+            <div class="payment-form-row">
+              <div><div class="stage-time-label" style="margin-bottom:4px">المبلغ</div><input class="payment-input" type="number" id="pi-amount-${pr.id}" placeholder="0"></div>
+              <div><div class="stage-time-label" style="margin-bottom:4px">التاريخ</div><input class="payment-input" type="date" id="pi-date-${pr.id}"></div>
+            </div>
+            <div class="payment-form-row">
+              <div><div class="stage-time-label" style="margin-bottom:4px">الوصف</div><input class="payment-input" type="text" id="pi-label-${pr.id}" placeholder="مثال: دفعة أولى"></div>
+              <div><div class="stage-time-label" style="margin-bottom:4px">الحالة</div><select class="payment-status-select" id="pi-done-${pr.id}"><option value="true">✅ مستلمة</option><option value="false">⏳ غير مستلمة</option></select></div>
+            </div>
+            <button class="payment-save-btn" onclick="addPayment('${pr.id}')">✓ حفظ الدفعة</button>
           </div>
-          <div class="payment-form-row">
-            <div><div class="stage-time-label" style="margin-bottom:4px">الوصف</div><input class="payment-input" type="text" id="pi-label-${pr.id}" placeholder="مثال: دفعة أولى"></div>
-            <div><div class="stage-time-label" style="margin-bottom:4px">الحالة</div><select class="payment-status-select" id="pi-done-${pr.id}"><option value="true">✅ مستلمة</option><option value="false">⏳ غير مستلمة</option></select></div>
-          </div>
-          <button class="payment-save-btn" onclick="addPayment('${pr.id}')">✓ حفظ الدفعة</button>
         </div>
       </div>
       <div class="stages-section"><div class="stages-title">ملاحظات المراحل</div>${stagesHtml}</div>
       <div class="card-actions">
         <button class="calc-btn" title="طباعة تقرير المشروع" aria-label="طباعة تقرير المشروع" onclick="exportProjectPDF('${pr.id}')"><i class="fa-solid fa-file-pdf"></i></button>
-        <button class="contract-btn" title="العقد" aria-label="العقد" onclick="openContract('${pr.id}')">العقد</button>
+        <button class="contract-btn" title="العقد" aria-label="العقد" onclick="${pr.status==='pending_approval'?`openContract('${pr.id}')`:`openContractPdfForProject('${pr.id}')`}">العقد</button>
         <button class="edit-btn" onclick="openEditForm('${pr.id}')">✏️ تعديل</button>
         <button class="del-btn" onclick="openDelete('${pr.id}')">🗑️</button>
       </div>
@@ -3257,7 +3278,14 @@ async function saveStageTime(pid,sid) {
 function setPlanned(pid,sid,days) { const inp=document.getElementById(`st-plan-${pid}-${sid}`); if(inp)inp.value=days; }
 
 // ─── PAYMENTS ───
+function togglePaymentSection(pid) {
+  openPayments[pid] = openPayments[pid] === false ? true : false;
+  render();
+}
 function togglePaymentForm(pid) {
+  openPayments[pid] = true;
+  const body=document.getElementById(`pay-body-${pid}`);
+  if(body) body.classList.add("open");
   const form=document.getElementById(`pf-${pid}`); if(!form)return;
   form.classList.toggle("open");
   if (form.classList.contains("open")) { const d=document.getElementById(`pi-date-${pid}`); if(d&&!d.value)d.value=todayStr(); }
@@ -3371,7 +3399,7 @@ function openEditForm(id){
   document.getElementById("f-name").value=pr.name;
   document.getElementById("f-client").value=pr.client;
   document.getElementById("f-price").value=pr.price||"";
-  document.getElementById("f-currency").value=pr.currency||"SAR";
+  document.getElementById("f-currency").value=pr.currency||appCurrency();
   document.getElementById("f-start").value=pr.startDate||"";
   document.getElementById("f-delivery").value=pr.deliveryDate||"";
   const sg=document.getElementById("stage-labels-group"); if(sg) sg.style.display="block";
@@ -4034,6 +4062,16 @@ async function saveContract(){
 }
 
 
+
+async function openContractPdfForProject(pid){
+  contractTargetId = pid;
+  const pr = window._projects.find(p => p.id === pid);
+  if (!pr) return;
+  fillContractForm(pr.contract || defaultContractForProject(pr));
+  await exportContractPDFNow();
+}
+
+window.openContractPdfForProject = openContractPdfForProject;
 function exportContractPDF(){
   if (!contractTargetId) return;
   const pr = window._projects.find(p => p.id === contractTargetId);
@@ -4298,9 +4336,11 @@ function openSettings(){
 function closeSettings(){
   document.getElementById("settings-overlay").classList.remove("show");
 }
-function saveSettings(){
+async function saveSettings(){
   const getVal = id => (document.getElementById(id)?.value || "").trim();
-  calcQuoteMeta.defaultCurrency = getVal("set-default-currency") || "SAR";
+  const oldCurrency = appCurrency();
+  const newCurrency = getVal("set-default-currency") || "SAR";
+  calcQuoteMeta.defaultCurrency = newCurrency;
   calcQuoteMeta.brandName = getVal("set-brand-name");
   calcQuoteMeta.myPhone = getVal("set-my-phone");
   calcQuoteMeta.myEmail = getVal("set-my-email");
@@ -4308,6 +4348,13 @@ function saveSettings(){
   calcQuoteMeta.accountName = getVal("set-account-name");
   calcQuoteMeta.accountNumber = getVal("set-account-number");
   saveCalcQuoteMeta();
+
+  // تحديث عملة المشاريع الموجودة حتى ينعكس تغيير العملة مباشرة في الكروت والتقارير.
+  if (oldCurrency !== newCurrency && Array.isArray(window._projects)) {
+    window._projects = window._projects.map(p => ({...p, currency: newCurrency}));
+    if (window._saveToDb) await window._saveToDb();
+  }
+
   closeSettings();
   render();
   showToast("✓ تم حفظ الإعدادات");
