@@ -2142,6 +2142,73 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
   padding: 8px 10px;
 }
 
+
+.stage-icon-select {
+  width: 100%;
+  height: 42px;
+  border: 1.5px solid #E7E5E0;
+  border-radius: 12px;
+  background: #fff;
+  font-size: 20px;
+  text-align: center;
+  outline: none;
+  font-family: inherit;
+  cursor: pointer;
+}
+.stage-icon-select:focus {
+  border-color: #D4A853;
+}
+
+
+.search-wrap {
+  padding: 12px 16px 0;
+}
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  border: 1.5px solid #E7E5E0;
+  border-radius: 16px;
+  padding: 10px 12px;
+  box-shadow: 0 3px 14px rgba(0,0,0,0.04);
+}
+.search-box i {
+  color: #A8A29E;
+  font-size: 14px;
+}
+.search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 14px;
+  color: #1C1917;
+  direction: rtl;
+}
+.search-input::placeholder {
+  color: #A8A29E;
+}
+.search-clear-btn {
+  display: none;
+  border: none;
+  background: #F3F2EF;
+  color: #78716C;
+  border-radius: 9px;
+  width: 26px;
+  height: 26px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.search-clear-btn.show { display: inline-flex; align-items: center; justify-content: center; }
+.search-result-hint {
+  padding: 8px 18px 0;
+  font-size: 11px;
+  font-weight: 700;
+  color: #78716C;
+}
+
 </style>
 </head>
 <body>
@@ -2212,6 +2279,14 @@ table td.amt { text-align: left; font-weight: 800; white-space: nowrap; }
     <button class="tab" onclick="setTab('completed',this)">✅ مكتمل</button>
     <button class="tab" onclick="setTab('all',this)">الكل</button>
   </div>
+  <div class="search-wrap">
+    <div class="search-box">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input class="search-input" id="project-search" type="search" placeholder="ابحث باسم المشروع، العميل، الحالة، التاريخ..." oninput="setProjectSearch(this.value)">
+      <button class="search-clear-btn" id="search-clear-btn" onclick="clearProjectSearch()" aria-label="مسح البحث">×</button>
+    </div>
+  </div>
+  <div class="search-result-hint" id="search-result-hint" style="display:none"></div>
   <div class="list" id="list"></div>
 </div>
 
@@ -2823,7 +2898,7 @@ const STAGES = [
   { id:"completed",        label:"مكتمل",                emoji:"✅", color:"#10B981", bg:"#ECFDF5", dark:"#065F46" },
 ];
 
-let currentTab = "active", expandedId = null, openStageNotes = {}, openPayments = {};
+let currentTab = "active", expandedId = null, openStageNotes = {}, openPayments = {}, projectSearch = "";
 let statusTargetId = null, deleteTargetId = null, editId = null, formStatus = "first_meeting";
 let calcTargetProjectId = null;
 let hideAmounts = false;
@@ -2868,13 +2943,21 @@ function getProjectStageEmoji(pr, sid) {
   const custom = pr && pr.customStageEmojis && pr.customStageEmojis[sid];
   return (custom && String(custom).trim()) || getDefaultStageEmoji(sid);
 }
+
+const STAGE_ICON_OPTIONS = ["⏳","🤝","🎨","📐","🗺️","✅","👁️","📄","🧾","🧮","💰","🏗️","🛠️","🧱","🏠","🏢","🌿","💡","📌","⭐","🔥","🚧","📦","🔍","📝","📊","📅","🔁","⚠️","❌"];
+function stageIconOptionsHtml(selected){
+  const value = String(selected || "").trim();
+  const options = STAGE_ICON_OPTIONS.includes(value) ? STAGE_ICON_OPTIONS : [value, ...STAGE_ICON_OPTIONS].filter(Boolean);
+  return options.map(icon => `<option value="${esc(icon)}" ${icon === value ? "selected" : ""}>${esc(icon)}</option>`).join("");
+}
+
 function renderStageCustomization(labels = {}, emojis = {}, target = "f", enabled = true) {
   const box = document.getElementById(target === "settings" ? "set-stage-custom" : "f-stage-custom");
   if (!box) return;
   box.classList.toggle("disabled", !enabled);
   box.innerHTML = STAGES.map(s => `
     <div class="stage-custom-row">
-      <input class="stage-icon-input" id="${target}-stage-emoji-${s.id}" maxlength="3" value="${esc(emojis[s.id] || getDefaultStageEmoji(s.id))}" ${enabled ? "" : "disabled"}>
+      <select class="stage-icon-select" id="${target}-stage-emoji-${s.id}" ${enabled ? "" : "disabled"}>${stageIconOptionsHtml(emojis[s.id] || getDefaultStageEmoji(s.id))}</select>
       <input class="stage-label-input" id="${target}-stage-label-${s.id}" value="${esc(labels[s.id] || getDefaultStageLabel(s.id))}" ${enabled ? "" : "disabled"}>
     </div>
   `).join("");
@@ -3022,17 +3105,67 @@ function statusPriority(status) {
   return 3;
 }
 
+
+function normalizeSearchText(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[إأآا]/g, "ا")
+    .replace(/ى/g, "ي")
+    .replace(/ة/g, "ه")
+    .replace(/[^\p{L}\p{N}\s@._+-]/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+function projectSearchHaystack(p) {
+  const pr = normalizeProject(p || {});
+  const stageLabel = getProjectStageLabel(pr, pr.status);
+  const parts = [
+    pr.name, pr.client, pr.currency, pr.price,
+    pr.startDate, pr.deliveryDate, pr.quoteSentDate,
+    stageLabel,
+    pr.quote?.projectName, pr.quote?.clientName, pr.quote?.clientPhone, pr.quote?.clientEmail,
+    pr.quote?.projectActivity, pr.quote?.projectLocation, pr.quote?.projectArea,
+    pr.contract?.client, pr.contract?.projectName, pr.contract?.projectLocation,
+    ...(pr.payments || []).map(x => `${x.label || ""} ${x.amount || ""} ${x.date || ""}`)
+  ];
+  return normalizeSearchText(parts.filter(Boolean).join(" "));
+}
+function setProjectSearch(value) {
+  projectSearch = value || "";
+  const btn = document.getElementById("search-clear-btn");
+  if (btn) btn.classList.toggle("show", !!projectSearch.trim());
+  render();
+}
+function clearProjectSearch() {
+  projectSearch = "";
+  const inp = document.getElementById("project-search");
+  if (inp) inp.value = "";
+  const btn = document.getElementById("search-clear-btn");
+  if (btn) btn.classList.remove("show");
+  render();
+}
+
 function getFilteredProjects() {
   const projects = window._projects || [];
+  const query = normalizeSearchText(projectSearch);
   let filtered = projects.filter(p => {
-    if (currentTab === "all") return true;
-    if (currentTab === "under_review") return !!p.activeReview || p.status === "client_review";
-    if (currentTab === "pending_approval") return p.status === "pending_approval";
-    if (currentTab === "completed") return p.status === "completed";
-    if (currentTab === "active") return p.status !== "completed" && p.status !== "pending_approval";
-    return true;
+    const pr = normalizeProject(p);
+    const matchesTab =
+      currentTab === "all" ||
+      (currentTab === "under_review" && (!!pr.activeReview || pr.status === "client_review")) ||
+      (currentTab === "pending_approval" && pr.status === "pending_approval") ||
+      (currentTab === "completed" && pr.status === "completed") ||
+      (currentTab === "active" && pr.status !== "completed" && pr.status !== "pending_approval");
+    if (!matchesTab) return false;
+    if (!query) return true;
+    return projectSearchHaystack(pr).includes(query);
   });
   return [...filtered].sort((a, b) => {
+    if (query) {
+      const qa = normalizeSearchText(a.name).startsWith(query) ? 0 : 1;
+      const qb = normalizeSearchText(b.name).startsWith(query) ? 0 : 1;
+      if (qa !== qb) return qa - qb;
+    }
     if (currentTab === "all") {
       const pa = statusPriority(a.status), pb = statusPriority(b.status);
       if (pa !== pb) return pa - pb;
@@ -3100,8 +3233,17 @@ function render() {
 
   const filtered = getFilteredProjects();
   const list = document.getElementById("list");
+  const hint = document.getElementById("search-result-hint");
+  if (hint) {
+    const q = projectSearch.trim();
+    hint.style.display = q ? "block" : "none";
+    hint.textContent = q ? `نتائج البحث: ${filtered.length}` : "";
+  }
   if (!filtered.length) {
-    list.innerHTML = `<div class="empty"><div class="empty-icon">🗂️</div><div class="empty-title">لا توجد مشاريع</div><div class="empty-sub">اضغط + لإضافة مشروع جديد</div></div>`;
+    const searching = projectSearch.trim();
+    list.innerHTML = searching
+      ? `<div class="empty"><div class="empty-icon">🔍</div><div class="empty-title">لا توجد نتائج</div><div class="empty-sub">جرّب البحث باسم المشروع أو العميل أو امسح البحث</div></div>`
+      : `<div class="empty"><div class="empty-icon">🗂️</div><div class="empty-title">لا توجد مشاريع</div><div class="empty-sub">اضغط + لإضافة مشروع جديد</div></div>`;
     return;
   }
 
