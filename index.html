@@ -2308,31 +2308,23 @@ function calcToggleSurvey(){
 }
 function calcResetPcts(){calcInitPcts();if(calcSurveyOn){calcItemPct[CALC_SURVEY.id]=2;const f=(100-2)/100;CALC_BASE.interior.forEach(d=>{calcItemPct[d.id]=Math.round(d.pct*f*10)/10;});}calcRender();}
 function calcUpdatePct(id,newVal,typeKey){
-  // Live typing: just store the raw value and update amounts WITHOUT rebuilding inputs (keeps focus)
+  // Live typing: store raw value, update ONLY the amount cells (no innerHTML rebuild = no lost focus)
   const parsed=parseFloat(newVal);
   calcItemPct[id]= isNaN(parsed) ? 0 : Math.min(100,Math.max(0,parsed));
   calcUpdateAmountsOnly(typeKey);
 }
-function calcBalancePct(id,typeKey){
-  // Runs on blur: redistributes remaining % across other items, then does a full re-render
-  const items=calcItemsFor(typeKey),others=items.filter(d=>d.id!==id);
+function calcBalancePct(typeKey){
+  // Runs once when leaving the field: redistributes so the group sums to 100%, then fully re-renders
+  const items=calcItemsFor(typeKey);
   const sum=items.reduce((s,d)=>s+(calcItemPct[d.id]??d.pct),0);
-  let diff=Math.round((100-sum)*10)/10;
-  if(diff!==0&&others.length){
-    const totalOthers=others.reduce((s,d)=>s+calcItemPct[d.id],0);
-    if(totalOthers>0){
-      const weights=others.map(d=>calcItemPct[d.id]/totalOthers);
-      others.forEach((d,i)=>{calcItemPct[d.id]=Math.max(0,Math.round((calcItemPct[d.id]+diff*weights[i])*10)/10);});
-      const sum2=items.reduce((s,d)=>s+calcItemPct[d.id],0),diff2=Math.round((100-sum2)*10)/10;
-      if(diff2!==0){const biggest=others.reduce((a,b)=>calcItemPct[a.id]>calcItemPct[b.id]?a:b);calcItemPct[biggest.id]=Math.round((calcItemPct[biggest.id]+diff2)*10)/10;}
-    } else {
-      calcItemPct[others[0].id]=Math.max(0,Math.round((calcItemPct[others[0].id]+diff)*10)/10);
-    }
+  const diff=Math.round((100-sum)*10)/10;
+  if(diff!==0 && items.length){
+    const biggest=items.reduce((a,b)=>(calcItemPct[a.id]??0)>(calcItemPct[b.id]??0)?a:b);
+    calcItemPct[biggest.id]=Math.max(0,Math.round(((calcItemPct[biggest.id]??0)+diff)*10)/10);
   }
   calcRender();
 }
 function calcUpdateAmountsOnly(typeKey){
-  // Updates only the amount cells + grand total, without touching the % inputs (preserves focus/cursor)
   const bud=calcBudgets[typeKey]||0;
   document.querySelectorAll(`.calc-amt-cell[data-type="${typeKey}"]`).forEach(cell=>{
     const id=cell.dataset.id;
@@ -2368,7 +2360,7 @@ function calcRender(){
   activeTypes.forEach(t=>{
     const info=CALC_TYPE_INFO[t],items=calcItemsFor(t),bud=calcBudgets[t]||0;
     if(multi)html+=`<tr class="calc-grp-sep"><td colspan="3">${info.label} — ${fmtN(bud)} ر.س</td></tr>`;
-    items.forEach(d=>{const pct=calcItemPct[d.id]??d.pct,amt=Math.round(bud*pct/100/100)*100;html+=`<tr><td>${d.isSurvey?'📐 ':''}${d.label}</td><td style="text-align:center"><div class="calc-pct-wrap"><input type="number" min="0" max="100" step="0.5" value="${pct}" oninput="calcUpdatePct('${d.id}',this.value,'${t}')" onblur="calcBalancePct('${d.id}','${t}')" onfocus="this.select()"><span>%</span></div></td><td class="col-amt calc-amt-cell" data-id="${d.id}" data-type="${t}" style="text-align:left">${fmtN(amt)} ر.س</td></tr>`;});
+    items.forEach(d=>{const pct=calcItemPct[d.id]??d.pct,amt=Math.round(bud*pct/100/100)*100;html+=`<tr><td>${d.isSurvey?'📐 ':''}${d.label}</td><td style="text-align:center"><div class="calc-pct-wrap"><input type="number" min="0" max="100" step="0.5" value="${pct}" oninput="calcUpdatePct('${d.id}',this.value,'${t}')" onblur="calcBalancePct('${t}')"><span>%</span></div></td><td class="col-amt calc-amt-cell" data-id="${d.id}" data-type="${t}" style="text-align:left">${fmtN(amt)} ر.س</td></tr>`;});
     const sum=items.reduce((s,d)=>s+(calcItemPct[d.id]??d.pct),0);
     if(Math.round(sum*10)/10!==100)html+=`<tr><td colspan="3" style="font-size:11px;color:#c0392b;background:#fdecea;padding:5px 10px">⚠ المجموع ${Math.round(sum*10)/10}% — يجب أن يساوي 100%</td></tr>`;
   });
